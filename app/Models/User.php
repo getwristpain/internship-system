@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -43,5 +44,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the role associated with the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the student associated with the user.
+     */
+    public function student()
+    {
+        return $this->belongsTo(Users\Student::class);
+    }
+
+    /**
+     * Get the teacher associated with the user.
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(Users\Teacher::class);
     }
 }
