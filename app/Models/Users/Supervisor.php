@@ -3,6 +3,7 @@
 namespace App\Models\Users;
 
 use App\Models\Company;
+use App\Models\Internship;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,5 +31,10 @@ class Supervisor extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function internships()
+    {
+        return $this->belongsToMany(Internship::class, 'internship_supervisor');
     }
 }
