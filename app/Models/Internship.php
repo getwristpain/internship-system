@@ -41,4 +41,14 @@ class Internship extends Model
     {
         return $this->belongsToMany(Users\Supervisor::class, 'internship_supervisor');
     }
+
+    public function progress()
+    {
+        return $this->hasMany(Progress::class);
+    }
+
+    public function testimonies()
+    {
+        return $this->hasMany(Testimony::class);
+    }
 }

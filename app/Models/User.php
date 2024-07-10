@@ -47,6 +47,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the log associated with the user.
+     */
+    public function logs()
+    {
+        return $this->hasMany(Log::class);
+    }
+
+    /**
      * Get the role associated with the user.
      */
     public function role()
@@ -68,5 +76,15 @@ class User extends Authenticatable
     public function teacher()
     {
         return $this->belongsTo(Users\Teacher::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    public function testimonies()
+    {
+        return $this->hasMany(Testimony::class);
     }
 }

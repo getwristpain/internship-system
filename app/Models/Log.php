@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Stage extends Model
+class Log extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'user_id',
         'description',
-        'order',
+        'activity_type',
+        'scope',
     ];
 
-    public function progress()
+    public function user()
     {
-        return $this->hasMany(Progress::class);
+        return $this->belongsTo(User::class);
     }
 }

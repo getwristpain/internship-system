@@ -21,4 +21,14 @@ class Program extends Model
     {
         return $this->hasMany(Internship::class);
     }
+
+    public function progress()
+    {
+        return $this->hasMany(Progress::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }
