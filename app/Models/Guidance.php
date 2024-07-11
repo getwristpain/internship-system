@@ -5,27 +5,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class Guidance extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'student_id',
         'internship_id',
-        'attendance_date',
-        'status',
+        'content',
         'remark',
-        'approved_by_supervisor',
         'approved_by_teacher',
+        'approved_by_supervisor',
     ];
 
     public function student()
     {
-        return $this->belongsTo(Users\Student::class, 'student_id');
+        return $this->belongsTo(User::class, 'student_id');
     }
 
     public function internship()
     {
-        return $this->belongsTo(Internship::class);
+        return $this->belongsTo(Program::class, 'internship_id');
     }
 }

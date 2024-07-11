@@ -2,7 +2,10 @@
 
 namespace App\Models\Users;
 
+use App\Models\Attendance;
+use App\Models\Guidance;
 use App\Models\Internship;
+use App\Models\Journal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,5 +39,20 @@ class Student extends Model
     public function internships()
     {
         return $this->belongsToMany(Internship::class, 'internship_student');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function journals()
+    {
+        return $this->hasMany(Journal::class);
+    }
+
+    public function guidances()
+    {
+        return $this->hasMany(Guidance::class);
     }
 }

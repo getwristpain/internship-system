@@ -12,7 +12,10 @@ class Internship extends Model
     protected $fillable = [
         'program_id',
         'company_id',
+        'location',
         'quota',
+        'description',
+        'requirements',
         'registration_start',
         'registration_end',
     ];
@@ -42,13 +45,23 @@ class Internship extends Model
         return $this->belongsToMany(Users\Supervisor::class, 'internship_supervisor');
     }
 
+    public function testimonies()
+    {
+        return $this->hasMany(Testimony::class);
+    }
+
     public function progress()
     {
         return $this->hasMany(Progress::class);
     }
 
-    public function testimonies()
+    public function attendances()
     {
-        return $this->hasMany(Testimony::class);
+        return $this->hasMany(Attendance::class);
     }
+
+    public function guidances()
+{
+    return $this->hasMany(Guidance::class);
+}
 }

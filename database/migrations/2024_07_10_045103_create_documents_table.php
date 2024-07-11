@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('type');
             $table->string('path');
+            $table->boolean('verified_status')->default(false);
+            $table->date('verified_at')->nullable();
+            $table->foreignId('verified_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

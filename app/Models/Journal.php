@@ -5,23 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class Journal extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'student_id',
         'internship_id',
-        'attendance_date',
-        'status',
+        'journal_date',
+        'competencies',
+        'topics',
+        'character_values',
         'remark',
-        'approved_by_supervisor',
         'approved_by_teacher',
+        'approved_by_supervisor',
     ];
 
     public function student()
     {
-        return $this->belongsTo(Users\Student::class, 'student_id');
+        return $this->belongsTo(Users\Student::class);
     }
 
     public function internship()

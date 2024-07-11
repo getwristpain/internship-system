@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('program_id')->constrained('programs')->onDelete('cascade');
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->integer('location');
             $table->integer('quota');
+            $table->integer('description');
+            $table->integer('requirements');
             $table->date('registration_start')->nullable();
             $table->date('registration_end')->nullable();
             $table->timestamps();

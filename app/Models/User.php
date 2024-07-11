@@ -47,19 +47,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the log associated with the user.
-     */
-    public function logs()
-    {
-        return $this->hasMany(Log::class);
-    }
-
-    /**
      * Get the role associated with the user.
      */
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Get the log associated with the user.
+     */
+    public function logs()
+    {
+        return $this->hasMany(Log::class);
     }
 
     /**

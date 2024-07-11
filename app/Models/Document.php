@@ -16,6 +16,9 @@ class Document extends Model
         'description',
         'type',
         'path',
+        'verified_status',
+        'verified_by',
+        'verified_at',
     ];
 
     public function program()
@@ -26,5 +29,10 @@ class Document extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }
