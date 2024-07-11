@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class DeliveryReceipt extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'internship_id',
+        'file_path',
+        'file_upload',
+        'type',
+        'verified_status',
+        'verified_by_teacher',
+    ];
 }

@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('delivery_receipts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('internship_id')->constrained('internships')->onDelete('cascade');
+            $table->string('file_path');
+            $table->string('file_upload');
+            $table->string('type');
+            $table->string('verified_status')->nullable();
+            $table->bolean('verified_by_teacher')->default(false);
             $table->timestamps();
         });
     }

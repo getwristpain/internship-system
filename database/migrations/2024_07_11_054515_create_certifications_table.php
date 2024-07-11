@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('certifications', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
+            $table->foreignId('internship_id')->constrained('internships')->onDelete('cascade');
+            $table->foreignId('report_id')->constrained('internship_reports')->onDelete('cascade');
+            $table->string('file_path');
+            $table->string('verified_status')->nullable();
+            $table->bolean('verified_by_teacher')->default(false);
             $table->timestamps();
         });
     }
