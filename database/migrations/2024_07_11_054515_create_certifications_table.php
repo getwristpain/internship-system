@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('report_id')->constrained('internship_reports')->onDelete('cascade');
             $table->string('file_path');
             $table->string('verified_status')->nullable();
-            $table->bolean('verified_by_teacher')->default(false);
+            $table->boolean('verified_by_teacher')->default(false);
             $table->timestamps();
         });
     }

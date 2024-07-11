@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('file_upload');
             $table->string('type');
             $table->string('verified_status')->nullable();
-            $table->bolean('verified_by_teacher')->default(false);
+            $table->boolean('verified_by_teacher')->default(false);
             $table->timestamps();
         });
     }

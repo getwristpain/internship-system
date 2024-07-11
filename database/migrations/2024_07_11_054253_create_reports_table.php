@@ -16,9 +16,8 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('program_id')->constrained()->onDelete('cascade');
             $table->foreignId('internship_id')->constrained('internships')->onDelete('cascade');
-            $table->bolean('verified_by_teacher')->default(false);
             $table->string('file_path');
-            $table->decimal('final_grade', 5, 2)->nullable();
+            $table->decimal('final_grade', 3, 2)->nullable();
             $table->boolean('graduation_status')->default(false);
             $table->timestamps();
         });

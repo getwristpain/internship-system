@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->foreignId('internship_id')->constrained('internships')->onDelete('cascade');
-            $table->number('score');
+            $table->decimal('score', 3, 2);
             $table->text('remark')->nullable();
             $table->timestamps();
         });
@@ -33,6 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('assessment_aspect');
         Schema::dropIfExists('assessments');
     }
 };
