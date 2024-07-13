@@ -1,4 +1,4 @@
-name: smpkl-dev
+name: smpkl-test
 
 on:
   push:

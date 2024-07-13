@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('competencies');
             $table->text('topics');
             $table->text('character_values');
+            $table->string('photo');
             $table->text('remark')->nullable();
             $table->boolean('approved_by_teacher')->default(false);
             $table->boolean('approved_by_supervisor')->default(false);

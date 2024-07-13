@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
-{
+new
+#[Layout('layouts.guest')]
+
+class extends Component {
     public LoginForm $form;
 
     /**
@@ -24,48 +26,72 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
+<div class="flex flex-col gap-5 p-4 py-10 items-center justify-between h-screen sm max-w-sm self-center">
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="w-full mb-4" :status="session('status')" />
 
-    <form wire:submit="login">
+    <!-- Login Heading -->
+    <div class="flex flex-col gap-2 text-center my-5 w-full">
+        <h1 class="font-heading text-xl">Hello, again!</h1>
+        <p>Masuk untuk melanjutkan perjalanan magangmu.</p>
+    </div>
+
+    {{-- Login Form --}}
+    <form wire:submit="login" class="flex flex-col gap-5 w-full">
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
+            <x-text-input wire:model="form.email" id="email" class="block w-full" type="email" name="email"
+                placeholder="Email" autocomplete="username" required autofocus />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <div class="">
+            <x-text-input wire:model="form.password" id="password" class="block w-full" type="password"
+                name="password" placeholder="Password" required autocomplete="current-password" />
 
             <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
         </div>
 
         <!-- Remember Me -->
-        <div class="block mt-4">
+        <div class="">
             <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+                <input wire:model="form.remember" id="remember" type="checkbox"
+                    class="rounded bg-gray-200 focus:text-gray-800 focus:ring-1 focus:ring-gray-800"
+                    name="remember">
+                <span class="ms-2 text-sm">{{ __('Ingat saya') }}</span>
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
+        <div class="">
+            <x-primary-button class="w-full">
+                {{ __('Masuk') }}
             </x-primary-button>
         </div>
+
+        <div class="w-full text-center">
+            <span>
+                atau
+            </span>
+        </div>
+
+        <div>
+            <x-secondary-button onclick="window.location='{{ route('login.company') }}'" class="w-full">
+                {{ __('Masuk Sebagai Perusahaan') }}
+            </x-secondary-button>
+        </div>
     </form>
+
+    <div class="w-full justify-center text-center flex flex-col">
+        @if (Route::has('password.request'))
+            <a class="underline" href="{{ route('password.request') }}" wire:navigate>
+                {{ __('Lupa password?') }}
+            </a>
+        @endif
+
+        <span>
+            Belum punya akun? <a class="underline" href="{{ route('register') }}" wire:navigate>
+            {{ __('Daftar di sini.') }} </a>
+        </span>
+    </div>
 </div>

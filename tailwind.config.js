@@ -14,7 +14,10 @@ export default {
             fontFamily: {
                 sans: [
                     "Inter",
-                    "Merriweather",
+                    ...defaultTheme.fontFamily.sans,
+                ],
+                heading: [
+                    "Paytone One",
                     ...defaultTheme.fontFamily.sans,
                 ],
             },
