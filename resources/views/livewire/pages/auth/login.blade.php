@@ -41,7 +41,7 @@ class extends Component {
         <!-- Email Address -->
         <div>
             <x-text-input wire:model="form.email" id="email" class="block w-full" type="email" name="email"
-                placeholder="Email" autocomplete="username" required autofocus />
+                placeholder="Email" autocomplete="email" required autofocus />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
