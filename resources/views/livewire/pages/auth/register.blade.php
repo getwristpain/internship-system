@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-5 p-4 py-10 items-center justify-center h-screen sm max-w-md self-center">
+<div class="flex flex-col gap-5 p-4 py-10 items-center justify-center h-screen w-full max-w-md self-center">
 
     <!-- Register Heading -->
     <div class="flex flex-col gap-2 text-center my-5 w-full">
@@ -79,7 +79,7 @@ new #[Layout('layouts.guest')] class extends Component {
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div>
+        <div class="flex w-full justify-center">
             <x-primary-button class="w-full">
                 {{ __('Daftar') }}
             </x-primary-button>

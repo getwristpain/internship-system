@@ -26,7 +26,7 @@ class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-5 p-4 py-10 items-center justify-between h-screen sm max-w-sm self-center">
+<div class="flex flex-col gap-5 p-4 py-10 items-center justify-between h-screen w-full max-w-md self-center">
     <!-- Session Status -->
     <x-auth-session-status class="w-full mb-4" :status="session('status')" />
 

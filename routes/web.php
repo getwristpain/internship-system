@@ -1,8 +1,13 @@
 <?php
 
+use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'dashboard')
+// Volt::route('/reset', 'pages.auth.reset');
+
+Route::redirect('/', '/dashboard', 301);
+
+Route::view('/dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -11,3 +16,4 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 require __DIR__.'/auth.php';
+require __DIR__.'/internships/student.php';
