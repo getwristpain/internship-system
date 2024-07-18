@@ -12,20 +12,29 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @livewireStyles
 </head>
 
 <body>
-    <div class="flex gap-5">
+    <div class="flex w-full min-h-screen">
         <!-- Page Sidebar -->
-        @livewire('layouts.navigation')
+        @livewire('components.sidebar')
 
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
+        <div class="flex flex-col w-full">
+            <!-- Page Sidebar -->
+            @livewire('components.navbar')
+
+            <!-- Page Content -->
+            <main {{$attributes->merge(['class' => 'grid grid-cols-12 p-4'])}}>
+                {{ $slot }}
+            </main>
+        </div>
     </div>
 
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+
+    @livewireScripts
 </body>
 
 </html>

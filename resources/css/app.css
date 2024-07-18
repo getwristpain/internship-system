@@ -5,5 +5,9 @@
 @tailwind utilities;
 
 body {
-    @apply font-sans font-light text-sm antialiased w-screen overflow-x-hidden text-gray-800;
+    @apply font-sans font-light text-sm antialiased w-screen overflow-x-hidden text-gray-950;
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }

@@ -1,11 +1,34 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+<?php
 
-    <div class="w-full">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil numquam, illum quis qui beatae iusto dolorem omnis, nulla magnam magni dolorum quam? Adipisci doloribus porro perspiciatis omnis modi sequi distinctio!
-    </div>
+use Livewire\Volt\Component;
+
+new class extends Component {
+    public $role;
+
+    public function mount()
+    {
+        $this->role = auth()->user()->role->name;
+    }
+}; ?>
+
+@volt
+
+<x-app-layout class="divide-x">
+    <x-card class="col-span-4">
+        <x-slot name="heading">
+            Profil Pengguna
+        </x-slot>
+    </x-card>
+    <x-card class="col-span-4">
+        <x-slot name="heading">
+            Profil Pengguna
+        </x-slot>
+    </x-card>
+    <x-card class="col-span-4">
+        <x-slot name="heading">
+            Profil Pengguna
+        </x-slot>
+    </x-card>
 </x-app-layout>
+
+@endvolt
