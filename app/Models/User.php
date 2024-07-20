@@ -84,27 +84,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the profile associated with the user.
+     */
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class);
+    }
+
+    /**
      * Get the log associated with the user.
      */
     public function logs()
     {
         return $this->hasMany(Log::class);
-    }
-
-    /**
-     * Get the student associated with the user.
-     */
-    public function student()
-    {
-        return $this->belongsTo(Users\Student::class);
-    }
-
-    /**
-     * Get the teacher associated with the user.
-     */
-    public function teacher()
-    {
-        return $this->belongsTo(Users\Teacher::class);
     }
 
     public function documents()

@@ -28,7 +28,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="sticky top-0 left-0 h-screen bg-white">
+<aside class="sticky top-0 left-0 h-screen bg-white border-r">
     <div class="flex flex-col justify-between gap-4 h-full px-2 py-4 {{ $open ? 'w-52' : 'w-fit' }}">
         <div class="">
             <div class="flex gap-2 items-center mb-12">
@@ -50,4 +50,4 @@ new class extends Component {
             </div>
         </div>
     </div>
-</div>
+</aside>
