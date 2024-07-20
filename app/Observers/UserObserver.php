@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\User;
 use App\Models\Profile;
+use Laravolt\Avatar\Facade as Avatar;
 
 class UserObserver
 {
@@ -14,6 +15,7 @@ class UserObserver
     {
         Profile::create([
             'user_id' => $user->id,
+            'avatar' => Avatar::create($user->name)->toBase64(),
         ]);
     }
 

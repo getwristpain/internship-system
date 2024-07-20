@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class UserTestSeeder extends Seeder
+class UsersTestSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,7 +19,7 @@ class UserTestSeeder extends Seeder
         $users = [
             [
                 'name' => 'Administrator',
-                'email' => 'test@admin.com',
+                'email' => 'admin@test.com',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Administrator',
@@ -27,17 +27,8 @@ class UserTestSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Department Staff',
-                'email' => 'test@department.com',
-                'password' => 'password',
-                'role' => [
-                    'name' => 'Staf Jurusan',
-                    'slug' => 'department-staff',
-                ],
-            ],
-            [
                 'name' => 'Student Test',
-                'email' => 'test@student.com',
+                'email' => 'student@test.com',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Siswa',
@@ -46,7 +37,7 @@ class UserTestSeeder extends Seeder
             ],
             [
                 'name' => 'Teacher Test',
-                'email' => 'test@teacher.com',
+                'email' => 'teacher@test.com',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Guru',
@@ -55,23 +46,24 @@ class UserTestSeeder extends Seeder
             ],
         ];
 
-        collect($users)->map(function ($userData) {
-            $role = Role::firstOrCreate(
+        foreach ($users as $userData) {
+            // Create or get the role
+            $role = Role::updateOrCreate(
                 ['slug' => $userData['role']['slug']],
                 ['name' => $userData['role']['name']]
             );
 
-            $user = User::firstOrCreate(
+            // Create or update the user
+            $user = User::updateOrCreate(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
                     'password' => Hash::make($userData['password']),
-                    'role_id' => $role->id,
                 ]
             );
 
-            $user->role()->associate($role);
-            $user->save();
-        });
+            // Attach the role to the user through the pivot table
+            $user->roles()->attach($role->id);
+        }
     }
 }

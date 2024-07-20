@@ -35,7 +35,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id'
     ];
 
     /**
@@ -76,11 +75,22 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the role associated with the user.
+     * The roles that belong to the user.
      */
-    public function role()
+    public function roles()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+
+    /**
+     * Check if the user has a specific role.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        return $this->roles()->where('slug', $role)->exists();
     }
 
     /**
@@ -88,29 +98,6 @@ class User extends Authenticatable
      */
     public function profile()
     {
-        return $this->belongsTo(Profile::class);
-    }
-
-    /**
-     * Get the log associated with the user.
-     */
-    public function logs()
-    {
-        return $this->hasMany(Log::class);
-    }
-
-    public function documents()
-    {
-        return $this->hasMany(Document::class);
-    }
-
-    public function testimonies()
-    {
-        return $this->hasMany(Testimony::class);
-    }
-
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
+        return $this->hasOne(Profile::class);
     }
 }

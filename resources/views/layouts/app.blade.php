@@ -16,7 +16,7 @@
     @livewireStyles
 </head>
 
-<body>
+<body class="bg-gray-100">
     <div class="flex w-full min-h-screen">
         <!-- Page Sidebar -->
         @livewire('components.sidebar')
@@ -26,7 +26,7 @@
             @livewire('components.navbar')
 
             <!-- Page Content -->
-            <main {{$attributes->merge(['class' => 'grid grid-cols-12 p-4'])}}>
+            <main {{$attributes->merge(['class' => 'p-4'])}}>
                 {{ $slot }}
             </main>
         </div>

@@ -1,15 +1,11 @@
-<?php
-
-use Livewire\Volt\Component;
-
-new class extends Component {
-    //
-}; ?>
-
-<section {{ $attributes->merge(['class' => 'border-gray-300 p-4 bg-white']) }}>
+<section {{ $attributes->merge(['class' => 'w-full h-fit p-4 rounded-xl shadow-xl shadow-slate-200/50 bg-white']) }}>
+    {{-- Header --}}
     @if (isset($heading))
-        <h2 class="text-base font-bold text-left">{{ $heading }}</h2>
+        <h2 {{ $attributes->merge(['class' => 'font-heading text-base text-left text-gray-700 my-4']) }}>
+            {{ $heading }}
+        </h2>
     @endif
+
 
     {{ $slot }}
 </section>

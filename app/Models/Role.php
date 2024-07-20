@@ -16,20 +16,9 @@ class Role extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
         'slug',
+        'name',
     ];
-
-    /**
-     * Get the "name" attribute and apply the "studly" method from the Str class.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    public function getNameAttribute($value)
-    {
-        return $this->attributes['name'] = Str::studly($value);
-    }
 
     /**
      * Get the "slug" attribute value.
@@ -43,12 +32,21 @@ class Role extends Model
     }
 
     /**
-     * Define a one-to-many relationship with the User model.
+     * Get the "name" attribute and apply the "studly" method from the Str class.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @param  mixed  $value
+     * @return string
+     */
+    public function getNameAttribute($value)
+    {
+        return $this->attributes['name'] = Str::studly($value);
+    }
+
+    /**
+     * The users that belong to the role.
      */
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'role_user');
     }
 }

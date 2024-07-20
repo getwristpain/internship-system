@@ -3,28 +3,20 @@
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public $open = true;
-    public string $activeLink = '';
-    public $links = [
-        ['name' => 'Dashboard', 'route' => 'dashboard', 'icon' => 'mage:dashboard-2-fill', 'label' => 'Dashboard'],
-        ['name' => 'Registration', 'route' => 'registration', 'icon' => 'mage:file-check-fill', 'label' => 'Pendaftaran']];
+    public bool $open = false;
+
+    public array $helpLink = ['name' => 'Help', 'route' => 'help', 'icon' => 'mage:question-mark-circle-fill', 'label' => 'Pusat Bantuan'];
 
     protected $listeners = ['toggleSidebar'];
+
+    public function mount()
+    {
+        //
+    }
 
     public function toggleSidebar($open)
     {
         $this->open = $open;
-    }
-
-    public function mount()
-    {
-        // Set active link based on current route
-        foreach ($this->links as $link) {
-            if (request()->routeIs($link['route'])) {
-                $this->activeLink = $link['name'];
-                break;
-            }
-        }
     }
 }; ?>
 
@@ -36,18 +28,11 @@ new class extends Component {
                 <span class="font-bold {{ $open ? 'inline' : 'hidden' }}">SMK Negeri 2 Klaten</span>
             </div>
 
-            <nav class="w-full h-full overflow-y-scroll scrollbar-hidden flex flex-col gap-2 {{ !$open ? 'center-items' : '' }}">
-                @foreach ($links as $link)
-                    <livewire:components.sidebar.menu :link="$link" :activeLink="$activeLink" :key="$loop->index" />
-                @endforeach
-            </nav>
+            <livewire:components.sidebar.menu />
         </div>
 
-        <div>
-            <div class="flex gap-2 items-center">
-                <img class="h-8 w-auto square" src="{{ asset('img/smkn2klaten.png') }}" alt="Application Logo">
-                <span class="font-bold {{ $open ? 'inline' : 'hidden' }}">SMK Negeri 2 Klaten</span>
-            </div>
+        <div class="w-full flex flex-col gap-2 {{ !$open ? 'center-items' : '' }}">
+            <livewire:components.sidebar.link :link="$helpLink" />
         </div>
     </div>
 </aside>
