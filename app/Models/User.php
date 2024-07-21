@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -48,17 +50,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
      * Boot function from Laravel.
@@ -68,6 +67,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($model) {
+            // Ensure the model's key is set to a UUID if not already set
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Uuid::uuid4();
             }
@@ -75,9 +75,9 @@ class User extends Authenticatable
     }
 
     /**
-     * The roles that belong to the user.
+     * Get the roles for the user.
      */
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
@@ -85,18 +85,31 @@ class User extends Authenticatable
     /**
      * Check if the user has a specific role.
      *
-     * @param string $role
+     * @param  string  $role
      * @return bool
      */
-    public function hasRole($role)
+    public function hasRole(string $role): bool
     {
-        return $this->roles()->where('slug', $role)->exists();
+        return $this->roles->pluck('slug')->contains($role);
+    }
+
+    /**
+     * Check if the user has a specific permission.
+     *
+     * @param  string  $permission
+     * @return bool
+     */
+    public function hasPermission(string $permission): bool
+    {
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->pluck('action')->contains($permission);
     }
 
     /**
      * Get the profile associated with the user.
      */
-    public function profile()
+    public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
     }

@@ -17,15 +17,24 @@ new class extends Component {
 @volt
     <x-app-layout>
         @switch($userRole)
+            @case('owner' || 'admin' || 'department-staff')
+                <x-dashboard.admin :user="$user" :userRole="$userRole" />
+            @break
+
             @case('student')
                 <x-dashboard.student :user="$user" :userRole="$userRole" />
             @break
 
             @case('teacher')
-                teacher
+                <x-dashboard.teacher :user="$user" :userRole="$userRole" />
+            @break
+
+            @case('supervisor')
+                <x-dashboard.supervisor :user="$user" :userRole="$userRole" />
             @break
 
             @default
+                <p>Access Denied</p>
         @endswitch
     </x-app-layout>
 @endvolt

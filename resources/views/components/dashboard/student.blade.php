@@ -1,11 +1,3 @@
-<?php
-
-use Livewire\Volt\Component;
-
-new class extends Component {
-    //
-}; ?>
-
 <div class="grid grid-cols-12 gap-4">
     <x-card class="col-span-12 flex flex-col lg:items-center lg:flex-row gap-2 lg:divide-x">
         <div class="flex justify-center w-full lg:w-fit px-4">
@@ -54,8 +46,13 @@ new class extends Component {
     <x-card class="col-span-12 lg:col-span-4">
         <x-slot name="heading">Program Magang</x-slot>
 
-        <div>
-            <p>Kamu belum ikut program magang apapun.</p>
+        <div class="flex w-full justify-center items-center">
+            <div class="flex flex-col gap-4 justify-center items-center bg-slate-100 p-4 w-full min-h-40 rounded-xl">
+                <p>Kamu belum ikut program magang apapun.</p>
+                <x-secondary-button :href="route('registration')" wire:navigate>
+                    Daftar Magang
+                </x-secondary-button>
+            </div>
         </div>
     </x-card>
 </div>
