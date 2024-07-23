@@ -9,11 +9,6 @@ new class extends Component {
 
     protected $listeners = ['toggleSidebar'];
 
-    public function mount()
-    {
-        //
-    }
-
     public function toggleSidebar($open)
     {
         $this->open = $open;
@@ -24,7 +19,7 @@ new class extends Component {
     <div class="flex flex-col justify-between gap-4 h-full px-2 py-4 {{ $open ? 'w-52' : 'w-fit' }}">
         <div class="">
             <div class="flex gap-2 items-center mb-12">
-                <img class="h-8 w-auto square" src="{{ asset('img/smkn2klaten.png') }}" alt="Application Logo">
+                <img class="h-8 w-auto square" src="{{ asset('img/logo.png') }}" alt="Application Logo">
                 <span class="font-bold {{ $open ? 'inline' : 'hidden' }}">SMK Negeri 2 Klaten</span>
             </div>
 

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('telp')->nullable();
             $table->string('fax')->nullable();
             $table->string('contact_person')->nullable();
+            $table->string('logo')->nullable();
             $table->timestamps();
         });
     }

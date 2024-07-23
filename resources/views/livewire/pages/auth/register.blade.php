@@ -47,48 +47,52 @@ new #[Layout('layouts.guest')] class extends Component {
     <form wire:submit="register" class="flex flex-col gap-5 w-full">
         <!-- Name -->
         <div>
-            <x-text-input wire:model="name" class="w-full"
-                id="name" type="text" name="name" placeholder="Nama Lengkap"
-                required autofocus autocomplete="name" />
+            <x-text-input wire:model="name" class="w-full" id="name" type="text" name="name"
+                placeholder="Nama Lengkap" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
         <!-- Email Address -->
         <div>
-            <x-text-input wire:model="email" id="email" class="w-full"
-                type="email" name="email" placeholder="Email"
-                required autocomplete="username" />
+            <x-text-input wire:model="email" id="email" class="w-full" type="email" name="email"
+                placeholder="Email" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div>
-            <x-text-input wire:model="password" class="block w-full"
-                id="password" type="password" name="password" placeholder="Pasword"
-                required autocomplete="new-password" />
+            <x-text-input wire:model="password" class="block w-full" id="password" type="password" name="password"
+                placeholder="Pasword" required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <!-- Confirm Password -->
         <div>
-            <x-text-input wire:model="password_confirmation" class="block w-full"
-                id="password_confirmation" type="password" name="password_confirmation" placeholder="Konfirmasi Password"
-                required autocomplete="new-password" />
+            <x-text-input wire:model="password_confirmation" class="block w-full" id="password_confirmation"
+                type="password" name="password_confirmation" placeholder="Konfirmasi Password" required
+                autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
         <div class="flex w-full justify-center">
             <x-primary-button class="w-full">
-                {{ __('Daftar') }}
+                {{ __('Daftar Sebagai Siswa') }}
             </x-primary-button>
+        </div>
+
+        <div class="flex flex-col gap-4 w-full justify-center text-center">
+            <span>Atau</span>
+            <x-secondary-button>
+                Daftar Sebagai Guru
+            </x-secondary-button>
         </div>
     </form>
 
     <div class="my-5">
         <span>
-            Sudah punya akun? <a href="{{ route('login') }}" class="underline">Masuk sekarang.</a>
+            Sudah punya akun? <a href="{{ route('login') }}" class="underline" wire:navigate>Masuk sekarang.</a>
         </span>
     </div>
 </div>

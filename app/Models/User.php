@@ -94,19 +94,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if the user has a specific permission.
-     *
-     * @param  string  $permission
-     * @return bool
-     */
-    public function hasPermission(string $permission): bool
-    {
-        return $this->roles->flatMap(function ($role) {
-            return $role->permissions;
-        })->pluck('action')->contains($permission);
-    }
-
-    /**
      * Get the profile associated with the user.
      */
     public function profile(): HasOne

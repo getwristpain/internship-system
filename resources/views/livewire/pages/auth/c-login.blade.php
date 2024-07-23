@@ -17,7 +17,7 @@ class extends Component {
     <!-- Login Heading -->
     <div class="flex flex-col gap-2 text-center my-5 w-full">
         <h1 class="font-heading text-xl">Selamat Datang, Supervisor!</h1>
-        <p>Kamu butuh <span class="bg-gray-300 rounded-md font-medium" title="Klik Pusat Bantuan jika kamu tidak memilikinya.">kunci akses</span> untuk masuk.</p>
+        <p>Kamu butuh <span class="bg-gray-300 rounded-md font-medium">kunci akses</span> untuk masuk.</p>
     </div>
 
     {{-- Login Form --}}
@@ -51,9 +51,9 @@ class extends Component {
     </form>
 
     <div class="w-full justify-center text-center flex flex-col">
-        <span>
-            <a class="underline" href="{{ route('register') }}" wire:navigate>
+        {{-- <span>
+            <a class="underline" href="{{ route('help') }}" wire:navigate>
             {{ __('Pusat Bantuan') }} </a>
-        </span>
+        </span> --}}
     </div>
 </div>

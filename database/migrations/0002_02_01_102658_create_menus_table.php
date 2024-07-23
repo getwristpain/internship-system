@@ -16,7 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('icon');
             $table->string('route');
-            $table->foreignId('permission_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
+        });
+        Schema::create('menu_role', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('menu_id')->constrained();
+            $table->foreignId('role_id')->constrained();
             $table->timestamps();
         });
     }
@@ -26,6 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('menu_role');
         Schema::dropIfExists('menus');
     }
 };

@@ -13,7 +13,7 @@ new class extends Component
      */
     public function deleteUser(Logout $logout): void
     {
-        $this->validate([
+    $this->validate([
             'password' => ['required', 'string', 'current_password'],
         ]);
 

@@ -5,11 +5,15 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new
-#[Layout('layouts.guest')]
-
-class extends Component {
+new #[Layout('layouts.guest')] class extends Component {
     public LoginForm $form;
+    public string $background;
+    public array $features = [['heading' => 'Pengelolaan Data Magang Terpadu', 'body' => 'Semua data PKL dalam satu sistem untuk akses mudah dan cepat. Pastikan setiap informasi tersimpan rapi dan aman.', 'icon' => 'mage:chart-fill'], ['heading' => 'Pelacakan Progres Siswa', 'body' => 'Pantau perkembangan siswa secara real-time selama PKL. Dapatkan laporan lengkap untuk setiap tahap kegiatan.', 'icon' => 'mage:id-card-fill'], ['heading' => 'Kolaborasi Mudah', 'body' => 'Fasilitasi komunikasi antara siswa, guru pembimbing dan supervisi. Bagikan informasi dengan feedback yang cepat dan efisien.', 'icon' => 'mage:message-conversation-fill']];
+
+    public function mount()
+    {
+        $this->background = 'img/background.png';
+    }
 
     /**
      * Handle an incoming authentication request.
@@ -26,72 +30,83 @@ class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-5 p-4 py-10 items-center justify-between h-screen w-full max-w-md self-center">
-    <!-- Session Status -->
-    <x-auth-session-status class="w-full mb-4" :status="session('status')" />
-
-    <!-- Login Heading -->
-    <div class="flex flex-col gap-2 text-center my-5 w-full">
-        <h1 class="font-heading text-xl">Hello, again!</h1>
-        <p>Masuk untuk melanjutkan perjalanan magangmu.</p>
+<div class="w-full h-full flex justify-center items-center bg-cover bg-fixed bg-no-repeat"
+    style="background-image: url('{{ $background }}')">
+    <div class="w-1/2 h-full hidden lg:flex flex-col">
+        <div class="p-8 grow w-full">
+            <div
+                class="flex flex-col justify-center items-center w-full h-full bg-white/20 backdrop-blur-xl p-16 rounded-xl">
+                <div class="flex flex-col gap-4">
+                    @foreach ($features as $feature)
+                        <div class="flex items-center gap-8">
+                            <iconify-icon class="p-2 text-5xl bg-gray-100/10 text-gray-950 backdrop-blur-md rounded-xl"
+                                icon="{{ $feature['icon'] }}"></iconify-icon>
+                            <div class="flex flex-col gap-2">
+                                <span class="font-heading text-base">{{ $feature['heading'] }}</span>
+                                <p>{{ $feature['body'] }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-center items-center bg-white w-full p-8">
+            <x-btn-tertiary href="#">
+                <span class="text-red-500">Hubungi kami</span>&nbsp;untuk informasi lebih lanjut atau bantuan teknis.
+            </x-btn-tertiary>
+        </div>
     </div>
 
-    {{-- Login Form --}}
-    <form wire:submit="login" class="flex flex-col gap-5 w-full">
-        <!-- Email Address -->
-        <div>
-            <x-text-input wire:model="form.email" id="email" class="block w-full" type="email" name="email"
-                placeholder="Email" autocomplete="email" required autofocus />
-            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
+    <div class="flex flex-col w-full lg:w-1/2 h-full bg-white">
+        <div class="grow flex flex-col gap-6 justify-around items-center w-full mb-8 py-8 px-32">
+            <!-- Session Status -->
+            <x-auth-session-status class="w-full mb-4" :status="session('status')" />
+
+            <!-- Login Heading -->
+            <div class="flex flex-col gap-2 text-center my-5 w-full">
+                <h1 class="font-heading text-xl">Hello, again!</h1>
+                <p>Masuk untuk melanjutkan perjalanan magangmu.</p>
+            </div>
+
+            {{-- Login Form --}}
+            <form wire:submit="login" class="flex flex-col gap-4 w-full">
+                <!-- Email Address -->
+                <div>
+                    <x-input-text wire:model="form.email" id="email" type="email" name="email"
+                        placeholder="Email" autocomplete="email" required autofocus />
+                    <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
+                </div>
+
+                <!-- Password -->
+                <div class="">
+                    <x-input-text wire:model="form.password" id="password" type="password" name="password"
+                        placeholder="Password" required autocomplete="current-password" />
+
+                    <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+                </div>
+
+                <!-- Remember Me -->
+                <div class="">
+                    <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
+                </div>
+
+                <div class="flex justify-end items-center w-full mt-16">
+                    @if (Route::has('password.request'))
+                        <x-btn-tertiary href="{{ route('password.request') }}">
+                            {{ __('Lupa password?') }}
+                        </x-btn-tertiary>
+                    @endif
+                    <x-btn-primary>
+                        {{ __('Masuk') }}
+                    </x-btn-primary>
+                </div>
+            </form>
         </div>
 
-        <!-- Password -->
-        <div class="">
-            <x-text-input wire:model="form.password" id="password" class="block w-full" type="password"
-                name="password" placeholder="Password" required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+        <div class="bg-gray-200 w-full p-8">
+            <x-btn-tertiary href="{{ route('login.company') }}">
+                Masuk untuk&nbsp;<span class="text-red-500">Mitra Perusahaan</span>&nbsp;-->
+            </x-btn-tertiary>
         </div>
-
-        <!-- Remember Me -->
-        <div class="">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox"
-                    class="rounded bg-gray-200 focus:text-gray-800 focus:ring-1 focus:ring-gray-800"
-                    name="remember">
-                <span class="ms-2 text-sm">{{ __('Ingat saya') }}</span>
-            </label>
-        </div>
-
-        <div class="">
-            <x-primary-button class="w-full">
-                {{ __('Masuk') }}
-            </x-primary-button>
-        </div>
-
-        <div class="w-full text-center">
-            <span>
-                atau
-            </span>
-        </div>
-
-        <div>
-            <x-secondary-button onclick="window.location='{{ route('login.company') }}'" class="w-full">
-                {{ __('Masuk Sebagai Perusahaan') }}
-            </x-secondary-button>
-        </div>
-    </form>
-
-    <div class="w-full justify-center text-center flex flex-col">
-        @if (Route::has('password.request'))
-            <a class="underline" href="{{ route('password.request') }}" wire:navigate>
-                {{ __('Lupa password?') }}
-            </a>
-        @endif
-
-        <span>
-            Belum punya akun? <a class="underline" href="{{ route('register') }}" wire:navigate>
-            {{ __('Daftar di sini.') }} </a>
-        </span>
     </div>
 </div>
