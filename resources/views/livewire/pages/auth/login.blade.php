@@ -7,12 +7,14 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
     public LoginForm $form;
+
     public string $background;
+
     public array $features = [['heading' => 'Pengelolaan Data Magang Terpadu', 'body' => 'Semua data PKL dalam satu sistem untuk akses mudah dan cepat. Pastikan setiap informasi tersimpan rapi dan aman.', 'icon' => 'mage:chart-fill'], ['heading' => 'Pelacakan Progres Siswa', 'body' => 'Pantau perkembangan siswa secara real-time selama PKL. Dapatkan laporan lengkap untuk setiap tahap kegiatan.', 'icon' => 'mage:id-card-fill'], ['heading' => 'Kolaborasi Mudah', 'body' => 'Fasilitasi komunikasi antara siswa, guru pembimbing dan supervisi. Bagikan informasi dengan feedback yang cepat dan efisien.', 'icon' => 'mage:message-conversation-fill']];
 
     public function mount()
     {
-        $this->background = 'img/background.png';
+        $this->background = asset('img/background.png');
     }
 
     /**
@@ -20,8 +22,6 @@ new #[Layout('layouts.guest')] class extends Component {
      */
     public function login(): void
     {
-        $this->validate();
-
         $this->form->authenticate();
 
         Session::regenerate();
@@ -33,7 +33,7 @@ new #[Layout('layouts.guest')] class extends Component {
 <div class="w-full h-full flex justify-center items-center bg-cover bg-fixed bg-no-repeat"
     style="background-image: url('{{ $background }}')">
     <div class="w-1/2 h-full hidden lg:flex flex-col">
-        <div class="p-8 grow w-full">
+        <div class="p-4 grow w-full">
             <div
                 class="flex flex-col justify-center items-center w-full h-full bg-white/20 backdrop-blur-xl p-16 rounded-xl">
                 <div class="flex flex-col gap-4">
@@ -51,62 +51,66 @@ new #[Layout('layouts.guest')] class extends Component {
             </div>
         </div>
         <div class="flex justify-center items-center bg-white w-full p-8">
-            <x-btn-tertiary href="#">
-                <span class="text-red-500">Hubungi kami</span>&nbsp;untuk informasi lebih lanjut atau bantuan teknis.
-            </x-btn-tertiary>
+            <x-button-tertiary href="#">
+                <span class="text-red-600">Hubungi kami</span>&nbsp;untuk informasi lebih lanjut atau bantuan teknis.
+            </x-button-tertiary>
         </div>
     </div>
 
-    <div class="flex flex-col w-full lg:w-1/2 h-full bg-white">
-        <div class="grow flex flex-col gap-6 justify-around items-center w-full mb-8 py-8 px-32">
-            <!-- Session Status -->
-            <x-auth-session-status class="w-full mb-4" :status="session('status')" />
+    <div class="flex flex-col justify-center items-center w-full lg:w-1/2 h-full bg-white">
+        <div class="grow flex justify-center items-center w-full max-w-md">
+            <div class="flex flex-col gap-16">
+                <!-- Session Status -->
+                <x-auth-session-status class="w-full" :status="session('status')" />
 
-            <!-- Login Heading -->
-            <div class="flex flex-col gap-2 text-center my-5 w-full">
-                <h1 class="font-heading text-xl">Hello, again!</h1>
-                <p>Masuk untuk melanjutkan perjalanan magangmu.</p>
+                <!-- Login Heading -->
+                <div class="flex flex-col gap-2 text-center w-full">
+                    <h1 class="font-heading text-xl">Hello, again!</h1>
+                    <p>Masuk untuk melanjutkan perjalanan magangmu.</p>
+                </div>
+
+                <!-- Login Form -->
+                <form wire:submit="login" class="flex flex-col gap-16 w-full">
+                    <div class="flex flex-col gap-4 w-full">
+                        <!-- Email Address -->
+                        <div>
+                            <x-input-text type="email" name="email" model="form.email" label="Email" required
+                                autofocus />
+                            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="">
+                            <x-input-text type="password" name="password" model="form.password" label="Password"
+                                required />
+
+                            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="">
+                            <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end items-center w-full">
+                        @if (Route::has('password.request'))
+                            <x-button-tertiary href="{{ route('password.request') }}">
+                                {{ __('Lupa password?') }}
+                            </x-button-tertiary>
+                        @endif
+                        <x-button-primary>
+                            {{ __('Masuk') }}
+                        </x-button-primary>
+                    </div>
+                </form>
             </div>
-
-            {{-- Login Form --}}
-            <form wire:submit="login" class="flex flex-col gap-4 w-full">
-                <!-- Email Address -->
-                <div>
-                    <x-input-text wire:model="form.email" id="email" type="email" name="email"
-                        placeholder="Email" autocomplete="email" required autofocus />
-                    <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
-                </div>
-
-                <!-- Password -->
-                <div class="">
-                    <x-input-text wire:model="form.password" id="password" type="password" name="password"
-                        placeholder="Password" required autocomplete="current-password" />
-
-                    <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
-                </div>
-
-                <!-- Remember Me -->
-                <div class="">
-                    <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
-                </div>
-
-                <div class="flex justify-end items-center w-full mt-16">
-                    @if (Route::has('password.request'))
-                        <x-btn-tertiary href="{{ route('password.request') }}">
-                            {{ __('Lupa password?') }}
-                        </x-btn-tertiary>
-                    @endif
-                    <x-btn-primary>
-                        {{ __('Masuk') }}
-                    </x-btn-primary>
-                </div>
-            </form>
         </div>
 
         <div class="bg-gray-200 w-full p-8">
-            <x-btn-tertiary href="{{ route('login.company') }}">
-                Masuk untuk&nbsp;<span class="text-red-500">Mitra Perusahaan</span>&nbsp;-->
-            </x-btn-tertiary>
+            <x-button-tertiary href="{{ route('login.company') }}">
+                Masuk untuk&nbsp;<span class="text-red-600">Mitra Perusahaan</span>&nbsp;-->
+            </x-button-tertiary>
         </div>
     </div>
 </div>

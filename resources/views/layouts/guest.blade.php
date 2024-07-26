@@ -17,18 +17,18 @@
 </head>
 
 <body class="flex flex-col h-screen overflow-x-auto">
-    <header class="flex justify-between items-center px-8 py-4 w-full max-w-screen bg-white">
+    <header class="fixed lg:static flex justify-between items-center px-8 py-4 w-full max-w-screen bg-white">
         <x-brand />
         <nav class="flex gap-4 items-center">
             @switch(request()->route()->getName())
                 @case('login')
-                    <x-btn-tertiary>Belum punya akun?</x-btn-tertiary>
-                    <x-btn-secondary>Register</x-btn-secondary>
+                    <x-button-tertiary>Belum punya akun?</x-button-tertiary>
+                    <x-button-secondary href="{{ route('register') }}">Register</x-button-secondary>
                 @break
 
                 @case('register')
-                    <x-btn-tertiary>Sudah punya akun?</x-btn-tertiary>
-                    <x-btn-secondary>Login</x-btn-secondary>
+                    <x-button-tertiary>Sudah punya akun?</x-button-tertiary>
+                    <x-button-secondary href="{{ route('login') }}">Login</x-button-secondary>
                 @break
 
                 @default
@@ -36,7 +36,7 @@
         </nav>
     </header>
 
-    <main class="grow flex w-full h-full justify-center items-center">
+    <main class="grow w-full h-full pt-16 lg:pt-0">
         {{ $slot }}
     </main>
 

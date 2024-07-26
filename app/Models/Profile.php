@@ -37,8 +37,7 @@ class Profile extends Model
     {
         return Attribute::make(
             get: fn (?string $value) => $value
-                ? $value
-                : 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name),
+                ?? 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name),
         );
     }
 

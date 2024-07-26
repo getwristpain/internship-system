@@ -16,8 +16,25 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (Auth::check() && in_array(Auth::user()->roles->pluck('slug')->first(), $roles)) {
-            return $next($request);
+        $user = Auth::user();
+        if (!$user) {
+            abort(403, 'Unauthorized');
+        }
+
+        // Define the allowed roles for the author
+        $allowedRolesForAuthor = ['owner', 'admin', 'department-staff'];
+
+        // Check if the required role is 'author'
+        if (in_array('author', $roles)) {
+            // Ensure the user has one of the allowed roles for author
+            if (in_array($user->roles->pluck('slug')->first(), $allowedRolesForAuthor)) {
+                return $next($request);
+            }
+        } else {
+            // Check if the user has any of the specified roles
+            if (in_array($user->roles->pluck('slug')->first(), $roles)) {
+                return $next($request);
+            }
         }
 
         abort(403, 'Unauthorized');

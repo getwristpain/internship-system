@@ -19,7 +19,7 @@ class UsersSeeder extends Seeder
         $users = [
             [
                 'name' => 'Administrator',
-                'email' => 'admin@test.com',
+                'email' => 'test@admin.test',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Administrator',
@@ -28,7 +28,7 @@ class UsersSeeder extends Seeder
             ],
             [
                 'name' => 'Student Test',
-                'email' => 'student@test.com',
+                'email' => 'test@student.test',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Siswa',
@@ -37,7 +37,7 @@ class UsersSeeder extends Seeder
             ],
             [
                 'name' => 'Teacher Test',
-                'email' => 'teacher@test.com',
+                'email' => 'test@teacher.test',
                 'password' => 'password',
                 'role' => [
                     'name' => 'Guru',

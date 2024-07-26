@@ -33,34 +33,35 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-5 p-4 py-10 items-center justify-center h-screen sm max-w-sm self-center">
-    <div class="mb-4">
-        <h1 class="font-heading text-lg text-center">
-            {{ __('Lupa Password') }}
-        </h1>
-        <p>
-            Link reset password akan dikirim melalui email.
-        </p>
+<div class="w-full h-full flex justify-center items-center p-8 lg:pb-24">
+    <div class="flex flex-col gap-5 w-full max-w-sm">
+        <div class="mb-4 text-center">
+            <h1 class="font-heading text-lg text-center">
+                {{ __('Lupa Password') }}
+            </h1>
+            <p>
+                Link reset password akan dikirim melalui email.
+            </p>
+        </div>
+
+        <!-- Session Status -->
+        <x-auth-session-status class="mb-4" :status="session('status')" />
+
+        <form wire:submit="sendPasswordResetLink" class="flex flex-col gap-5 w-full">
+            <!-- Email Address -->
+            <div>
+                <x-input-text type="email" name="email" model="email" label="Email" required autofocus />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </div>
+
+            <div class="flex items-center self-center gap-4">
+                <x-button-primary>
+                    {{ __('Reset Password') }}
+                </x-button-primary>
+                <x-button-secondary onclick="window.history.back()">
+                    {{ __('Batal') }}
+                </x-button-secondary>
+            </div>
+        </form>
     </div>
-
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form wire:submit="sendPasswordResetLink" class="flex flex-col gap-5 w-full">
-        <!-- Email Address -->
-        <div>
-            <x-text-input wire:model="email" id="email" class="block w-full" type="email" name="email"
-                placeholder="Email" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center self-center gap-2">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-            <x-secondary-button onclick="window.history.back()">
-                {{__('Batal')}}
-            </x-secondary-button>
-        </div>
-    </form>
 </div>

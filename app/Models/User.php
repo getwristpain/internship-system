@@ -93,6 +93,11 @@ class User extends Authenticatable
         return $this->roles->pluck('slug')->contains($role);
     }
 
+    public function getRole(): string
+    {
+        return $this->roles->pluck('slug')->first();
+    }
+
     /**
      * Get the profile associated with the user.
      */
