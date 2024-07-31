@@ -16,7 +16,7 @@
     @livewireStyles()
 </head>
 
-<body class="flex flex-col h-screen overflow-x-auto">
+<body class="flex flex-col h-screen overflow-y-auto">
     <header class="fixed lg:static flex justify-between items-center px-8 py-4 w-full max-w-screen bg-white">
         <x-brand />
         <nav class="flex gap-4 items-center">

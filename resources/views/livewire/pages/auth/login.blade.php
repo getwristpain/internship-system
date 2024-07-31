@@ -74,21 +74,18 @@ new #[Layout('layouts.guest')] class extends Component {
                     <div class="flex flex-col gap-4 w-full">
                         <!-- Email Address -->
                         <div>
-                            <x-input-text type="email" name="email" model="form.email" label="Email" required
-                                autofocus />
-                            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
+                            <x-input-text type="email" name="email" model="form.email" label="Email"
+                                icon="mdi:email" required autofocus />
                         </div>
 
                         <!-- Password -->
                         <div class="">
                             <x-input-text type="password" name="password" model="form.password" label="Password"
-                                required />
-
-                            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+                                icon="mdi:password" required />
                         </div>
 
                         <!-- Remember Me -->
-                        <div class="">
+                        <div class="pt-4">
                             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
                         </div>
                     </div>

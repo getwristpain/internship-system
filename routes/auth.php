@@ -33,8 +33,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Volt::route('auth/u/step/three', 'pages.auth.register.step-profile')
-        ->name('register.profile');
     Volt::route('verify-email', 'pages.auth.verify-email')
         ->name('verification.notice');
 

@@ -21,11 +21,9 @@ new #[Layout('layouts.guest')] class extends Component {
         {{-- Login Form --}}
         <form wire:submit="login" class="flex flex-col gap-5 w-full">
             <!-- Password -->
-            <div class="">
-                <x-input-text type="text" name="access_key" model="form.access_key" label="Kunci Akses" required
-                    autofocus />
-
-                <x-input-error :messages="$errors->get('form.access_key')" class="mt-2" />
+            <div>
+                <x-input-text type="text" name="access_key" model="form.access_key" label="Kunci Akses"
+                    icon="mdi:password" required />
             </div>
 
             <!-- Remember Me -->
@@ -37,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 <x-button-primary class="w-full">
                     {{ __('Masuk') }}
                 </x-button-primary>
-                <x-button-secondary onclick="window.history.back()" class="w-full">
+                <x-button-secondary href="{{ route('login') }}" class="w-full">
                     {{ __('Kembali') }}
                 </x-button-secondary>
             </div>

@@ -1,29 +1,24 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+<?php
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-profile-information-form />
-                </div>
-            </div>
+use App\Models\User;
+use App\Models\School;
+use Livewire\Volt\Component;
+use Livewire\Attributes\Layout;
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.update-password-form />
-                </div>
-            </div>
+new #[Layout('layouts.app')] class extends Component {
+    public $user;
+    public $userRole;
+    public $school;
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+    public function mount()
+    {
+        $this->user = User::with('roles', 'profile')->find(auth()->id()) ?? abort(404, 'User not found');
+        $this->userRole = $this->user->roles->pluck('slug')->first();
+
+        $this->school = School::first();
+    }
+}; ?>
+
+<div>
+    <x-upload-avatar />
+</div>

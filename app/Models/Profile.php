@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravolt\Avatar\Avatar;
 
 class Profile extends Model
 {
@@ -36,8 +38,13 @@ class Profile extends Model
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value
-                ?? 'https://ui-avatars.com/api/?name=' . urlencode($this->user->name),
+            get: function (?string $value) {
+                $avatar = new Avatar();
+
+                return $value
+                    ? $value
+                    : $avatar->create($this->user->name)->toBase64();
+            }
         );
     }
 
@@ -45,7 +52,7 @@ class Profile extends Model
      * Summary of user
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

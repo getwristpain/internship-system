@@ -16,7 +16,7 @@ new #[Layout('layouts.guest')] class extends Component {
         $this->form->accountType = Session::get('account_type');
     }
 
-    public function nextStep()
+    public function submit()
     {
         $this->form->registerStepTwo();
     }
@@ -30,12 +30,12 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <!-- Register Form - Step 2 --->
-        <form wire:submit.prevent="nextStep" class="flex flex-col gap-16">
+        <form wire:submit.prevent="submit" class="flex flex-col gap-16">
             <!-- Form Input --->
             <div class="grid grid-cols-2 gap-12 w-full">
-                <x-input-text type="text" name="name" label="Nama" model="form.name" required autofocus />
-                <x-input-text type="password" name="password" model="form.password" label="Password" required />
+                <x-input-text type="text" name="name" label="Nama Lengkap" model="form.name" required autofocus />
                 <x-input-text type="email" name="email" label="Email" model="form.email" disabled />
+                <x-input-text type="password" name="password" model="form.password" label="Password" required />
                 <x-input-text type="password" name="password_confirmation" model="form.password_confirmation"
                     label="Konfirmasi Password" required />
             </div>

@@ -31,14 +31,13 @@ new #[Layout('layouts.guest')] class extends Component {
             </div>
 
             <!-- Login Form - Step 1 -->
-            <form wire:submit.prevent="register('student')" class="w-full flex flex-col gap-4">
+            <form wire:submit.prevent="register('student')" class="w-full flex flex-col gap-8">
                 <!-- Email Address -->
                 <div class="w-full">
                     <x-input-text type="email" name="email" model="form.email" label="Email" required autofocus />
-                    <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
                 </div>
-                <div class="w-full flex flex-col gap-4">
-                    <x-button-primary wire:click.prevent="register('student')" class="w-full">Buat Akun
+                <div class="w-full flex justify-center gap-4">
+                    <x-button-primary wire:click.prevent="register('student')">Buat Akun
                         Siswa</x-button-primary>
                     <x-button-secondary wire:click.prevent="register('teacher')">Buat Akun Guru</x-button-secondary>
                 </div>
