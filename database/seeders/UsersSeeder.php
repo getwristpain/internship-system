@@ -3,11 +3,11 @@
 namespace Database\Seeders;
 
 
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Spatie\Permission\Models\Role;
 
 class UsersSeeder extends Seeder
 {
@@ -21,36 +21,26 @@ class UsersSeeder extends Seeder
                 'name' => 'Administrator',
                 'email' => 'test@admin.test',
                 'password' => 'password',
-                'role' => [
-                    'name' => 'Administrator',
-                    'slug' => 'admin',
-                ],
+                'role' => 'Admin',
             ],
             [
                 'name' => 'Student Test',
                 'email' => 'test@student.test',
                 'password' => 'password',
-                'role' => [
-                    'name' => 'Siswa',
-                    'slug' => 'student',
-                ],
+                'role' => 'Student',
             ],
             [
                 'name' => 'Teacher Test',
                 'email' => 'test@teacher.test',
                 'password' => 'password',
-                'role' => [
-                    'name' => 'Guru',
-                    'slug' => 'teacher',
-                ],
+                'role' => 'Teacher',
             ],
         ];
 
         foreach ($users as $userData) {
             // Create or get the role
             $role = Role::updateOrCreate(
-                ['slug' => $userData['role']['slug']],
-                ['name' => $userData['role']['name']]
+                ['name' => $userData['role']]
             );
 
             // Create or update the user
@@ -62,8 +52,8 @@ class UsersSeeder extends Seeder
                 ]
             );
 
-            // Attach the role to the user through the pivot table
-            $user->roles()->attach($role->id);
+            // Assign the role to the user
+            $user->assignRole($role);
         }
     }
 }

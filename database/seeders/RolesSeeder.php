@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Spatie\Permission\Models\Role;
 
 class RolesSeeder extends Seeder
 {
@@ -16,35 +16,28 @@ class RolesSeeder extends Seeder
         $roles = [
             [
                 'name' => 'Owner',
-                'slug' => 'owner',
             ],
             [
-                'name' => 'Administrator',
-                'slug' => 'admin',
+                'name' => 'Admin',
             ],
             [
-                'name' => 'Staf Jurusan',
-                'slug' => 'department-staff',
+                'name' => 'Staff',
             ],
             [
-                'name' => 'Siswa',
-                'slug' => 'student',
+                'name' => 'Student',
             ],
             [
-                'name' => 'Guru',
-                'slug' => 'teacher',
+                'name' => 'Teacher',
             ],
             [
-                'name' => 'Supervisi',
-                'slug' => 'supervisor',
+                'name' => 'Supervisor',
             ],
         ];
 
-        collect($roles)->map(function ($role) {
-            return Role::firstOrCreate(
-                ['slug' => $role['slug']],
+        foreach ($roles as $role) {
+            Role::firstOrCreate(
                 ['name' => $role['name']]
             );
-        });
+        }
     }
 }

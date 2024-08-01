@@ -14,8 +14,14 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->string('name')->unique();
-            $table->string('head_of_department')->nullable();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+        Schema::create('department_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('department_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -14,10 +14,9 @@ class DBTestSeeder extends Seeder
     {
         $this->call([
             RolesSeeder::class,
-        ]);
-
-        $this->call([
             UsersSeeder::class,
+            SchoolSeeder::class,
+            DepartmentsSeeder::class,
         ]);
     }
 }

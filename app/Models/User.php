@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The "type" of the primary key ID.
@@ -75,34 +76,20 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the roles for the user.
-     */
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'role_user');
-    }
-
-    /**
-     * Check if the user has a specific role.
-     *
-     * @param  string  $role
-     * @return bool
-     */
-    public function hasRole(string $role): bool
-    {
-        return $this->roles->pluck('slug')->contains($role);
-    }
-
-    public function getRole(): string
-    {
-        return $this->roles->pluck('slug')->first();
-    }
-
-    /**
      * Get the profile associated with the user.
      */
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
+    }
+
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class);
+    }
+
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class);
     }
 }

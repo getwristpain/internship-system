@@ -49,7 +49,7 @@ class Profile extends Model
     }
 
     /**
-     * Summary of user
+     * User Profile with one-to-one Relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo

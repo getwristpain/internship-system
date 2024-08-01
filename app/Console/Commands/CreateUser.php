@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
+use App\Models\User;
+use Illuminate\Support\Str;
 
 class CreateUser extends Command
 {
@@ -55,32 +55,30 @@ class CreateUser extends Command
         $roles[] = 'Create new role';
         $roleName = $this->choice('Select a role for the user or create a new one', $roles);
 
-        switch ($roleName) {
-            case 'Create new role':
-                $roleName = $this->ask('Enter the name of the new role');
-                $roleName = Str::studly($roleName);
-                $roleSlug = Str::slug($roleName);
-                if (Role::where('slug', $roleSlug)->exists()) {
-                    $this->error('Role already exists. Please choose a different name.');
-                    return;
-                }
-                $role = Role::create(['name' => $roleName, 'slug' => $roleSlug]);
-                $this->info("New role created: {$roleName}");
-                break;
+        if ($roleName === 'Create new role') {
+            $roleName = $this->ask('Enter the name of the new role');
+            $roleName = Str::studly($roleName);
 
-            default:
-                $role = Role::where('name', $roleName)->first();
-                break;
+            if (Role::where('name', $roleName)->exists()) {
+                $this->error('Role already exists. Please choose a different name.');
+                return;
+            }
+
+            $role = Role::create(['name' => $roleName, 'guard_name' => 'web']);
+            $this->info("New role created: {$roleName}");
+        } else {
+            $role = Role::where('name', $roleName)->first();
         }
 
+        // Create the user
         $user = User::create([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
-            'role_id' => $role->id,
         ]);
 
-        $user->roles()->attach($role->id);
+        // Assign the role to the user
+        $user->assignRole($role->name);
 
         $this->info("User created successfully with the role: {$roleName}");
     }

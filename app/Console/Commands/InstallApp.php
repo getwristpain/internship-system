@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Role;
 use App\Models\User;
 use App\Models\School;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class InstallApp extends Command
 {
@@ -48,9 +48,6 @@ class InstallApp extends Command
         // Create owner (user)
         $this->createOwner();
 
-        // Create school
-        $this->createSchool();
-
         $this->info('Application installed successfully!');
         return 0;
     }
@@ -85,7 +82,7 @@ class InstallApp extends Command
             return;
         }
 
-        $role = Role::firstOrCreate(['name' => 'Owner', 'slug' => 'owner']);
+        $role = Role::firstOrCreate(['name' => 'Owner']);
         $this->info("Role ensured: {$role->name}");
 
         $user = User::create([
@@ -94,68 +91,11 @@ class InstallApp extends Command
             'password' => Hash::make($password),
         ]);
 
-        if ($user && $role) {
-            $user->roles()->attach($role->id);
+        if ($user) {
+            $user->assignRole($role);
             $this->info('Owner user created successfully!');
         } else {
-            $this->error('Error in creating user or role.');
+            $this->error('Error in creating user.');
         }
-    }
-
-    /**
-     * Create a school.
-     *
-     * @return void
-     */
-    protected function createSchool()
-    {
-        $this->info('Creating school...');
-
-        $name = $this->ask("What is the school's name? (required)");
-        $email = $this->ask("What is the school's email? (required)");
-        $principal_name = $this->ask("What is the principal's name? (required)");
-        $address = $this->ask("What is the school's address?");
-        $post_code = $this->ask("What is the school's post code?");
-        $telp = $this->ask("What is the school's telephone number?");
-        $fax = $this->ask("What is the school's fax number?");
-        $contact_person = $this->ask("Who is the contact person?");
-
-        $validator = Validator::make([
-            'name' => $name,
-            'email' => $email,
-            'principal_name' => $principal_name,
-            'address' => $address,
-            'post_code' => $post_code,
-            'telp' => $telp,
-            'fax' => $fax,
-            'contact_person' => $contact_person,
-        ], [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:schools'],
-            'principal_name' => ['required', 'string', 'max:255'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'post_code' => ['nullable', 'string', 'max:255'],
-            'telp' => ['nullable', 'string', 'max:255'],
-            'fax' => ['nullable', 'string', 'max:255'],
-            'contact_person' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        if ($validator->fails()) {
-            $this->error($validator->errors()->first());
-            return;
-        }
-
-        School::create([
-            'name' => $name,
-            'email' => $email,
-            'principal_name' => $principal_name,
-            'address' => $address ?: '',
-            'post_code' => $post_code ?: '',
-            'telp' => $telp ?: '',
-            'fax' => $fax ?: '',
-            'contact_person' => $contact_person ?: '',
-        ]);
-
-        $this->info('School created successfully!');
     }
 }

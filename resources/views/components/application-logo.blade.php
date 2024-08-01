@@ -1,8 +1,8 @@
 @props(['logo' => ''])
 
-<a wire:navigate href="{{ url('/') }}" {{ $attributes->merge(['class' => 'inline-block']) }}>
+<a href="{{ url('/') }}" {{ $attributes->merge(['class' => 'block']) }} wire:navigate>
     @if ($logo)
-        <img class="h-6 square" src="{{ $logo }}" alt="Logo">
+        <img class="square h-full" src="{{ $logo }}" alt="Logo">
     @else
         <x-no-image class="max-h-6" />
     @endif

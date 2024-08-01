@@ -90,7 +90,7 @@ new #[Layout('layouts.guest')] class extends Component {
                         </div>
                     </div>
 
-                    <div class="flex justify-end items-center w-full">
+                    <div class="flex gap-4 justify-end items-center w-full">
                         @if (Route::has('password.request'))
                             <x-button-tertiary href="{{ route('password.request') }}">
                                 {{ __('Lupa password?') }}

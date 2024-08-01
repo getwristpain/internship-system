@@ -16,8 +16,7 @@
     @livewireStyles
 </head>
 
-<body class="bg-slate-
-100">
+<body class="bg-slate-100">
     <div class="flex w-full min-h-screen">
         <!-- Page Sidebar -->
         @livewire('components.sidebar')

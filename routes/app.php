@@ -11,19 +11,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('profile');
 });
 
-Route::middleware(['auth', 'verified', 'role:owner,admin,department-staff'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Owner|Admin|Staff'])->group(function () {
     //
 });
 
-Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Student'])->group(function () {
     Volt::route('/registration', 'pages.internships.registration')
         ->name('registration');
 });
 
-Route::middleware(['auth', 'verified', 'role:teacher'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Teacher'])->group(function () {
     //
 });
 
-Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Supervisor'])->group(function () {
     //
 });
