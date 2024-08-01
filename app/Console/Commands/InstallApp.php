@@ -32,6 +32,9 @@ class InstallApp extends Command
     {
         $this->info('Starting application installation...');
 
+        // Run clearCache
+        $this->clearCache();
+
         // Run migrations
         $this->call('migrate:fresh', [
             '--force' => true
@@ -50,6 +53,27 @@ class InstallApp extends Command
 
         $this->info('Application installed successfully!');
         return 0;
+    }
+
+    protected function clearCache()
+    {
+        $this->info('Clearing all caches...');
+
+        // Clear application cache
+        $this->call('cache:clear');
+        $this->info('Application cache cleared.');
+
+        // Clear route cache
+        $this->call('route:clear');
+        $this->info('Route cache cleared.');
+
+        // Clear configuration cache
+        $this->call('config:clear');
+        $this->info('Configuration cache cleared.');
+
+        // Clear compiled views cache
+        $this->call('view:clear');
+        $this->info('View cache cleared.');
     }
 
     /**

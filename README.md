@@ -6,7 +6,7 @@ A Laravel-based web application for managing internship information systems (PKL
 
 ## Features
 
-- **User Management**: Roles include admin, department staff, student, teacher, supervisor.
+- **User Management**: Roles include admin, staff, student, teacher, supervisor.
 - **Assessment**: Evaluation system with aspects and indicators.
 - **Reporting**: Internship report management with file uploads and verification.
 - **Livewire Integration**: Fully dynamic interface using Livewire and Volt.
@@ -32,12 +32,13 @@ A Laravel-based web application for managing internship information systems (PKL
    cp .env.example .env
    php artisan key:generate
    ```
-5. Migrate the database:
+5. Install the app:
    ```bash
-   php artisan migrate
+   php artisan app:install
    ```
 6. Start the development server:
    ```bash
+   npm run dev
    php artisan serve
    ```
 
