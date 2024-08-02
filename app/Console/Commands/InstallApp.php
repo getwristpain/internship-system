@@ -106,9 +106,6 @@ class InstallApp extends Command
             return;
         }
 
-        $role = Role::firstOrCreate(['name' => 'Owner']);
-        $this->info("Role ensured: {$role->name}");
-
         $user = User::create([
             'name' => $name,
             'email' => $email,
@@ -116,7 +113,7 @@ class InstallApp extends Command
         ]);
 
         if ($user) {
-            $user->assignRole($role);
+            $user->assignRoles(['Owner']);
             $this->info('Owner user created successfully!');
         } else {
             $this->error('Error in creating user.');

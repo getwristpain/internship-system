@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Listeners\AssignAuthorRole;
 use Ramsey\Uuid\Uuid;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -10,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
@@ -60,6 +63,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $listen = [
+        Registered::class => [
+            AssignAuthorRole::class,
+        ],
+    ];
+
     /**
      * Boot function from Laravel.
      */
@@ -73,6 +82,35 @@ class User extends Authenticatable
                 $model->{$model->getKeyName()} = (string) Uuid::uuid4();
             }
         });
+    }
+    /**
+     * Assign roles to the user.
+     *
+     * @param array $roles
+     * @return void
+     */
+    public function assignRoles(array $roles)
+    {
+        // Define roles that should automatically grant Author role
+        $rolesThatGrantAuthor = ['Owner', 'Admin', 'Staff'];
+
+        foreach ($roles as $roleName) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            if (!$this->hasRole($roleName)) {
+                $this->assignRole($roleName);
+            }
+        }
+
+        // Check if the user has any of the roles that grant Author
+        foreach ($rolesThatGrantAuthor as $roleName) {
+            if ($this->hasRole($roleName)) {
+                $authorRole = Role::firstOrCreate(['name' => 'Author']);
+                if (!$this->hasRole($authorRole)) {
+                    $this->assignRole($authorRole);
+                }
+                break; // No need to check further once the Author role is assigned
+            }
+        }
     }
 
     /**

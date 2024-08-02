@@ -11,7 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('profile');
 });
 
-Route::middleware(['auth', 'verified', 'role:Owner|Admin|Staff'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:Author'])->group(function () {
     //
 });
 

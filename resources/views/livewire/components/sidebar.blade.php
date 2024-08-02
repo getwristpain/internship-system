@@ -9,11 +9,19 @@ new class extends Component {
     public $school;
     public bool $open = false;
 
-    public array $helpMenu = [
-        'name' => 'Help',
-        'route' => 'dashboard',
-        'icon' => 'mage:question-mark-circle-fill',
-        'label' => 'Pusat Bantuan',
+    public array $additionalMenu = [
+        [
+            'name' => 'Setting',
+            'route' => 'setting',
+            'icon' => 'ph:gear-fill',
+            'label' => 'Pengaturan',
+        ],
+        [
+            'name' => 'Help',
+            'route' => 'help',
+            'icon' => 'mage:question-mark-circle-fill',
+            'label' => 'Pusat Bantuan',
+        ],
     ];
 
     protected $listeners = ['toggleSidebar'];
@@ -45,7 +53,9 @@ new class extends Component {
         </div>
 
         <div class="w-full flex flex-col gap-2 {{ !$open ? 'center-items' : '' }}">
-            <livewire:components.sidebar-link :item="$helpMenu" />
+            @foreach ($additionalMenu as $item)
+                <livewire:components.sidebar-link :item="$item" key="{{ $item['name'] }}" />
+            @endforeach
         </div>
     </div>
 </aside>

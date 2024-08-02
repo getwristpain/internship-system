@@ -33,7 +33,7 @@ new class extends Component {
 };
 ?>
 
-<button type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate"
+<a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate"
     class="group relative flex cursor-pointer gap-2 p-2 w-full rounded-xl items-center {{ $active ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}">
 
     <!-- Icon -->
@@ -44,4 +44,4 @@ new class extends Component {
         class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full p-2 pl-2 whitespace-nowrap rounded-r-xl transition-transform transform -translate-x-2' }} {{ $active ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
         {{ $item['label'] ?? '' }}
     </span>
-</button>
+</a>

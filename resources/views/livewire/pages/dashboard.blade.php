@@ -22,21 +22,21 @@ new #[Layout('layouts.app')] class extends Component {
             <div class="flex flex-col items-center gap-8 p-4">
                 <x-application-logo logo="{{ asset('img/logo.png') }}" class="h-32" />
                 <div class="flex flex-col items-center">
-                    <span class="font-bold">{{ $school->name }}</span>
+                    <span class="font-bold text-lg">{{ $school->name }}</span>
                     <span>{{ $school->email }}</span>
                 </div>
 
                 <div class="flex flex-col gap-2 w-full mt-4">
                     <div>
-                        <b>Informasi Sekolah:</b>
+                        <b class="text-base">Informasi Sekolah:</b>
                     </div>
                     <div class="flex flex-col w-full gap-2">
                         @foreach (['Principal Name' => $school->principal_name, 'Address' => $school->address, 'Post Code' => $school->post_code, 'Telp' => $school->telp, 'Fax' => $school->fax, 'Contact Person' => $school->contact_person] as $key => $value)
                             <div class="flex">
-                                <div class="w-1/3 font-bold">
+                                <div class="w-1/3 font-medium">
                                     {{ $key }}
                                 </div>
-                                <div class="w-2/3 text-right">
+                                <div class="w-2/3 text-right text-gray-800">
                                     {{ $value }}
                                 </div>
                             </div>
