@@ -32,8 +32,9 @@
         </div>
     </div>
 
+    <!-- JS Libraries -->
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-
+    @stack('scripts')
     @livewireScripts
 </body>
 

@@ -1,4 +1,4 @@
-<section {{ $attributes->merge(['class' => 'w-full h-fit p-4 rounded-xl shadow-xl shadow-slate-200/80 bg-white']) }}>
+<section {{ $attributes->merge(['class' => 'w-full h-fit p-4 rounded-xl border bg-white']) }}>
     {{-- Header --}}
     @if (isset($heading))
         <h2 {{ $attributes->merge(['class' => 'font-heading font-medium text-base text-left text-gray-600 mb-4']) }}>

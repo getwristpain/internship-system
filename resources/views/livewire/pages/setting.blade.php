@@ -9,15 +9,34 @@ new #[Layout('layouts.app')] class extends Component {
     use WithFileUploads;
 
     public array $school = [];
-    public $image = '';
+    public $images = [
+        'logo' => '',
+        'cover' => '',
+        'profile' => '',
+    ];
+
+    protected $listeners = [
+        'imageUpdated' => 'updateImage'
+    ];
+
+    public function updateImage($identifier, $path)
+    {
+        if (array_key_exists($identifier, $this->images)) {
+            $this->images[$identifier] = $path;
+        }
+    }
 
     public function mount()
     {
-        $this->school = School::first()->toArray() ?? [];
+        $school = School::first();
+        if ($school) {
+            $this->school = $school->toArray();
+        }
+        $this->images['logo'] = asset('img/logo.png');
     }
 }; ?>
 
-<div>
+<div class="max-w-full">
     <x-card class="w-full">
         <div class="flex flex-grow gap-12 p-4">
             <div class="w-1/5 hidden lg:block border-r">
@@ -37,7 +56,19 @@ new #[Layout('layouts.app')] class extends Component {
                         <p>Lengkapi dan atur data sekolah.</p>
                     </div>
                     <form>
-                        <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-4 w-full">
+                            <!-- School Logo --->
+                            <div class="flex items-center gap-12 w-full">
+                                <div class="w-1/4">
+                                    <span class="font-medium">Logo Sekolah</span>
+                                </div>
+                                <div class="flex h-24">
+                                    <x-upload-image :image="$images['logo']" identifier="logo" />
+                                    IMAGE: {{ $images['logo'] }}
+                                </div>
+                            </div>
+                            <!-- End of School Logo --->
+
                             <!-- School Name --->
                             <div class="flex items-center gap-12">
                                 <span class="w-1/3 font-medium">Nama Sekolah</span>
@@ -90,17 +121,6 @@ new #[Layout('layouts.app')] class extends Component {
                                 <x-input-text required type="text" name="schoolPrincipalName"
                                     placeholder="Kepala Sekolah" model="school.principal_name" />
                             </div>
-                            <!-- School Image --->
-                            <div class="flex items-center gap-12 w-full">
-                                <div class="w-1/4">
-                                    <span class="font-medium">Logo Sekolah</span>
-                                </div>
-                                <div class="flex h-32">
-                                    <x-upload-image aspectRatio="1/1" wire:model="image" />
-                                    IMAGE: {{ $image }}
-                                </div>
-                            </div>
-                            <!-- End of School Image --->
                         </div>
                     </form>
                 </div>

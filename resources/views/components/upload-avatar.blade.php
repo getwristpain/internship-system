@@ -38,7 +38,7 @@ new class extends Component {
                 ->encode('jpg', 75);
 
             $fileName = "{$userId}-" . uniqid() . '.jpg';
-            $path = "avatars/{$userId}/{$fileName}";
+            $path = "uploads/avatars/{$userId}/{$fileName}";
 
             Storage::disk('private')->put($path, (string) $image->encode());
 
