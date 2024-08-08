@@ -1,39 +1,11 @@
 <?php
 
-use App\Models\School;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
-use Livewire\WithFileUploads;
 
 new #[Layout('layouts.app')] class extends Component {
-    use WithFileUploads;
-
-    public array $school = [];
-    public $images = [
-        'logo' => '',
-        'cover' => '',
-        'profile' => '',
-    ];
-
-    protected $listeners = [
-        'imageUpdated' => 'updateImage'
-    ];
-
-    public function updateImage($identifier, $path)
-    {
-        if (array_key_exists($identifier, $this->images)) {
-            $this->images[$identifier] = $path;
-        }
-    }
-
-    public function mount()
-    {
-        $school = School::first();
-        if ($school) {
-            $this->school = $school->toArray();
-        }
-        $this->images['logo'] = asset('img/logo.png');
-    }
+    //
 }; ?>
 
 <div class="max-w-full">
@@ -50,80 +22,7 @@ new #[Layout('layouts.app')] class extends Component {
                 </div>
             </div>
             <div class="grow">
-                <div>
-                    <div id="schoolData" class="mb-8">
-                        <h2 class="font-heading text-lg">Data Sekolah</h2>
-                        <p>Lengkapi dan atur data sekolah.</p>
-                    </div>
-                    <form>
-                        <div class="flex flex-col gap-4 w-full">
-                            <!-- School Logo --->
-                            <div class="flex items-center gap-12 w-full">
-                                <div class="w-1/4">
-                                    <span class="font-medium">Logo Sekolah</span>
-                                </div>
-                                <div class="flex h-24">
-                                    <x-upload-image :image="$images['logo']" identifier="logo" />
-                                    IMAGE: {{ $images['logo'] }}
-                                </div>
-                            </div>
-                            <!-- End of School Logo --->
-
-                            <!-- School Name --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Nama Sekolah</span>
-                                <x-input-text required type="text" name="schoolName" placeholder="Nama Sekolah"
-                                    model="school.name" />
-                            </div>
-                            <!-- School Address --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Alamat Sekolah</span>
-                                <x-input-text required type="text" custom="address" name="schoolAddress"
-                                    placeholder="Alamat Sekolah" model="school.address" />
-                            </div>
-                            <!-- School Post Code --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Kode Pos Sekolah</span>
-                                <x-input-text required type="number" custom="postcode" name="schoolPostCode"
-                                    placeholder="Kode Pos Sekolah" model="school.post_code" />
-                            </div>
-                            <!-- School Email --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Email Sekolah</span>
-                                <x-input-text required type="email" name="schoolEmail" placeholder="Email Sekolah"
-                                    model="school.email" />
-                            </div>
-                            <!-- School Phone --->
-                            <div class="flex lg:items-center gap-12">
-                                <span class="w-1/3 font-medium">Telepon Sekolah</span>
-                                <div class="flex items-center w-full flex-wrap gap-4">
-                                    <div class="grow">
-                                        <span class="font-medium"> Telp. </span>
-                                        <x-input-text required type="text" custom="phone" name="schoolTelp"
-                                            placeholder="Telepon Sekolah" model="school.telp" />
-                                    </div>
-                                    <div class="grow">
-                                        <span class="font-medium"> /Fax. </span>
-                                        <x-input-text required type="text" custom="phone" name="schoolFax"
-                                            placeholder="Fax Sekolah" model="school.fax" />
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- School Contact Person --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Kontak Person</span>
-                                <x-input-text required type="text" custom="mobile" name="schoolCP"
-                                    placeholder="Kontak Person Sekolah" model="school.contact_person" />
-                            </div>
-                            <!-- School Principal --->
-                            <div class="flex items-center gap-12">
-                                <span class="w-1/3 font-medium">Kepala Sekolah</span>
-                                <x-input-text required type="text" name="schoolPrincipalName"
-                                    placeholder="Kepala Sekolah" model="school.principal_name" />
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                @livewire('settings.edit-school')
             </div>
         </div>
     </x-card>

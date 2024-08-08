@@ -1,6 +1,4 @@
 import "./bootstrap";
-import "cropperjs/dist/cropper.min.css";
+import Swal from 'sweetalert2';
 
-import Cropper from "cropperjs";
-
-window.Cropper = Cropper;
+window.Swal = Swal;

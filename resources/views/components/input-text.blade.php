@@ -40,6 +40,16 @@
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium"></iconify-icon>
             @break
 
+            @case('person')
+                <iconify-icon icon="mdi:user"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium"></iconify-icon>
+            @break
+
+            @case('idcard')
+                <iconify-icon icon="mingcute:idcard-fill"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium"></iconify-icon>
+            @break
+
             @case('phone')
                 <iconify-icon icon="mdi:phone"
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium"></iconify-icon>
@@ -70,7 +80,7 @@
         @endif
 
         <!-- Input Field -->
-        <input type="{{ $type }}" wire:model="{{ $model }}" id="{{ $name }}"
+        <input type="{{ $type }}" wire:model.live="{{ $model }}" id="{{ $name }}"
             placeholder="{{ $placeholder }}" autocomplete="{{ $model }}" {{ $disabled ? 'disabled' : '' }}
             {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
             @focus="focused = true; filled = true" @blur="if (!$el.value) { focused = false; filled = false }"

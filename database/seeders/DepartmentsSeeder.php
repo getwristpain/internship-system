@@ -27,7 +27,7 @@ class DepartmentsSeeder extends Seeder
                             'name' => 'Admin TKGSP',
                             'email' => 'tkgsp@staff.test',
                             'password' => 'password',
-                            'role' => 'Department Staff',
+                            'role' => 'Staff',
                         ],
                     ],
                     'groups' => [
@@ -47,7 +47,7 @@ class DepartmentsSeeder extends Seeder
                             'name' => 'Admin SIJA',
                             'email' => 'tsija@staff.test',
                             'password' => 'password',
-                            'role' => 'Department Staff',
+                            'role' => 'Staff',
                         ],
                     ],
                     'groups' => [
@@ -86,7 +86,7 @@ class DepartmentsSeeder extends Seeder
                     );
 
                     // Assign the role to the user
-                    $user->assignRole($role);
+                    $user->assignRoles([$role]);
                 }
             }
 

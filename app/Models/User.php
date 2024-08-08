@@ -92,7 +92,7 @@ class User extends Authenticatable
     public function assignRoles(array $roles)
     {
         // Define roles that should automatically grant Author role
-        $rolesThatGrantAuthor = ['Owner', 'Admin', 'Staff'];
+        $rolesThatGrantAuthor = ['Owner', 'Admin'];
 
         foreach ($roles as $roleName) {
             $role = Role::firstOrCreate(['name' => $roleName]);
@@ -102,13 +102,17 @@ class User extends Authenticatable
         }
 
         // Check if the user has any of the roles that grant Author
-        foreach ($rolesThatGrantAuthor as $roleName) {
-            if ($this->hasRole($roleName)) {
-                $authorRole = Role::firstOrCreate(['name' => 'Author']);
-                if (!$this->hasRole($authorRole)) {
-                    $this->assignRole($authorRole);
+        $this->grantToRole('Author', $rolesThatGrantAuthor);
+    }
+
+    private function grantToRole($name, $roles) {
+        foreach ($roles as $role) {
+            if ($this->hasRole($role)) {
+                $grantToRole = Role::firstOrCreate(['name' => $name]);
+                if (!$this->hasRole($grantToRole)) {
+                    $this->assignRole($grantToRole);
                 }
-                break; // No need to check further once the Author role is assigned
+                break;
             }
         }
     }
