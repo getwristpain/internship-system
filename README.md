@@ -32,11 +32,15 @@ A Laravel-based web application for managing internship information systems (PKL
    cp .env.example .env
    php artisan key:generate
    ```
-5. Install the app:
+5. Run the migration
+    ```bash
+    php artisan migrate
+    ```
+6. Install the app:
    ```bash
    php artisan app:install
    ```
-6. Start the development server:
+7. Start the development server:
    ```bash
    npm run dev
    php artisan serve
@@ -47,6 +51,7 @@ A Laravel-based web application for managing internship information systems (PKL
 - Access the application at `http://localhost:8000`.
 - Admin can manage users, roles, and permissions.
 - Students can submit and manage their internship reports.
+- Teachers can manage their student interships and give the feedbacks.
 - Supervisors can evaluate students based on predefined aspects and indicators.
 
 ## Contributing
