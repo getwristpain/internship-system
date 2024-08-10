@@ -27,7 +27,7 @@ new class extends Component {
     {
         // Ensure route is valid before redirecting
         if (!empty($this->item['route']) && Route::has($this->item['route'])) {
-            return $this->redirect(route($this->item['route']), navigate: true);
+            return $this->redirect(route($this->item['route']));
         }
     }
 };

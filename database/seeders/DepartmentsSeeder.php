@@ -32,10 +32,9 @@ class DepartmentsSeeder extends Seeder
                     ],
                     'groups' => [
                         [
-                            'name' => 'XIII KGSP A',
-                            'group' => 'A',
+                            'code' => 'TKGSP-XIII-KA',
+                            'name' => 'Kelas A',
                             'level' => 'XIII',
-                            'code' => 'TKGSP-XIII-A'
                         ],
                     ],
                 ],
@@ -52,10 +51,9 @@ class DepartmentsSeeder extends Seeder
                     ],
                     'groups' => [
                         [
-                            'name' => 'XIII SIJA A',
-                            'group' => 'A',
+                            'code' => 'TSIJA-XIII-XSA',
+                            'name' => 'Kelas A',
                             'level' => 'XIII',
-                            'code' => 'TSIJA-XIII-A',
                         ],
                     ],
                 ],
@@ -97,7 +95,6 @@ class DepartmentsSeeder extends Seeder
                         ['code' => $groupData['code']],
                         [
                             'name' => $groupData['name'],
-                            'group' => $groupData['group'],
                             'level' => $groupData['level'],
                             'department_id' => $department->id,
                         ]

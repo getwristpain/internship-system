@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->string('group');
             $table->string('level');
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
             $table->timestamps();
         });
+
         Schema::create('group_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('group_id')->constrained()->onDelete('cascade');
@@ -33,6 +33,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('group_user');
         Schema::dropIfExists('groups');
     }
 };

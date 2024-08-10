@@ -1,23 +1,31 @@
 @props(['show' => false])
 
-<div x-data="{ show: @entangle($attributes->wire('model')) }" @keydown.escape.window="show = false">
-    @teleport('body')
-        <div x-show="show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-            class="fixed z-10 inset-0 overflow-y-auto">
-            <div class="flex items-center justify-center min-h-screen min-w-full bg-black bg-opacity-10">
-                <div
-                    class="relative bg-white rounded-xl overflow-hidden shadow-xl transform transition-all p-12 w-full max-w-xl mx-auto">
+<div x-data="{ show: @entangle($show) }" @keydown.escape.window="show = false">
+    <div x-show="show" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+        class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen w-screen bg-black bg-opacity-10 p-4 sm:p-6 lg:p-8">
+            <div
+                class="bg-white rounded-xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl shadow-xl transform transition-all mx-auto">
+                <div class="w-full p-4 space-y-2">
+                    <div class="flex w-full justify-between items-center ">
+                        <div class="grow line-clamp-1 sm:px-2 lg:px-4">
+                            <h3 class="font-heading text-lg font-bold text-gray-900">{{ $header }}</h3>
+                        </div>
+                        <div>
+                            <!-- Close Button -->
+                            <button x-on:click="show = false" class="text-xl font-medium text-red-400">
+                                <iconify-icon icon="carbon:close-filled"></iconify-icon>
+                            </button>
+                        </div>
+                    </div>
 
-                    {{ $slot }}
-
-                    <!-- Close Button -->
-                    <button @click="show = false" class="absolute top-2 right-2 text-xl font-medium text-red-400">
-                        <iconify-icon icon="carbon:close-filled"></iconify-icon>
-                    </button>
+                    <div class="sm:p-2 lg:p-4 overflow-x-scroll">
+                        {{ $slot }}
+                    </div>
                 </div>
             </div>
         </div>
-    @endteleport
+    </div>
 </div>

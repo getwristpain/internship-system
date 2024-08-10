@@ -11,18 +11,13 @@ export default {
     darkMode: false,
     theme: {
         extend: {
-            keyframes: {
-                blink: {
-                    "0%, 100%": { opacity: 1 },
-                    "50%": { opacity: 0 },
-                },
-            },
             animation: {
                 blink: "blink 0.5s infinite",
             },
-            fontFamily: {
-                sans: ["Inter", ...defaultTheme.fontFamily.sans],
-                heading: ["Paytone One", ...defaultTheme.fontFamily.sans],
+            borderStyle: {
+                "dashed-3": "3px dashed",
+                "dashed-5": "5px dashed",
+                "dashed-10": "10px dashed",
             },
             colors: {
                 yellow: {
@@ -96,6 +91,16 @@ export default {
                     800: "#5C5C5C",
                     900: "#4A4A4A",
                     950: "#3C3C3C",
+                },
+            },
+            fontFamily: {
+                sans: ["Inter", ...defaultTheme.fontFamily.sans],
+                heading: ["Paytone One", ...defaultTheme.fontFamily.sans],
+            },
+            keyframes: {
+                blink: {
+                    "0%, 100%": { opacity: 1 },
+                    "50%": { opacity: 0 },
                 },
             },
         },

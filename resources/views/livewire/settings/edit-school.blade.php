@@ -60,7 +60,7 @@ new class extends Component {
 
 <div>
     <div class="mb-8">
-        <h2 class="font-heading text-lg">Data Sekolah</h2>
+        <h2 class="font-heading text-xl">Data Sekolah</h2>
         <p>Lengkapi dan atur data sekolah.</p>
     </div>
     <form wire:submit.prevent="submit">

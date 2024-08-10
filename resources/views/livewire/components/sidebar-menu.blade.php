@@ -71,7 +71,7 @@ new class extends Component {
             $this->openSubmenus = in_array($menuName, $this->openSubmenus) ? array_filter($this->openSubmenus, fn($name) => $name !== $menuName) : [...$this->openSubmenus, $menuName];
         } else {
             if (!empty($item['route']) && Route::has($item['route'])) {
-                return $this->redirect(route($item['route']), navigate: true);
+                return $this->redirect(route($item['route']));
             }
         }
     }

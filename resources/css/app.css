@@ -12,18 +12,22 @@ body {
     display: none;
 }
 
-.table-custom {
+.custom-table {
     @apply table-auto w-full text-left border-spacing-2;
 }
 
-.table-custom tr {
-    @apply rounded-xl overflow-hidden border-y hover:bg-gray-100 transition ease-in-out duration-150;
+.custom-table tr {
+    @apply border-y hover:bg-gray-100 transition ease-in-out duration-150;
 }
 
-.table-custom th {
-    @apply font-bold bg-gray-200 p-4 overflow-hidden;
+.custom-table th {
+    @apply font-bold bg-gray-200 p-4 break-words;
 }
 
-.table-custom td {
-    @apply px-4 py-2 overflow-hidden;
+.custom-table td {
+    @apply px-4 py-2 align-top break-words;
+}
+
+.custom-input {
+    @apply border-0 w-fit px-2 py-1 bg-transparent focus:ring-0 focus:border-b focus:border-black;
 }

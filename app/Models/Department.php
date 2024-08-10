@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,6 +16,21 @@ class Department extends Model
         'code',
         'name',
     ];
+
+    /**
+     * Set the department's name and code.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            set: function ($value) {
+                $this->attributes['code'] = strtoupper(implode('', array_map(function ($word) {
+                    return $word[0];
+                }, explode(' ', $value))));
+                return $value;
+            }
+        );
+    }
 
     /**
      * Deparment and user with many-to-many relation
