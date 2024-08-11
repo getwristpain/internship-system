@@ -9,10 +9,12 @@
     'label' => '',
     'custom' => '',
     'icon' => 'tabler:edit',
+    'error' => null,
 ])
 
 @php
     $custom = $custom ?: $type;
+    $errorMessages = $error ? [$error] : ($errors->has($model) ? $errors->get($model) : []);
 @endphp
 
 <div x-data="{ focused: false, filled: false }" x-init="$nextTick(() => {
@@ -83,7 +85,7 @@
         @endif
 
         <!-- Input Field -->
-        <input type="{{ $type }}" wire:model.live="{{ $model }}" id="{{ $name }}"
+        <input type="{{ $type }}" wire:model.live.debounce.1500ms="{{ $model }}" id="{{ $name }}"
             placeholder="{{ $placeholder }}" autocomplete="{{ $name }}" {{ $disabled ? 'disabled' : '' }}
             {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
             @focus="focused = true; filled = true" @blur="if (!$el.value) { focused = false; filled = false }"
@@ -92,5 +94,7 @@
             aria-describedby="{{ $name }}-error">
     </div>
 
-    <x-input-error :messages="$errors->get($model)" class="mt-2" />
+    <div>
+        <x-input-error :messages="$errorMessages" class="mt-2" />
+    </div>
 </div>
