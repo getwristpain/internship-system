@@ -19,6 +19,16 @@ class Group extends Model
         'department_id',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($group) {
+            // Detach users when group is deleted
+            $group->users()->detach();
+        });
+    }
+
     /**
      * Ensure the group's code is always uppercase.
      */

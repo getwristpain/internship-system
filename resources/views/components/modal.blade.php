@@ -7,7 +7,7 @@
         class="fixed z-10 inset-0 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen w-screen bg-black bg-opacity-10 p-4 sm:p-6 lg:p-8">
             <div
-                class="bg-white rounded-xl w-full max-w-lg sm:max-w-2xl lg:max-w-4xl shadow-xl transform transition-all mx-auto">
+                class="bg-white rounded-xl max-w-lg sm:max-w-2xl lg:max-w-4xl shadow-xl transform transition-all mx-auto">
                 <div class="w-full p-4 space-y-2">
                     <div class="flex w-full justify-between items-center ">
                         <div class="grow line-clamp-1 sm:px-2 lg:px-4">

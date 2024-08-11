@@ -17,6 +17,16 @@ class Department extends Model
         'name',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($department) {
+            // Detach users when department is deleted
+            $department->users()->detach();
+        });
+    }
+
     /**
      * Set the department's name and code.
      */
@@ -24,9 +34,14 @@ class Department extends Model
     {
         return Attribute::make(
             set: function ($value) {
-                $this->attributes['code'] = strtoupper(implode('', array_map(function ($word) {
-                    return $word[0];
-                }, explode(' ', $value))));
+                $this->attributes['code'] = strtoupper(
+                    implode(
+                        '',
+                        array_map(function ($word) {
+                            return ctype_upper($word[0] ?? '') ? $word[0] : '';
+                        }, explode(' ', $value))
+                    )
+                );
                 return $value;
             }
         );
