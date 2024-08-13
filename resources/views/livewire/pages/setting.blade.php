@@ -15,12 +15,17 @@ new #[Layout('layouts.app')] class extends Component {
                 <x-sidemenu />
             </div>
             <div class="grow flex flex-col divide-y">
-                <div id="schoolData" class="py-8">
-                    @livewire('settings.edit-school')
-                </div>
-                <div id="department" class="py-8">
-                    @livewire('settings.manage-departments')
-                </div>
+                @role('Author')
+                    <div id="schoolData" class="py-8">
+                        @livewire('settings.edit-school')
+                    </div>
+                    <div id="department" class="py-8">
+                        @livewire('settings.manage-departments')
+                    </div>
+                    <div id="administrator" class="py-8">
+                        @livewire('settings.manage-admin')
+                    </div>
+                @endrole
             </div>
         </div>
     </x-card>

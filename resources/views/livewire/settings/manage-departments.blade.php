@@ -75,14 +75,12 @@ new class extends Component {
         $this->hasUnsavedChanges = false;
     }
 
-    public function updateDepartment()
+    public function createOrUpdateDepartment()
     {
         if (isset($this->department['id'])) {
-            // Update existing department
             $department = Department::findOrFail($this->department['id']);
             $department->update($this->department);
         } else {
-            // Create new department
             $department = Department::create($this->department);
         }
 
@@ -98,6 +96,8 @@ new class extends Component {
         $this->mount();
         $this->showEditDepartmentModal = false;
         $this->hasUnsavedChanges = false;
+
+        $this->dispatch('department-updated');
     }
 
     public function addGroup()
@@ -134,25 +134,27 @@ new class extends Component {
 
         if ($this->departmentName_confirmation === $this->department['name']) {
             $department->delete();
-        }
 
-        $this->showRemoveDepartmentModal = false;
-        $this->mount();
+            $this->mount();
+            $this->showRemoveDepartmentModal = false;
+
+            $this->dispatch('department-deleted');
+        }
     }
 }; ?>
 
 <div>
     <div class="mb-8">
-        <h2 class="font-heading font-bold text-xl">Jurusan</h2>
+        <h2 class="font-heading font-bold text-xl">Daftar Jurusan</h2>
         <p>Kelola informasi jurusan sekolah.</p>
     </div>
     <div>
         <div class="flex w-full justify-end mb-4">
-            <x-button-secondary wire:click="addDepartment">
-                + Buat Jurusan
-            </x-button-secondary>
+            <x-button-primary wire:click="addDepartment">
+                + Tambah Jurusan
+            </x-button-primary>
         </div>
-        <table class="custom-table">
+        <table class="custom-table col-top">
             <thead>
                 <tr>
                     <th>Kode</th>
@@ -175,16 +177,13 @@ new class extends Component {
                         </td>
                         <td>
                             <div class="flex gap-2 text-xs">
-                                <x-button-tertiary type="button" wire:click="editDepartment({{ $department->id ?? '' }})"
-                                    class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
+                                <x-button-secondary wire:click="editDepartment({{ $department->id ?? '' }})">
                                     <span><iconify-icon icon="tabler:edit"></span>
                                     <span class="hidden lg:block">Edit</span>
-                                </x-button-tertiary>
-                                <x-button-tertiary type="button"
-                                    wire:click="removeDepartment({{ $department->id ?? '' }})"
-                                    class="w-fit bg-red-100 cursor-pointer text-red-600 hover:bg-red-300">
+                                </x-button-secondary>
+                                <x-button-danger wire:click="removeDepartment({{ $department->id ?? '' }})">
                                     <span><iconify-icon icon="tabler:trash"></span>
-                                </x-button-tertiary>
+                                </x-button-danger>
                             </div>
                         </td>
                     </tr>
@@ -209,7 +208,7 @@ new class extends Component {
                 @endif
             </div>
             <div>
-                <form wire:submit.prevent="updateDepartment" class="flex flex-col">
+                <form wire:submit.prevent="createOrUpdateDepartment" class="flex flex-col">
                     <div class="flex flex-col gap-4">
                         <!-- Kode Jurusan -->
                         <div class="flex items-center gap-2">
@@ -263,20 +262,20 @@ new class extends Component {
                                 </div>
                             @endif
                             <div>
-                                <x-button-tertiary type="button" wire:click="addGroup"
+                                <x-button-secondary type="button" wire:click="addGroup"
                                     class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
                                     <span><iconify-icon icon="tabler:plus"></iconify-icon></span>
                                     <span>Tambah Kelas</span>
-                                </x-button-tertiary>
+                                </x-button-secondary>
                             </div>
                         </div>
                     </div>
                     <div class="flex justify-end items-center gap-2 mt-4">
-                        <x-button-secondary type="button" wire:click="$set('showEditDepartmentModal', false)"
+                        <x-button-tertiary type="button" wire:click="$set('showEditDepartmentModal', false)"
                             class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
                             <span>Batal</span>
-                        </x-button-secondary>
-                        <x-button-primary class="flex items-center gap-2 w-fit">
+                        </x-button-tertiary>
+                        <x-button-primary type="submit" class="flex items-center gap-2 w-fit">
                             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
                             <span class="hidden lg:block">Simpan</span>
                         </x-button-primary>
@@ -313,11 +312,11 @@ new class extends Component {
                 <x-input-text name="departmentName_confirmation" model="departmentName_confirmation" required />
             </div>
             <div class="flex justify-end items-center gap-2 mt-4">
-                <x-button-secondary type="button" wire:click="$set('showRemoveDepartmentModal', false)"
+                <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
                     class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
                     <span>Batal</span>
                 </x-button-secondary>
-                <x-button-primary type="button" wire:click="deleteDepartment"
+                <x-button-primary wire:click="deleteDepartment"
                     class="flex items-center gap-2 w-fit bg-red-600 border-red-600 hover:ring-red-600 focus:ring-red-600">
                     <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
                     <span class="hidden lg:block">Hapus</span>

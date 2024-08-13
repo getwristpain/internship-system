@@ -43,7 +43,7 @@ new #[Layout('layouts.guest')] class extends Component {
             <!-- Form Action --->
             <div class="flex gap-4 justify-end items-center w-full">
                 <x-button-secondary href="{{ route('register') }}">Batal</x-button-secondary>
-                <x-button-primary>Selanjutnya --></x-button-primary>
+                <x-button-primary type="submit">Register</x-button-primary>
             </div>
         </form>
     </div>

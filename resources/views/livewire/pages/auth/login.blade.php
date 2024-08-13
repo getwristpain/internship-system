@@ -69,9 +69,9 @@ new #[Layout('layouts.guest')] class extends Component {
             </section>
         </div>
         <div class="flex justify-center items-center bg-white w-full p-8">
-            <x-button-tertiary href="#">
+            <x-button-link href="#">
                 <span class="text-red-600">Hubungi kami</span>&nbsp;untuk informasi lebih lanjut atau bantuan teknis.
-            </x-button-tertiary>
+            </x-button-link>
         </div>
     </div>
 
@@ -114,7 +114,7 @@ new #[Layout('layouts.guest')] class extends Component {
                                 {{ __('Lupa password?') }}
                             </x-button-tertiary>
                         @endif
-                        <x-button-primary>
+                        <x-button-primary type="submit">
                             {{ __('Masuk') }}
                         </x-button-primary>
                     </div>
@@ -122,10 +122,10 @@ new #[Layout('layouts.guest')] class extends Component {
             </div>
         </div>
 
-        <div class="bg-gray-200 w-full p-8">
-            <x-button-tertiary href="{{ route('login.company') }}">
+        <div class="flex justify-center bg-gray-200 w-full p-8">
+            <x-button-link href="{{ route('login.company') }}">
                 Masuk untuk&nbsp;<span class="text-red-600">Mitra Perusahaan</span>&nbsp;-->
-            </x-button-tertiary>
+            </x-button-link>
         </div>
     </div>
 </div>

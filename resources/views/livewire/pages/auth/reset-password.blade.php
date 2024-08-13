@@ -87,26 +87,23 @@ new #[Layout('layouts.guest')] class extends Component {
                 <!-- Password -->
                 <div class="w-full">
                     <x-input-text type="password" name="password" model="password" label="Password" required />
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 
                 <!-- Confirm Password -->
                 <div class="w-full">
                     <x-input-text type="password" name="password_confirmation" model="password_confirmation"
                         label="Konfirmasi Password" required autofocus />
-
-                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
             </div>
 
             <div class="flex items-center justify-center w-full gap-2">
-                <x-button-primary>
-                    {{ __('Reset Password') }}
-                </x-button-primary>
-
                 <x-button-secondary onclick="window.history.back()">
                     {{ __('Batal') }}
                 </x-button-secondary>
+
+                <x-button-primary type="submit">
+                    {{ __('Reset Password') }}
+                </x-button-primary>
             </div>
         </form>
     </div>

@@ -127,7 +127,7 @@ class User extends Authenticatable
 
     public function departments(): BelongsToMany
     {
-        return $this->belongsToMany(Department::class);
+        return $this->belongsToMany(Department::class, 'department_user');
     }
 
     public function groups(): BelongsToMany

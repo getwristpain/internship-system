@@ -22,12 +22,12 @@
         <nav class="flex gap-4 items-center">
             @switch(request()->route()->getName())
                 @case('login')
-                    <x-button-tertiary>Belum punya akun?</x-button-tertiary>
+                    <span>Belum punya akun?</span>
                     <x-button-secondary href="{{ route('register') }}">Register</x-button-secondary>
                 @break
 
                 @case('register')
-                    <x-button-tertiary>Sudah punya akun?</x-button-tertiary>
+                    <span>Sudah punya akun?</span>
                     <x-button-secondary href="{{ route('login') }}">Login</x-button-secondary>
                 @break
 

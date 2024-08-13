@@ -18,9 +18,9 @@ class AvatarController extends Controller
         }
 
         // Define the allowed roles
-        $allowedRoles = ['owner', 'admin', 'department-staff'];
+        $allowedRoles = ['Author', 'Staff'];
 
-        if ($user->id !== $userId && !in_array($user->roles->pluck('slug')->first(), $allowedRoles)) {
+        if ($user->id !== $userId && !in_array($user->roles->pluck('name')->first(), $allowedRoles)) {
             abort(403, 'Unauthorized');
         }
 

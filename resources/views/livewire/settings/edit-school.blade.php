@@ -25,7 +25,7 @@ new class extends Component {
     {
         if ($identifier === 'logo') {
             $this->schoolData['logo'] = $path;
-            $this->isDirty = true; // Mark as dirty
+            $this->isDirty = true;
         }
     }
 
@@ -130,7 +130,7 @@ new class extends Component {
         </div>
         <!-- Form Actions --->
         <div class="flex gap-2 w-full justify-end items-center pt-8">
-            <x-button-primary :disabled="!$isDirty">
+            <x-button-primary type="submit" :disabled="!$isDirty">
                 Simpan
             </x-button-primary>
         </div>

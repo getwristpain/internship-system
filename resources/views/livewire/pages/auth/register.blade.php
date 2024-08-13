@@ -37,17 +37,21 @@ new #[Layout('layouts.guest')] class extends Component {
                     <x-input-text type="email" name="email" model="form.email" label="Email" required autofocus />
                 </div>
                 <div class="w-full flex justify-center gap-4">
-                    <x-button-primary wire:click.prevent="register('student')">Buat Akun
-                        Siswa</x-button-primary>
-                    <x-button-secondary wire:click.prevent="register('teacher')">Buat Akun Guru</x-button-secondary>
+                    <x-button-primary type="submit" wire:click.prevent="register('student')">
+                        Buat Akun Siswa
+                    </x-button-primary>
+
+                    <x-button-secondary wire:click.prevent="register('teacher')">
+                        Buat Akun Guru
+                    </x-button-secondary>
                 </div>
             </form>
         </div>
 
         <div class="flex justify-around items-center p-8 bg-gray-200 w-full">
-            <x-button-tertiary href="{{ route('login.company') }}">
+            <x-button-link href="{{ route('login.company') }}">
                 Masuk untuk&nbsp;<span class="text-red-600">Mitra Perusahaan</span>&nbsp;-->
-            </x-button-tertiary>
+            </x-button-link>
         </div>
     </div>
     <div class="hidden w-1/2 lg:flex flex-col justify-between">
@@ -63,10 +67,10 @@ new #[Layout('layouts.guest')] class extends Component {
                 </div>
             </div>
         </div>
-        <div class="w-full flex justify-around items-center p-8 bg-white">
-            <x-button-tertiary href="#">
+        <div class="w-full flex justify-center items-center p-8 bg-white">
+            <x-button-link href="#">
                 <span class="text-red-600">Hubungi kami</span>&nbsp;untuk informasi lebih lanjut atau bantuan teknis.
-            </x-button-tertiary>
+            </x-button-link>
         </div>
     </div>
 </div>

@@ -53,7 +53,7 @@ class Department extends Model
      */
     public function users(): BelongsToMany
     {
-        return $this->BelongsToMany(User::class);
+        return $this->BelongsToMany(User::class, 'department_user');
     }
 
     /**

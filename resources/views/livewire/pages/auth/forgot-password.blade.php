@@ -55,12 +55,13 @@ new #[Layout('layouts.guest')] class extends Component {
             </div>
 
             <div class="flex items-center self-center gap-4">
-                <x-button-primary>
-                    {{ __('Reset Password') }}
-                </x-button-primary>
                 <x-button-secondary onclick="window.history.back()">
                     {{ __('Batal') }}
                 </x-button-secondary>
+
+                <x-button-primary type="submit">
+                    {{ __('Reset Password') }}
+                </x-button-primary>
             </div>
         </form>
     </div>

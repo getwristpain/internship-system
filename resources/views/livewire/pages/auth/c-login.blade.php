@@ -8,7 +8,7 @@ new #[Layout('layouts.guest')] class extends Component {
 }; ?>
 
 <div class="w-full h-full flex justify-center items-center p-8 lg:pb-24">
-    <div class="flex flex-col gap-5 w-full max-w-sm lg:pb-6">
+    <div class="flex flex-col gap-8 w-full max-w-sm lg:mb-6">
         <!-- Session Status -->
         <x-auth-session-status class="w-full mb-4" :status="session('status')" />
 
@@ -31,13 +31,13 @@ new #[Layout('layouts.guest')] class extends Component {
                 <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
             </div>
 
-            <div class="flex flex-col gap-2">
-                <x-button-primary class="w-full">
-                    {{ __('Masuk') }}
-                </x-button-primary>
-                <x-button-secondary href="{{ route('login') }}" class="w-full">
+            <div class="flex gap-4 pt-8 justify-end">
+                <x-button-secondary href="{{ route('login') }}">
                     {{ __('Kembali') }}
                 </x-button-secondary>
+                <x-button-primary type="submit">
+                    {{ __('Masuk') }}
+                </x-button-primary>
             </div>
         </form>
 
@@ -47,5 +47,5 @@ new #[Layout('layouts.guest')] class extends Component {
                     {{ __('Pusat Bantuan') }} </a>
             </span> --}}
         </div>
+        </d>
     </div>
-</div>

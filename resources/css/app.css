@@ -25,7 +25,11 @@ body {
 }
 
 .custom-table td {
-    @apply px-4 py-2 align-top break-words;
+    @apply px-4 py-2 break-words;
+}
+
+.col-top td {
+    @apply align-top;
 }
 
 .custom-input {

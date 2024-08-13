@@ -32,6 +32,7 @@ class LoginForm extends Form
             'remember' => 'boolean',
         ]);
 
+        $this->errors = [];
         $this->ensureIsNotRateLimited();
 
         // Check if the user exists

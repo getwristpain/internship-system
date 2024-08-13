@@ -53,7 +53,7 @@ class UsersSeeder extends Seeder
             );
 
             // Assign the role to the user
-            $user->assignRole($role);
+            $user->assignRoles([$role]);
         }
     }
 }

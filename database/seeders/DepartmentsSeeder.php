@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Department;
 use App\Models\Group;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -84,7 +83,10 @@ class DepartmentsSeeder extends Seeder
                     );
 
                     // Assign the role to the user
-                    $user->assignRoles([$role]);
+                    $user->assignRole($role);
+
+                    // Attach the user to the department
+                    $user->departments()->syncWithoutDetaching($department->id);
                 }
             }
 

@@ -3,6 +3,7 @@
         @role('Author')
             <x-sidemenu-item href="#schoolData">Data Sekolah</x-sidemenu-item>
             <x-sidemenu-item href="#department">Kelola Jurusan</x-sidemenu-item>
+            <x-sidemenu-item href="#administrator">Administrator</x-sidemenu-item>
         @endrole
     </div>
 </div>
