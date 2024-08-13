@@ -40,14 +40,14 @@ class LoginForm extends Form
 
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
-            $this->errors['email'] = __('auth.user_not_found'); // Set error message for user not found
+            $this->errors['email'] = __('auth.user_not_found');
             return;
         }
 
         // Attempt authentication
         if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
-            $this->errors['password'] = __('auth.password_incorrect'); // Set error message for incorrect password
+            $this->errors['password'] = __('auth.password_incorrect');
             return;
         }
 

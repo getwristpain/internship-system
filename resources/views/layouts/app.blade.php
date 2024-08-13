@@ -13,7 +13,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @livewireStyles
+    @livewireStyles()
 </head>
 
 <body class="bg-slate-100">
@@ -34,8 +34,9 @@
 
     <!-- JS Libraries -->
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+
     @stack('scripts')
-    @livewireScripts
+    @livewireScripts()
 </body>
 
 </html>

@@ -7,9 +7,7 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
     public LoginForm $form;
-
     public string $background;
-
     public array $features = [
         [
             'heading' => 'Pengelolaan Data Magang Terpadu',
@@ -39,10 +37,9 @@ new #[Layout('layouts.guest')] class extends Component {
     public function login()
     {
         $this->form->authenticate();
-        // dd($this->form->errors['email'] ?? null, $this->form->errors['password'] ?? null);
 
         if (empty($this->form->errors)) {
-            // Redirect if authentication is successful
+            session()->flash('status', 'Login successfully!');
             return $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
         }
     }
@@ -55,8 +52,8 @@ new #[Layout('layouts.guest')] class extends Component {
             <section
                 class="flex flex-col justify-center items-center w-full h-full bg-white/20 backdrop-blur-xl p-16 rounded-xl">
                 <div class="flex flex-col gap-4">
-                    @foreach ($features as $feature)
-                        <article class="flex items-center gap-8">
+                    @foreach ($features as $index => $feature)
+                        <article class="flex items-center gap-8" :key="$index">
                             <iconify-icon class="p-2 text-5xl bg-gray-100/10 text-gray-950 backdrop-blur-md rounded-xl"
                                 icon="{{ $feature['icon'] }}" aria-label="{{ $feature['heading'] }}"></iconify-icon>
                             <div class="flex flex-col gap-2">
@@ -89,33 +86,30 @@ new #[Layout('layouts.guest')] class extends Component {
 
                 <!-- Login Form -->
                 <form wire:submit.prevent="login" class="flex flex-col gap-16 w-full">
+                    @csrf
+
                     <div class="flex flex-col gap-4 w-full">
                         <!-- Email Address -->
-                        <div>
-                            <x-input-text type="email" name="email" model="form.email" label="Email"
-                                icon="mdi:email" autofocus :error="$form->errors['email'] ?? null" />
-                        </div>
+                        <x-input-text type="email" name="email" model="form.email" label="Email" icon="mdi:email"
+                            autofocus :error="$form->errors['email'] ?? null" />
 
                         <!-- Password -->
-                        <div>
-                            <x-input-text type="password" name="password" model="form.password" label="Password"
-                                icon="mdi:password" :error="$form->errors['password'] ?? null" />
-                        </div>
+                        <x-input-text type="password" name="password" model="form.password" label="Password"
+                            icon="mdi:password" :error="$form->errors['password'] ?? null" />
 
                         <!-- Remember Me -->
-                        <div class="pt-4">
-                            <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
-                        </div>
+                        <x-input-checkbox class="pt-4" name="remember" model="form.remember" label="Ingat saya" />
                     </div>
 
+                    <!-- Form Action --->
                     <div class="flex gap-4 justify-end items-center w-full">
                         @if (Route::has('password.request'))
                             <x-button-tertiary href="{{ route('password.request') }}">
-                                {{ __('Lupa password?') }}
+                                <span>Lupa password?</span>
                             </x-button-tertiary>
                         @endif
                         <x-button-primary type="submit">
-                            {{ __('Masuk') }}
+                            <span>Login</span>
                         </x-button-primary>
                     </div>
                 </form>

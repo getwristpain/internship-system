@@ -307,21 +307,23 @@ new class extends Component {
                     <span>{{ $department['name'] ?? '' }}</span>
                 </div>
             </div>
-            <div class="flex flex-col gap-2">
-                <p>Harap konfirmasi dengan memasukkan kembali nama jurusan yang ingin dihapus.</p>
-                <x-input-text name="departmentName_confirmation" model="departmentName_confirmation" required />
-            </div>
-            <div class="flex justify-end items-center gap-2 mt-4">
-                <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
-                    class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
-                    <span>Batal</span>
-                </x-button-secondary>
-                <x-button-primary wire:click="deleteDepartment"
-                    class="flex items-center gap-2 w-fit bg-red-600 border-red-600 hover:ring-red-600 focus:ring-red-600">
-                    <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
-                    <span class="hidden lg:block">Hapus</span>
-                </x-button-primary>
-            </div>
+            <form class="flex flex-col">
+                <div class="flex flex-col gap-2">
+                    <p>Harap konfirmasi dengan memasukkan kembali nama jurusan yang ingin dihapus.</p>
+                    <x-input-text name="departmentName_confirmation" model="departmentName_confirmation" required />
+                </div>
+                <div class="flex justify-end items-center gap-2 mt-4">
+                    <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
+                        class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
+                        <span>Batal</span>
+                    </x-button-secondary>
+                    <x-button-primary type="submit" wire:click="deleteDepartment"
+                        class="flex items-center gap-2 w-fit bg-red-600 border-red-600 hover:ring-red-600 focus:ring-red-600">
+                        <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
+                        <span class="hidden lg:block">Hapus</span>
+                    </x-button-primary>
+                </div>
+            </form>
         </div>
     </x-modal>
 </div>
