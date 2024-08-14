@@ -6,11 +6,25 @@ use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public $departments = [];
-    public $admin = [];
-    public $staff = [];
+    public array $departments = [];
+    public array $admin = [];
+    public array $staff = [];
+    public array $userData = [
+        'role' => '',
+        'department_code' => '',
+    ];
+    public array $departmentOptions = [];
+
+    public bool $showAddOrEditModal = false;
+    public bool $showDepartmentSelector = false;
 
     public function mount()
+    {
+        $this->loadAdminData();
+        $this->loadDepartmentData();
+    }
+
+    private function loadAdminData()
     {
         $admin = User::role('Author')->with('roles')->get();
 
@@ -32,7 +46,10 @@ new class extends Component {
                 }
             });
         }
+    }
 
+    private function loadDepartmentData()
+    {
         $departments = Department::with('users.roles')->get();
 
         if ($departments) {
@@ -43,9 +60,15 @@ new class extends Component {
                         return $user->roles->contains('name', 'Staff');
                     });
 
+                    $departmentOptions = [
+                        'value' => $department->code,
+                        'text' => $department->name,
+                    ];
+
                     // Only include departments with staff
                     if ($staff->isNotEmpty()) {
                         return $department->toArray() + [
+                            'option' => $departmentOptions,
                             'staff' => $staff
                                 ->map(function ($user) {
                                     $firstRole = $user->roles->first();
@@ -59,13 +82,28 @@ new class extends Component {
                 ->filter()
                 ->values()
                 ->toArray();
+
+            $this->departmentOptions = collect($this->departments)
+                ->pluck('option')
+                ->toArray();
         }
     }
 
     #[On('department-updated', 'department-deleted')]
     public function handleDepartmentUpdated()
     {
-        $this->mount();
+        $this->loadAdminData();
+        $this->loadDepartmentData();
+    }
+
+    public function addAdmin()
+    {
+        $this->showAddOrEditModal = true;
+    }
+
+    public function updated()
+    {
+        $this->showDepartmentSelector = $this->userData['role'] === 'Staff';
     }
 }; ?>
 
@@ -75,7 +113,7 @@ new class extends Component {
         <p>Atur siapa saja yang dapat mengelola aplikasi.</p>
     </div>
     <div>
-        <div class="flex justify-end p-4">
+        <div class="flex justify-end pb-4">
             <x-button-primary wire:click="addAdmin">
                 + Tambah Admin
             </x-button-primary>
@@ -142,4 +180,51 @@ new class extends Component {
             </tbody>
         </table>
     </div>
+
+    <x-modal show="showAddOrEditModal">
+        <x-slot name="header">
+            {{ isset($userData['id']) ? 'Edit Administrator' : 'Buat Akun Baru' }}
+        </x-slot>
+
+        <div class="min-w-xl">
+            <form>
+                <table class="table-auto w-full">
+                    <tr>
+                        <td class="font-medium">Nama</td>
+                        <td>
+                            <x-input-text type="text" custom="person" name="name" model="userData.name"
+                                placeholder="Masukkan nama" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Email</td>
+                        <td>
+                            <x-input-text type="email" name="email" model="userData.email"
+                                placeholder="Masukkan email" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Role</td>
+                        <td>
+                            <x-input-select name="role" :options="[
+                                ['value' => 'Admin', 'text' => 'Admin'],
+                                ['value' => 'Staff', 'text' => 'Staff'],
+                            ]" model="userData.role"
+                                placeholder="Select or create an option..." required />
+                        </td>
+                    </tr>
+
+                    @if ($showDepartmentSelector)
+                        <tr>
+                            <td class="font-medium">Jurusan</td>
+                            <td>
+                                <x-input-select name="department" :options="$departmentOptions" model="userData.department"
+                                    placeholder="Pilih jurusan..." required />
+                            </td>
+                        </tr>
+                    @endif
+                </table>
+            </form>
+        </div>
+    </x-modal>
 </div>

@@ -1,23 +1,25 @@
 @props([
     'options' => [],
-    'selected' => null,
     'disabled' => false,
     'required' => false,
     'autofocus' => false,
     'placeholder' => 'Select or create an option...',
     'name' => '',
+    'model' => '',
     'label' => '',
     'allowCreate' => false,
 ])
 
 <div
-    class="flex justify-center items-center gap-4 w-full font-medium {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
-    <label class="w-24" for="{{ $name }}">{{ $label }}</label>
-    <span>:</span>
+    class="flex flex-col sm:flex-row sm:items-center gap-4 w-full font-medium {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
+    @if (!empty($label))
+        <label class="w-24" for="{{ $name }}">{{ $label }}</label>
+        <span class="hidden sm:inline">:</span>
+    @endif
     <div class="relative w-full" x-data="{
         open: false,
         search: '',
-        selected: @entangle($selected),
+        selected: @entangle($model).live,
         options: @js($options),
         allowCreate: @js($allowCreate),
         filteredOptions() {
@@ -36,7 +38,7 @@
         }
     }">
         <div @click="if (!{{ $disabled ? 'true' : 'false' }}) { open = !open }"
-            class="flex items-center cursor-pointer border-b px-4 py-2 font-gray-400 text-sm {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
+            class="flex items-center justify-between cursor-pointer border-b px-4 py-2 text-sm {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
             <span x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-2" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -65,5 +67,7 @@
             </template>
         </div>
     </div>
-    <x-input-error :messages="$errors->get($name)" class="mt-2" />
+    <div class="w-full sm:w-auto">
+        <x-input-error :messages="$errors->get($model)" class="mt-2" />
+    </div>
 </div>

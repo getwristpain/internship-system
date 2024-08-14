@@ -229,7 +229,7 @@ new class extends Component {
                                             <tr>
                                                 <th>Kode</th>
                                                 <th>Nama</th>
-                                                <th>Level</th>
+                                                <th>Tingkat</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
