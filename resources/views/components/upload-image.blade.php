@@ -10,19 +10,20 @@ new class extends Component {
     use WithFileUploads;
 
     public $image = null;
-    public $currentImage = null; // Add this for the current image path
+    public $currentImage = null;
     public string $disk = 'public';
     public string $aspect = '1/1';
     public string $label = 'Upload Image';
     public string $imagePreview = '';
     public string $identifier;
     public bool $circle = false;
+    public bool $loading = true;
 
     public function mount(string $image = '', string $identifier, string $aspect = '1/1', bool $circle = false)
     {
         $this->identifier = $identifier;
         $this->image = $image;
-        $this->currentImage = $this->image; // Initialize current image
+        $this->currentImage = $this->image;
         $this->aspect = $aspect;
         $this->circle = $circle;
 
@@ -31,6 +32,7 @@ new class extends Component {
         }
 
         $this->imagePreview = $this->getImageUrl($this->image);
+        $this->loading = false;
     }
 
     public function updatedImage()
@@ -40,6 +42,7 @@ new class extends Component {
         ]);
 
         if ($this->image) {
+            $this->loading = true;
             $this->handleImageUpload();
         }
     }
@@ -62,6 +65,7 @@ new class extends Component {
 
         // Update the image path and preview URL
         $this->updateImage($path);
+        $this->loading = false;
     }
 
     private function getResizeImage($imageFile)
@@ -120,32 +124,38 @@ new class extends Component {
 ?>
 
 @volt
-    <div x-data="{ hovering: false, imagePreview: @entangle('imagePreview') }" class="relative flex h-full">
-        <div class="relative flex flex-col items-center gap-2 h-full">
+    <div x-data="{ hovering: false, imagePreview: @entangle('imagePreview'), loading: @entangle('loading') }" class="relative flex h-full">
+        <div class="relative flex flex-col items-center h-full gap-2">
             <!-- Image Preview -->
             <div class="relative h-full bg-gray-200 overflow-hidden cursor-pointer hover:opacity-75 {{ $circle ? 'rounded-full' : '' }}"
                 style="aspect-ratio: {{ $aspect }};" @mouseenter="hovering = true" @mouseleave="hovering = false"
                 @click="$refs.image.click()">
-                <template x-if="!imagePreview">
-                    <div class="h-full w-full flex justify-center items-center">
+
+                <!-- Skeleton Loading -->
+                <template x-if="loading">
+                    <div class="flex items-center justify-center w-full h-full bg-gray-300">
+                        <div
+                            class="w-16 h-16 border-4 border-t-4 border-gray-500 rounded-full border-t-transparent animate-spin">
+                        </div>
+                    </div>
+                </template>
+
+                <!-- No Image Placeholder -->
+                <template x-if="!loading && !imagePreview">
+                    <div class="flex items-center justify-center w-full h-full">
                         <x-no-image class="w-1/2 opacity-30" />
                     </div>
                 </template>
 
-                <template x-if="imagePreview">
+                <!-- Image Preview -->
+                <template x-if="!loading && imagePreview">
                     <img :src="imagePreview" alt="Image preview" class="object-cover w-full h-full aspect-auto"
                         x-show="imagePreview">
                 </template>
 
-                <!-- Loading Indicator -->
-                <div wire:loading wire:target="image"
-                    class="absolute inset-0 w-full h-full flex items-center justify-center bg-white bg-opacity-60 text-white text-sm font-bold">
-                    <iconify-icon icon="line-md:uploading-loop"></iconify-icon>
-                </div>
-
                 <!-- Select File Icon -->
                 <div x-show="hovering"
-                    class="absolute inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-bold">
+                    class="absolute inset-0 flex items-center justify-center w-full h-full text-sm font-bold text-white bg-black bg-opacity-50">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6">
                         <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="1.5">
@@ -161,7 +171,7 @@ new class extends Component {
             <div class="absolute bottom-6 right-4">
                 @if ($imagePreview && !str_contains($imagePreview, 'data:image/png;base64,'))
                     <button type="button" wire:click='removeImage'
-                        class="flex items-center justify-center border border-red-500 bg-red-500 text-white aspect-square rounded-full p-1 text-xs hover:bg-white hover:text-red-500 cursor-pointer">
+                        class="flex items-center justify-center p-1 text-xs text-white bg-red-500 border border-red-500 rounded-full cursor-pointer aspect-square hover:bg-white hover:text-red-500">
                         <iconify-icon icon="fluent:delete-28-filled"></iconify-icon>
                     </button>
                 @endif

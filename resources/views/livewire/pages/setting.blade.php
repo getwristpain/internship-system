@@ -1,30 +1,35 @@
 <?php
 
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component {
-    //
+    public array $components = [
+        'author' => [
+            'edit-school' => 'schoolData',
+            'manage-departments' => 'department',
+            'manage-admin' => 'administrator',
+        ],
+    ];
 }; ?>
 
 <div class="max-w-full">
     <x-card class="w-full">
         <div class="flex flex-grow gap-12 p-4">
-            <div class="hidden lg:block border-r px-12 py-4">
-                <x-sidemenu />
+            <div class="hidden border-r lg:block">
+                <x-sidemenu :menu="[
+                    'Data Sekolah' => '#schoolData',
+                    'Kelola Jurusan' => '#department',
+                    'Administrator' => '#administrator',
+                ]" role="Author" />
             </div>
-            <div class="grow flex flex-col divide-y">
+            <div class="flex flex-col divide-y grow">
                 @role('Author')
-                    <div id="schoolData" class="py-8">
-                        @livewire('settings.edit-school')
-                    </div>
-                    <div id="department" class="py-8">
-                        @livewire('settings.manage-departments')
-                    </div>
-                    <div id="administrator" class="py-8">
-                        @livewire('settings.manage-admin')
-                    </div>
+                    @foreach ($components['author'] as $authorComponent => $id)
+                        <div id="{{ $id }}" class="py-8" :key="$id">
+                            @livewire('settings.' . $authorComponent, ['lazy' => true])
+                        </div>
+                    @endforeach
                 @endrole
             </div>
         </div>

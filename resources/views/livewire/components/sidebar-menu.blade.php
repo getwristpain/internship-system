@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -43,9 +44,18 @@ new class extends Component {
 
     public bool $open = false;
 
-    protected $listeners = ['toggleSidebar'];
-
     public function mount()
+    {
+        $this->loadMenu();
+    }
+
+    #[On('toggleSidebar')]
+    public function toggleSidebar($open)
+    {
+        $this->open = $open;
+    }
+
+    private function loadMenu()
     {
         $user = Auth::user();
         $roles = $user->roles->pluck('name')->toArray();
@@ -56,11 +66,6 @@ new class extends Component {
                 $this->filteredMenuItems = array_merge($this->filteredMenuItems, $this->menuItems[$role]);
             }
         }
-    }
-
-    public function toggleSidebar($open)
-    {
-        $this->open = $open;
     }
 
     public function navigate($menuName)
@@ -109,7 +114,7 @@ new class extends Component {
             <!-- Submenu items -->
             @if (!empty($item['submenu']) && in_array($item['name'], $openSubmenus))
                 @foreach ($item['submenu'] as $submenu)
-                    <div class="{{ !$open ?: 'pl-8' }}">
+                    <div class="{{ !$open ?: 'pl-8' }}" :key="$submenu">
                         <a type="button" title="{{ $submenu['label'] ?? '' }}"
                             wire:click="navigate('{{ $submenu['name'] }}')"
                             class="group relative flex cursor-pointer gap-2 p-2 w-full rounded-xl items-center {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}">

@@ -10,33 +10,27 @@
 
     <link rel="shortcut icon" href="" type="image/x-icon">
 
-    <!-- Scripts -->
+    <!-- Vite Load -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @livewireStyles()
+    @livewireStyles
 </head>
 
-<body class="bg-slate-100">
-    <div class="flex w-full min-h-screen">
-        <!-- Page Sidebar -->
-        @livewire('components.sidebar')
+<body class="flex w-full min-h-screen bg-slate-100">
+    <!-- Page Sidebar -->
+    <livewire:components.sidebar />
 
-        <div class="flex flex-col w-full">
-            <!-- Page Sidebar -->
-            @livewire('components.navbar')
+    <div class="flex flex-col w-full">
+        <!-- Page Navbar -->
+        <livewire:components.navbar />
 
-            <!-- Page Content -->
-            <main class="p-4">
-                {{ $slot }}
-            </main>
-        </div>
+        <!-- Page Content -->
+        <main class="p-4">
+            {{ $slot }}
+        </main>
     </div>
 
-    <!-- JS Libraries -->
-    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-
-    @stack('scripts')
-    @livewireScripts()
+    @livewireScripts
 </body>
 
 </html>

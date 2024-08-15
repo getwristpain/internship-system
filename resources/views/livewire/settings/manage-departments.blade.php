@@ -5,320 +5,339 @@ use App\Models\Group;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public $departments;
-    public array $department = [];
+    public array $departments = [];
+    public array $department = ['id' => ''];
     public array $groups = [];
-
-    public string $departmentName_confirmation = '';
+    public string $department_name_confirmation = '';
     public bool $hasUnsavedChanges = false;
-
     public bool $showEditDepartmentModal = false;
     public bool $showRemoveDepartmentModal = false;
 
+    // Lifecycle Methods
     public function mount()
     {
-        $this->departments = Department::with('groups')->get();
+        $this->loadDepartmentData();
     }
 
-    public function updated()
+    // Data Handling
+    private function loadDepartmentData()
     {
-        if (isset($this->department['name'])) {
-            $departmentNameWords = array_filter(explode(' ', $this->department['name']));
-            $formattedDepartmentName = strtoupper(
-                implode(
-                    '',
-                    array_map(function ($word) {
-                        return ctype_upper($word[0] ?? '') ? $word[0] : '';
-                    }, $departmentNameWords),
-                ),
-            );
+        $this->departments = Department::with('groups')->get()->toArray();
+    }
 
-            $this->department['code'] = str_replace(' ', '', $formattedDepartmentName);
+    private function resetDepartment()
+    {
+        $this->department = ['id' => ''];
+        $this->groups = [];
+        $this->hasUnsavedChanges = false;
+    }
 
-            foreach ($this->groups as $index => $group) {
-                if (isset($group['name'])) {
-                    $groupNameWords = array_filter(explode(' ', $group['name']));
-                    $formattedGroupName = strtoupper(
-                        implode(
-                            '',
-                            array_map(function ($word) {
-                                return $word[0] ?? '';
-                            }, $groupNameWords),
-                        ),
-                    );
-                    $formattedGroupCode = str_replace(' ', '-', $formattedGroupName);
-                    $this->groups[$index]['code'] = $this->department['code'] . '-' . $group['level'] . '-' . $formattedGroupCode;
-                }
+    private function saveGroups(int $departmentId)
+    {
+        foreach ($this->groups as $group) {
+            $groupData = ['department_id' => $departmentId] + $group;
+            if (isset($group['id'])) {
+                Group::findOrFail($group['id'])->update($groupData);
+            } else {
+                Group::create($groupData);
             }
         }
-
-        $this->hasUnsavedChanges = true;
     }
 
+    private function updateDepartmentCode()
+    {
+        $nameParts = array_filter(explode(' ', $this->department['name']));
+        $this->department['code'] = strtoupper(implode('', array_map(fn($word) => ctype_upper($word[0] ?? '') ? $word[0] : '', $nameParts)));
+    }
+
+    private function updateGroupCodes()
+    {
+        foreach ($this->groups as $index => $group) {
+            if (isset($group['name'])) {
+                $groupNameParts = array_filter(explode(' ', $group['name']));
+                $formattedGroupCode = strtoupper(implode('', array_map(fn($word) => $word[0] ?? '', $groupNameParts)));
+                $this->groups[$index]['code'] = "{$this->department['code']}-{$group['level']}-{$formattedGroupCode}";
+            }
+        }
+    }
+
+    // Actions
     public function addDepartment()
     {
-        $this->department = [];
-        $this->groups = [];
+        $this->resetDepartment();
         $this->showEditDepartmentModal = true;
-        $this->hasUnsavedChanges = false;
     }
 
-    public function editDepartment($departmentId)
+    public function editDepartment(int $departmentId)
     {
         $department = Department::with('groups')->findOrFail($departmentId);
-        if ($department) {
-            $this->department = $department->toArray();
-            $this->groups = $department->groups->toArray();
-        }
-
+        $this->department = $department->toArray();
+        $this->groups = $department->groups->toArray();
         $this->showEditDepartmentModal = true;
         $this->hasUnsavedChanges = false;
     }
 
-    public function createOrUpdateDepartment()
+    public function saveDepartment()
     {
-        if (isset($this->department['id'])) {
-            $department = Department::findOrFail($this->department['id']);
-            $department->update($this->department);
-        } else {
-            $department = Department::create($this->department);
-        }
+        $this->validate();
 
-        foreach ($this->groups as $group) {
-            if (isset($group['id'])) {
-                $existingGroup = Group::findOrFail($group['id']);
-                $existingGroup->update($group);
-            } else {
-                Group::create($group + ['department_id' => $department->id]);
-            }
-        }
+        $department = $this->department['id'] ? Department::findOrFail($this->department['id'])->update($this->department) : Department::create($this->department);
 
-        $this->mount();
+        $this->saveGroups($department->id);
+        $this->loadDepartmentData();
+
         $this->showEditDepartmentModal = false;
         $this->hasUnsavedChanges = false;
 
+        flash()->success('Department saved successfully!');
         $this->dispatch('department-updated');
     }
 
     public function addGroup()
     {
-        $this->groups[] = [
-            'code' => '',
-            'name' => '',
-            'level' => '',
-        ];
-
+        $this->groups[] = ['code' => '', 'name' => '', 'level' => ''];
         $this->hasUnsavedChanges = true;
     }
 
-    public function removeGroup($index)
+    public function removeGroup(int $index)
     {
         if (isset($this->groups[$index])) {
             unset($this->groups[$index]);
-
             $this->groups = array_values($this->groups);
+            $this->hasUnsavedChanges = true;
         }
-
-        $this->hasUnsavedChanges = true;
     }
 
-    public function removeDepartment($departmentId)
+    public function removeDepartment(int $departmentId)
     {
         $this->department = Department::findOrFail($departmentId)->toArray();
-        $this->showRemoveDepartmentModal = true;
+
+        if ($this->department) {
+            $this->showRemoveDepartmentModal = true;
+            $this->department_name_confirmation = '';
+        }
     }
 
     public function deleteDepartment()
     {
-        $department = Department::findOrFail($this->department['id']);
+        $this->validateOnly('department_name_confirmation');
 
-        if ($this->departmentName_confirmation === $this->department['name']) {
-            $department->delete();
-
-            $this->mount();
-            $this->showRemoveDepartmentModal = false;
-
-            $this->dispatch('department-deleted');
+        try {
+            Department::findOrFail($this->department['id'])->delete();
+        } catch (\Throwable $th) {
+            flash()->error('Departments cannot be deleted!');
         }
+
+        $this->loadDepartmentData();
+        $this->showRemoveDepartmentModal = false;
+
+        flash()->info('Department has been deleted!');
+        $this->dispatch('department-deleted');
     }
-}; ?>
+
+    // Validation Rules
+    public function rules()
+    {
+        return [
+            'department.name' => 'required|string|max:255',
+            'groups.*.name' => 'required|string|max:255',
+            'groups.*.level' => 'required|string|max:10',
+            'department_name_confirmation' => ['required_if:showRemoveDepartmentModal,true', 'in:' . ($this->department['name'] ?? '')],
+        ];
+    }
+
+    // Event Handlers
+    public function updated()
+    {
+        if (isset($this->department['name'])) {
+            $this->updateDepartmentCode();
+            $this->updateGroupCodes();
+        }
+
+        $this->hasUnsavedChanges = true;
+    }
+
+    public function placeholder()
+    {
+        return view('components.skeleton-loading');
+    }
+};
+?>
 
 <div>
-    <div class="mb-8">
-        <h2 class="font-heading font-bold text-xl">Daftar Jurusan</h2>
-        <p>Kelola informasi jurusan sekolah.</p>
-    </div>
+    <!-- Department List -->
     <div>
-        <div class="flex w-full justify-end mb-4">
-            <x-button-primary wire:click="addDepartment">
-                + Tambah Jurusan
-            </x-button-primary>
+        <div class="mb-8">
+            <h2 class="text-xl font-bold font-heading">Daftar Jurusan</h2>
+            <p>Kelola informasi jurusan sekolah.</p>
         </div>
-        <table class="custom-table col-top">
-            <thead>
-                <tr>
-                    <th>Kode</th>
-                    <th>Jurusan</th>
-                    <th>Kelas</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($departments as $department)
+        <div>
+            <div class="flex justify-end w-full mb-4">
+                <x-button-primary wire:click="addDepartment">
+                    + Tambah Jurusan
+                </x-button-primary>
+            </div>
+            <table class="custom-table col-top">
+                <thead>
                     <tr>
-                        <td>{{ $department->code }}</td>
-                        <td>{{ $department->name }}</td>
-                        <td>
-                            <div class="flex flex-col gap-1">
-                                @foreach ($department->groups as $group)
-                                    <span class="w-fit p-2 rounded-xl bg-gray-100">{{ $group->name }}</span>
-                                @endforeach
-                            </div>
-                        </td>
-                        <td>
-                            <div class="flex gap-2 text-xs">
-                                <x-button-secondary wire:click="editDepartment({{ $department->id ?? '' }})">
-                                    <span><iconify-icon icon="tabler:edit"></span>
-                                    <span class="hidden lg:block">Edit</span>
-                                </x-button-secondary>
-                                <x-button-danger wire:click="removeDepartment({{ $department->id ?? '' }})">
-                                    <span><iconify-icon icon="tabler:trash"></span>
-                                </x-button-danger>
-                            </div>
-                        </td>
+                        <th>Kode</th>
+                        <th>Jurusan</th>
+                        <th>Kelas</th>
+                        <th>Aksi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($departments as $department)
+                        <tr>
+                            <td>{{ $department['code'] }}</td>
+                            <td>{{ $department['name'] }}</td>
+                            <td>
+                                <div class="flex flex-col gap-1">
+                                    @foreach ($department['groups'] as $group)
+                                        <span class="p-2 bg-gray-100 w-fit rounded-xl">{{ $group['name'] }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td>
+                                <div class="flex gap-2 text-xs">
+                                    <x-button-secondary wire:click="editDepartment({{ $department['id'] }})">
+                                        <span><iconify-icon icon="tabler:edit"></iconify-icon></span>
+                                        <span class="hidden lg:block">Edit</span>
+                                    </x-button-secondary>
+                                    <x-button-danger wire:click="removeDepartment({{ $department['id'] }})">
+                                        <span><iconify-icon icon="tabler:trash"></iconify-icon></span>
+                                    </x-button-danger>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- Edit Department Modal -->
     <x-modal show="showEditDepartmentModal">
         <x-slot name="header">
-            {{ isset($department['id']) ? 'Edit Jurusan' : 'Buat Jurusan' }}
+            {{ $department['id'] ? 'Edit Jurusan' : 'Buat Jurusan' }}
         </x-slot>
 
         <div class="flex flex-col w-full gap-2">
-            <div>
-                @if ($hasUnsavedChanges)
-                    <div
-                        class="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg mb-4">
-                        <iconify-icon icon="clarity:warning-solid" class="text-xl"></iconify-icon>
-                        <span>Kamu punya perubahan yang belum disimpan.</span>
+            @if ($hasUnsavedChanges)
+                <div
+                    class="flex items-center gap-2 p-4 mb-4 text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg">
+                    <iconify-icon icon="clarity:warning-solid" class="text-xl"></iconify-icon>
+                    <span>Kamu punya perubahan yang belum disimpan.</span>
+                </div>
+            @endif
+
+            <form wire:submit.prevent="saveDepartment" class="flex flex-col">
+                <div class="flex flex-col gap-4">
+                    <!-- Department Code -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-1/5 font-medium">Kode</span>
+                        <x-input-text disabled name="departmentCode" model="department.code" required />
                     </div>
-                @endif
-            </div>
-            <div>
-                <form wire:submit.prevent="createOrUpdateDepartment" class="flex flex-col">
-                    <div class="flex flex-col gap-4">
-                        <!-- Kode Jurusan -->
-                        <div class="flex items-center gap-2">
-                            <span class="font-medium w-1/5">Kode</span>
-                            <x-input-text disabled name="departmentCode" model="department.code" required />
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <!-- Nama Jurusan -->
-                            <span class="font-medium w-1/5">Nama</span>
-                            <x-input-text name="departmentName" model="department.name" required />
-                        </div>
-                        <div class="flex flex-col space-y-4 pt-4">
-                            <span class="font-bold w-1/5">Daftar Kelas</span>
-                            @if ($groups)
-                                <div class="container overflow-x-scroll py-2">
-                                    <table class="custom-table">
-                                        <thead>
+                    <div class="flex items-center gap-2">
+                        <!-- Department Name -->
+                        <span class="w-1/5 font-medium">Nama</span>
+                        <x-input-text name="departmentName" model="department.name" required />
+                    </div>
+                    <div class="flex flex-col pt-4 space-y-4">
+                        <span class="w-1/5 font-bold">Daftar Kelas</span>
+                        @if ($groups)
+                            <div class="container py-2 overflow-x-scroll">
+                                <table class="custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kode</th>
+                                            <th>Nama</th>
+                                            <th>Tingkat</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($groups as $index => $group)
                                             <tr>
-                                                <th>Kode</th>
-                                                <th>Nama</th>
-                                                <th>Tingkat</th>
-                                                <th>Aksi</th>
+                                                <td><input disabled class="custom-input" type="text"
+                                                        wire:model.live.debounce.1500ms="groups.{{ $index }}.code"
+                                                        placeholder="Kode kelas..." required></td>
+                                                <td><input class="custom-input" type="text"
+                                                        wire:model.live.debounce.1500ms="groups.{{ $index }}.name"
+                                                        placeholder="Nama kelas..." required></td>
+                                                <td><input class="custom-input" type="text"
+                                                        wire:model.live.debounce.1500ms="groups.{{ $index }}.level"
+                                                        placeholder="Tingkat kelas..." required></td>
+                                                <td>
+                                                    <x-button-tertiary type="button"
+                                                        wire:click="removeGroup({{ $index }})"
+                                                        class="text-red-600 bg-red-100 cursor-pointer w-fit hover:bg-red-300">
+                                                        <span><iconify-icon icon="tabler:trash"></iconify-icon></span>
+                                                    </x-button-tertiary>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($groups as $index => $group)
-                                                <tr>
-                                                    <td><input disabled class="custom-input" type="text"
-                                                            wire:model.live.debounce.1500ms="groups.{{ $index }}.code"
-                                                            placeholder="Kode kelas..." required>
-                                                    </td>
-                                                    <td><input class="custom-input" type="text"
-                                                            wire:model.live.debounce.1500ms="groups.{{ $index }}.name"
-                                                            placeholder="Nama kelas..." required>
-                                                    </td>
-                                                    <td><input class="custom-input" type="text"
-                                                            wire:model.live.debounce.1500ms="groups.{{ $index }}.level"
-                                                            placeholder="Tingkat kelas..." required></td>
-                                                    <td>
-                                                        <x-button-tertiary type="button"
-                                                            wire:click="removeGroup({{ $index }})"
-                                                            class="w-fit bg-red-100 cursor-pointer text-red-600 hover:bg-red-300">
-                                                            <span><iconify-icon
-                                                                    icon="tabler:trash"></iconify-icon></span>
-                                                        </x-button-tertiary>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @endif
-                            <div>
-                                <x-button-secondary type="button" wire:click="addGroup"
-                                    class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
-                                    <span><iconify-icon icon="tabler:plus"></iconify-icon></span>
-                                    <span>Tambah Kelas</span>
-                                </x-button-secondary>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
+                        @endif
+                        <div>
+                            <x-button-secondary type="button" wire:click="addGroup"
+                                class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
+                                <span><iconify-icon icon="tabler:plus"></iconify-icon></span>
+                                <span>Tambah Kelas</span>
+                            </x-button-secondary>
                         </div>
                     </div>
-                    <div class="flex justify-end items-center gap-2 mt-4">
-                        <x-button-tertiary type="button" wire:click="$set('showEditDepartmentModal', false)"
-                            class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
-                            <span>Batal</span>
-                        </x-button-tertiary>
-                        <x-button-primary type="submit" class="flex items-center gap-2 w-fit">
-                            <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
-                            <span class="hidden lg:block">Simpan</span>
-                        </x-button-primary>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="flex items-center justify-end gap-2 mt-4">
+                    <x-button-secondary wire:click="$set('showEditDepartmentModal', false)">
+                        <span>Batal</span>
+                    </x-button-secondary>
+                    <x-button-primary type="submit">
+                        <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
+                        <span class="hidden lg:block">Simpan</span>
+                    </x-button-primary>
+                </div>
+            </form>
         </div>
     </x-modal>
 
+    <!-- Remove Department Modal -->
     <x-modal show="showRemoveDepartmentModal">
         <x-slot name="header">
             Konfirmasi Hapus
         </x-slot>
 
-        <div class="flex flex-col gap-4 max-w-lg">
+        <div class="flex flex-col gap-4">
             <p><b>Apakah kamu yakin ingin menghapus jurusan berikut?</b></p>
             <div
-                class="flex items-center gap-2 bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-lg mb-4">
+                class="flex items-center gap-2 p-4 mb-4 text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-lg">
                 <iconify-icon icon="clarity:warning-solid" class="text-xl"></iconify-icon>
                 <p>Dengan menghapus jurusan akan mempengaruhi pengguna dan menghapus semua kelas yang terhubung.</p>
             </div>
-            <div class="bg-gray-100 rounded-lg p-4">
+            <div class="p-4 bg-gray-100 rounded-lg">
                 <div class="flex items-center gap-2">
-                    <span class="font-medium w-1/5">Kode</span>
+                    <span class="w-1/5 font-medium">Kode</span>
                     <span>{{ $department['code'] ?? '' }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="font-medium w-1/5">Nama</span>
+                    <span class="w-1/5 font-medium">Nama</span>
                     <span>{{ $department['name'] ?? '' }}</span>
                 </div>
             </div>
-            <form class="flex flex-col">
+            <form class="flex flex-col" wire:submit.prevent="deleteDepartment">
                 <div class="flex flex-col gap-2">
                     <p>Harap konfirmasi dengan memasukkan kembali nama jurusan yang ingin dihapus.</p>
-                    <x-input-text name="departmentName_confirmation" model="departmentName_confirmation" required />
+                    <x-input-text name="department_name_confirmation" model="department_name_confirmation" required />
                 </div>
-                <div class="flex justify-end items-center gap-2 mt-4">
+                <div class="flex items-center justify-end gap-2 mt-4">
                     <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
-                        class="w-fit bg-gray-100 text-gray-900 border cursor-pointer hover:bg-black hover:text-white">
+                        class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
                         <span>Batal</span>
                     </x-button-secondary>
                     <x-button-primary type="submit" wire:click="deleteDepartment"
-                        class="flex items-center gap-2 w-fit bg-red-600 border-red-600 hover:ring-red-600 focus:ring-red-600">
+                        class="flex items-center gap-2 bg-red-600 border-red-600 w-fit hover:ring-red-600 focus:ring-red-600">
                         <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
                         <span class="hidden lg:block">Hapus</span>
                     </x-button-primary>

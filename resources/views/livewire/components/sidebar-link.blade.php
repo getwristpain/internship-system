@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -8,24 +9,26 @@ new class extends Component {
     public bool $active = false;
     public bool $open = false;
 
-    protected $listeners = ['toggleSidebar'];
+    public function mount(array $item)
+    {
+        $this->item = $item;
+        $this->isActive($this->item);
+    }
 
+    private function isActive(array $item)
+    {
+        $routeName = request()->route()->getName();
+        $this->active = $routeName === $item['route'];
+    }
+
+    #[On('toggleSidebar')]
     public function toggleSidebar($open)
     {
         $this->open = $open;
     }
 
-    public function mount(array $item)
-    {
-        $this->item = $item;
-
-        $routeName = request()->route()->getName();
-        $this->active = $routeName === $item['route'];
-    }
-
     public function navigate()
     {
-        // Ensure route is valid before redirecting
         if (!empty($this->item['route']) && Route::has($this->item['route'])) {
             return $this->redirect(route($this->item['route']));
         }

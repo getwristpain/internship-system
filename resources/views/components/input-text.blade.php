@@ -27,59 +27,59 @@
         @switch($custom)
             @case('email')
                 <iconify-icon icon="mdi:email"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('password')
                 <iconify-icon icon="mdi:password"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('number')
                 <iconify-icon icon="tabler:number-123"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('address')
                 <iconify-icon icon="mdi:address-marker"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('person')
                 <iconify-icon icon="mdi:user"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('idcard')
                 <iconify-icon icon="mingcute:idcard-fill"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('phone')
                 <iconify-icon icon="mdi:phone"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('mobile')
                 <iconify-icon icon="basil:mobile-phone-outline"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @case('postcode')
                 <iconify-icon icon="material-symbols:local-post-office-rounded"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
             @default
                 <iconify-icon icon="{{ $icon }}"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></iconify-icon>
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
         @endswitch
 
         <!-- Label -->
         @if ($label)
             <label for="{{ $name }}"
                 :class="{ '-top-3 text-xs': focused || filled, 'top-2 text-sm': !(focused || filled) }"
-                class="absolute left-10 transform transition-all duration-300 ease-in-out pointer-events-none font-medium z-10">
+                class="absolute z-10 font-medium transition-all duration-300 ease-in-out transform pointer-events-none left-10">
                 {{ $label }}
             </label>
         @endif

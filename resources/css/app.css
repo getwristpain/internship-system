@@ -8,6 +8,12 @@ body {
     @apply font-sans text-sm antialiased w-screen min-h-screen overflow-x-hidden text-gray-950;
 }
 
+iconify-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+
 .scrollbar-hidden::-webkit-scrollbar {
     display: none;
 }

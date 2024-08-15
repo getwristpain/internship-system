@@ -3,8 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\User;
-use App\Models\Role;
-use App\Models\Profile;
+use Spatie\Permission\Models\Role;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -47,7 +46,7 @@ class RegisterForm extends Form
     public function registerStepOne()
     {
         $this->validate([
-            'accountType' => 'required|in:student,teacher',
+            'accountType' => 'required|in:Student,Teacher',
             'email' => 'required|email|unique:users,email',
         ]);
 
@@ -91,8 +90,8 @@ class RegisterForm extends Form
             'password' => Hash::make($this->password),
         ]);
 
-        // Attach role to the user
-        $user->roles()->attach($role->id);
+        // Assign to user role;
+        $user->assignRoles([$role]);
 
         Auth::login($user);
     }

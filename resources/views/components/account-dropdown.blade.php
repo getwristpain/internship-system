@@ -2,11 +2,11 @@
     $userName = auth()->user()->name;
 @endphp
 
-<div class="flex gap-2 items-center">
+<div class="flex items-center gap-2">
     <x-dropdown align="right" width="48">
         <x-slot name="trigger">
-            <button class="flex gap-2 items-center">
-                <iconify-icon class="rounded-full bg-gray-200 p-1 text-gray-500" icon="mage:user-fill"></iconify-icon>
+            <button class="flex items-center gap-2">
+                <iconify-icon class="text-xl text-gray-400" icon="mingcute:user-4-fill"></iconify-icon>
 
                 <div x-data="{ name: '{{ $userName }}' }" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></div>
 

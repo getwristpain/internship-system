@@ -13,30 +13,21 @@ new class extends Component {
 
     public function mount()
     {
+        $this->loadSchoolData();
+    }
+
+    private function loadSchoolData(): void
+    {
         $school = School::first();
         if ($school) {
             $this->schoolData = $school->toArray();
-            $this->schoolData['logo'] = $school->logo ? $school->logo : asset('img/logo.png');
+            $this->schoolData['logo'] = $school->logo ?? '';
         }
     }
 
-    #[On('image-updated')]
-    public function updateImage($identifier, $path)
+    public function rules(): array
     {
-        if ($identifier === 'logo') {
-            $this->schoolData['logo'] = $path;
-            $this->isDirty = true;
-        }
-    }
-
-    public function updated($propertyName)
-    {
-        $this->isDirty = true;
-    }
-
-    public function submit()
-    {
-        $this->validate([
+        return [
             'schoolData.name' => 'required|string|max:255',
             'schoolData.address' => 'required|string|max:255',
             'schoolData.post_code' => 'required|numeric',
@@ -46,105 +37,169 @@ new class extends Component {
             'schoolData.contact_person' => 'required|string|max:255',
             'schoolData.principal_name' => 'required|string|max:255',
             'schoolData.logo' => 'nullable|string|max:255',
-        ]);
+        ];
+    }
 
+    public function placeholder(): \Illuminate\Contracts\View\View
+    {
+        return view('components.skeleton-loading');
+    }
+
+    #[On('image-updated')]
+    public function handleImageUpdate(string $identifier, string $path): void
+    {
+        if ($identifier === 'logo') {
+            $this->schoolData['logo'] = $path;
+
+            $this->updateSchoolLogo($path);
+        }
+
+        $this->setIsDirty(true);
+    }
+
+    private function updateSchoolLogo(string $path): void
+    {
+        $school = School::first();
+        if ($school) {
+            $school->update(['logo' => $path]);
+        }
+    }
+
+    public function updated(): void
+    {
+        $this->setIsDirty(true);
+    }
+
+    private function setIsDirty(bool $status): void
+    {
+        $this->isDirty = $status;
+    }
+
+    public function saveSchool(): void
+    {
+        $this->validate();
+
+        $this->updateSchoolData();
+
+        $this->setIsDirty(false);
+
+        flash()->success('School data saved successfully!');
+    }
+
+    private function updateSchoolData(): void
+    {
         $school = School::first();
         if ($school) {
             $school->update($this->schoolData);
-            $this->isDirty = false;
         }
-
-        $this->dispatch('school-updated', title: 'Sukses', text: 'Data sekolah telah disimpan.', icon: 'success');
     }
-}; ?>
+};
+?>
 
 <div>
     <div class="mb-8">
-        <h2 class="font-heading text-xl">Data Sekolah</h2>
+        <h2 class="text-xl font-heading">Data Sekolah</h2>
         <p>Lengkapi dan atur data sekolah.</p>
     </div>
-    <form wire:submit.prevent="submit">
-        <div class="flex flex-col gap-4 w-full">
-            <!-- School Logo --->
-            <div class="flex items-center gap-12 w-full">
-                <div class="w-1/4">
-                    <span class="font-medium">Logo Sekolah</span>
-                </div>
-                <div class="flex h-24">
-                    <x-upload-image :image="$schoolData['logo']" identifier="logo" circle />
-                </div>
-            </div>
+    <div>
+        <form wire:submit.prevent="saveSchool">
+            <table class="min-w-full bg-white">
+                <tbody>
+                    <!-- School Logo -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Logo Sekolah</td>
+                        <td class="flex gap-8 py-2">
+                            <div class="h-24">
+                                <x-upload-image :image="$schoolData['logo']" identifier="logo" circle />
+                            </div>
+                            <div
+                                class="flex flex-col items-center justify-center max-w-sm gap-2 p-4 bg-yellow-100 border border-yellow-500 grow rounded-xl">
+                                <p>Logo harus memiliki format JPG, JPEG, atau PNG dan tidak boleh lebih dari 10MB.</p>
+                            </div>
+                        </td>
+                    </tr>
 
-            <!-- School Name --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Nama Sekolah</span>
-                <x-input-text required type="text" custom="idcard" name="schoolName" placeholder="Nama Sekolah"
-                    model="schoolData.name" />
-            </div>
-            <!-- School Address --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Alamat Sekolah</span>
-                <x-input-text required type="text" custom="address" name="schoolAddress" placeholder="Alamat Sekolah"
-                    model="schoolData.address" />
-            </div>
-            <!-- School Post Code --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Kode Pos Sekolah</span>
-                <x-input-text required type="number" name="schoolPostCode" placeholder="Kode Pos Sekolah"
-                    model="schoolData.post_code" />
-            </div>
-            <!-- School Email --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Email Sekolah</span>
-                <x-input-text required type="email" name="schoolEmail" placeholder="Email Sekolah"
-                    model="schoolData.email" />
-            </div>
-            <!-- School Phone --->
-            <div class="flex lg:items-center gap-12">
-                <span class="w-1/3 font-medium">Telepon Sekolah</span>
-                <div class="flex items-center w-full flex-wrap gap-4">
-                    <div class="grow">
-                        <span class="font-medium"> Telp. </span>
-                        <x-input-text required type="text" custom="phone" name="schoolTelp"
-                            placeholder="Telepon Sekolah" model="schoolData.telp" />
-                    </div>
-                    <div class="grow">
-                        <span class="font-medium"> /Fax. </span>
-                        <x-input-text required type="text" custom="phone" name="schoolFax" placeholder="Fax Sekolah"
-                            model="schoolData.fax" />
-                    </div>
-                </div>
-            </div>
-            <!-- School Contact Person --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Kontak Person</span>
-                <x-input-text required type="text" custom="mobile" name="schoolCP"
-                    placeholder="Kontak Person Sekolah" model="schoolData.contact_person" />
-            </div>
-            <!-- School Principal --->
-            <div class="flex items-center gap-12">
-                <span class="w-1/3 font-medium">Kepala Sekolah</span>
-                <x-input-text required type="text" custom="person" name="schoolPrincipalName"
-                    placeholder="Kepala Sekolah" model="schoolData.principal_name" />
-            </div>
-        </div>
-        <!-- Form Actions --->
-        <div class="flex gap-2 w-full justify-end items-center pt-8">
-            <x-button-primary type="submit" :disabled="!$isDirty">
-                Simpan
-            </x-button-primary>
-        </div>
-    </form>
+                    <!-- School Name -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Nama Sekolah</td>
+                        <td class="py-2">
+                            <x-input-text required type="text" custom="idcard" name="schoolName"
+                                placeholder="Nama Sekolah" model="schoolData.name" />
+                        </td>
+                    </tr>
+
+                    <!-- School Address -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Alamat Sekolah</td>
+                        <td class="py-2">
+                            <x-input-text required type="text" custom="address" name="schoolAddress"
+                                placeholder="Alamat Sekolah" model="schoolData.address" />
+                        </td>
+                    </tr>
+
+                    <!-- School Post Code -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Kode Pos Sekolah</td>
+                        <td class="py-2">
+                            <x-input-text required type="number" name="schoolPostCode" placeholder="Kode Pos Sekolah"
+                                model="schoolData.post_code" />
+                        </td>
+                    </tr>
+
+                    <!-- School Email -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Email Sekolah</td>
+                        <td class="py-2">
+                            <x-input-text required type="email" name="schoolEmail" placeholder="Email Sekolah"
+                                model="schoolData.email" />
+                        </td>
+                    </tr>
+
+                    <!-- School Phone -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Telepon Sekolah</td>
+                        <td class="flex flex-wrap gap-4 py-2">
+                            <div class="grow">
+                                <span class="font-medium">Telp.</span>
+                                <x-input-text required type="text" custom="phone" name="schoolTelp"
+                                    placeholder="Telepon Sekolah" model="schoolData.telp" />
+                            </div>
+                            <div class="grow">
+                                <span class="font-medium">/Fax.</span>
+                                <x-input-text required type="text" custom="phone" name="schoolFax"
+                                    placeholder="Fax Sekolah" model="schoolData.fax" />
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- School Contact Person -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Kontak Person</td>
+                        <td class="py-2">
+                            <x-input-text required type="text" custom="mobile" name="schoolCP"
+                                placeholder="Kontak Person Sekolah" model="schoolData.contact_person" />
+                        </td>
+                    </tr>
+
+                    <!-- School Principal -->
+                    <tr class="w-full">
+                        <td class="py-2 pr-4 font-medium">Kepala Sekolah</td>
+                        <td class="py-2">
+                            <x-input-text required type="text" custom="person" name="schoolPrincipalName"
+                                placeholder="Kepala Sekolah" model="schoolData.principal_name" />
+                        </td>
+                    </tr>
+
+                    <!-- Form Actions -->
+                    <tr class="w-full">
+                        <td colspan="2" class="py-4 text-right">
+                            <x-button-primary type="submit" :disabled="!$isDirty">
+                                Simpan
+                            </x-button-primary>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
 </div>
-
-@script
-    <script>
-        $wire.on('school-updated', (event) => {
-            Swal.fire({
-                title: event.title,
-                text: event.text,
-                icon: event.icon,
-            });
-        });
-    </script>
-@endscript
