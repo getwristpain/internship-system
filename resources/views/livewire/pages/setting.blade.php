@@ -27,7 +27,7 @@ new #[Layout('layouts.app')] class extends Component {
                 @role('Author')
                     @foreach ($components['author'] as $authorComponent => $id)
                         <div id="{{ $id }}" class="py-8" :key="$id">
-                            @livewire('settings.' . $authorComponent, ['lazy' => true])
+                            @livewire('settings.' . $authorComponent)
                         </div>
                     @endforeach
                 @endrole

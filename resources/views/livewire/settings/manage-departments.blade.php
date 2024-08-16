@@ -32,10 +32,11 @@ new class extends Component {
         $this->hasUnsavedChanges = false;
     }
 
-    private function saveGroups(int $departmentId)
+    private function saveGroups($departmentId)
     {
         foreach ($this->groups as $group) {
             $groupData = ['department_id' => $departmentId] + $group;
+
             if (isset($group['id'])) {
                 Group::findOrFail($group['id'])->update($groupData);
             } else {
@@ -81,15 +82,29 @@ new class extends Component {
     {
         $this->validate();
 
-        $department = $this->department['id'] ? Department::findOrFail($this->department['id'])->update($this->department) : Department::create($this->department);
+        if (isset($this->department['id']) && !empty($this->department['id'])) {
+            // Update existing department
+            $department = Department::findOrFail($this->department['id']);
+            $department->update($this->department);
+        } else {
+            // Create new department
+            $department = Department::create($this->department);
+        }
 
+        // Save groups related to the department
         $this->saveGroups($department->id);
+
+        // Reload department data
         $this->loadDepartmentData();
 
+        // Hide the edit modal and reset unsaved changes flag
         $this->showEditDepartmentModal = false;
         $this->hasUnsavedChanges = false;
 
+        // Flash success message
         flash()->success('Department saved successfully!');
+
+        // Dispatch department-updated event
         $this->dispatch('department-updated');
     }
 
@@ -290,17 +305,18 @@ new class extends Component {
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center justify-end gap-2 mt-4">
-                    <x-button-secondary wire:click="$set('showEditDepartmentModal', false)">
-                        <span>Batal</span>
-                    </x-button-secondary>
-                    <x-button-primary type="submit">
-                        <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
-                        <span class="hidden lg:block">Simpan</span>
-                    </x-button-primary>
-                </div>
             </form>
         </div>
+
+        <x-slot name="footer">
+            <x-button-secondary wire:click="$set('showEditDepartmentModal', false)">
+                <span>Batal</span>
+            </x-button-secondary>
+            <x-button-primary wire:click="saveDepartment">
+                <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
+                <span class="hidden lg:block">Simpan</span>
+            </x-button-primary>
+        </x-slot>
     </x-modal>
 
     <!-- Remove Department Modal -->
@@ -316,7 +332,7 @@ new class extends Component {
                 <iconify-icon icon="clarity:warning-solid" class="text-xl"></iconify-icon>
                 <p>Dengan menghapus jurusan akan mempengaruhi pengguna dan menghapus semua kelas yang terhubung.</p>
             </div>
-            <div class="p-4 bg-gray-100 rounded-lg">
+            <div class="p-4 bg-gray-100 rounded-xl">
                 <div class="flex items-center gap-2">
                     <span class="w-1/5 font-medium">Kode</span>
                     <span>{{ $department['code'] ?? '' }}</span>
@@ -331,18 +347,19 @@ new class extends Component {
                     <p>Harap konfirmasi dengan memasukkan kembali nama jurusan yang ingin dihapus.</p>
                     <x-input-text name="department_name_confirmation" model="department_name_confirmation" required />
                 </div>
-                <div class="flex items-center justify-end gap-2 mt-4">
-                    <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
-                        class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
-                        <span>Batal</span>
-                    </x-button-secondary>
-                    <x-button-primary type="submit" wire:click="deleteDepartment"
-                        class="flex items-center gap-2 bg-red-600 border-red-600 w-fit hover:ring-red-600 focus:ring-red-600">
-                        <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
-                        <span class="hidden lg:block">Hapus</span>
-                    </x-button-primary>
-                </div>
             </form>
         </div>
+
+        <x-slot name="footer">
+            <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
+                class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
+                <span>Batal</span>
+            </x-button-secondary>
+            <x-button-primary wire:click="deleteDepartment"
+                class="flex items-center gap-2 bg-red-600 border-red-600 w-fit hover:ring-red-600 focus:ring-red-600">
+                <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
+                <span class="hidden lg:block">Hapus</span>
+            </x-button-primary>
+        </x-slot>
     </x-modal>
 </div>

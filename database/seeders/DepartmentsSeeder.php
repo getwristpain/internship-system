@@ -24,7 +24,7 @@ class DepartmentsSeeder extends Seeder
                     'users' => [
                         [
                             'name' => 'Admin TKGSP',
-                            'email' => 'tkgsp@staff.test',
+                            'email' => 'tkgsp@mail.test',
                             'password' => 'password',
                             'role' => 'Staff',
                         ],
@@ -43,7 +43,7 @@ class DepartmentsSeeder extends Seeder
                     'users' => [
                         [
                             'name' => 'Admin SIJA',
-                            'email' => 'tsija@staff.test',
+                            'email' => 'tsija@mail.test',
                             'password' => 'password',
                             'role' => 'Staff',
                         ],

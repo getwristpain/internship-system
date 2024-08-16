@@ -89,13 +89,20 @@ class User extends Authenticatable
      * @param array $roles
      * @return void
      */
-    public function assignRoles(array $roles)
+    public function assignRoles($roles)
     {
+        // Normalize the $roles input to always be an array
+        if (!is_array($roles)) {
+            $roles = explode(',', $roles);
+        }
+
         // Define roles that should automatically grant Author role
         $rolesThatGrantAuthor = ['Owner', 'Admin'];
 
         foreach ($roles as $roleName) {
+            $roleName = trim($roleName); // Trim any extra whitespace
             $role = Role::firstOrCreate(['name' => $roleName]);
+
             if (!$this->hasRole($roleName)) {
                 $this->assignRole($roleName);
             }
@@ -105,7 +112,8 @@ class User extends Authenticatable
         $this->grantToRole('Author', $rolesThatGrantAuthor);
     }
 
-    private function grantToRole($name, $roles) {
+    private function grantToRole($name, $roles)
+    {
         foreach ($roles as $role) {
             if ($this->hasRole($role)) {
                 $grantToRole = Role::firstOrCreate(['name' => $name]);
@@ -115,6 +123,11 @@ class User extends Authenticatable
                 break;
             }
         }
+    }
+
+    public function getFirstRole()
+    {
+        return $this->roles->pluck('name')->first();
     }
 
     /**

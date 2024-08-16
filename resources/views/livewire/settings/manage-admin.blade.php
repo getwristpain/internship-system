@@ -9,16 +9,15 @@ use Livewire\Volt\Component;
 new class extends Component {
     public array $errors = [];
     public array $departments = [];
-    public array $admin = [];
+    public array $admins = [];
     public array $staff = [];
     public array $userData = [
         'id' => '',
         'name' => '',
         'email' => '',
-        'username' => '',
         'old_password' => '',
-        'new_password' => '',
-        'new_password_confirmation' => '',
+        'password' => '',
+        'password_confirmation' => '',
         'role' => '',
         'department_code' => '',
     ];
@@ -41,17 +40,15 @@ new class extends Component {
 
     private function loadAdminData()
     {
-        $admin = User::role('Admin')->with('roles')->get();
+        // This Author include Owner and Admin roles
+        $admins = User::role('Author')->with('roles')->get();
 
-        if ($admin) {
-            $this->admin = $admin
-                ->map(function ($user) {
-                    $firstRole = $user->roles->first();
-                    return $user->toArray() + ['first_role' => $firstRole ? $firstRole->name : 'No roles assigned'];
-                })
-                ->toArray();
-
-            usort($this->admin, function ($a, $b) {
+        $this->admins = $admins
+            ->map(function ($user) {
+                $firstRole = $user->roles->first();
+                return $user->toArray() + ['first_role' => $firstRole ? $firstRole->name : 'No roles assigned'];
+            })
+            ->sort(function ($a, $b) {
                 if ($a['first_role'] === 'Owner' && $b['first_role'] !== 'Owner') {
                     return -1;
                 } elseif ($a['first_role'] !== 'Owner' && $b['first_role'] === 'Owner') {
@@ -59,50 +56,46 @@ new class extends Component {
                 } else {
                     return strcmp($a['first_role'], $b['first_role']);
                 }
-            });
-        }
+            })
+            ->toArray();
     }
 
     private function loadDepartmentStaffData()
     {
         $departments = Department::with('users.roles')->get();
 
-        if ($departments) {
-            $this->departments = $departments
-                ->map(function ($department) {
-                    $staff = $department->users->filter(function ($user) {
-                        return $user->roles->contains('name', 'Staff');
-                    });
+        $this->departments = $departments
+            ->map(function ($department) {
+                $staff = $department->users->filter(function ($user) {
+                    return $user->roles->contains('name', 'Staff');
+                });
 
-                    $departmentOptions = [
-                        'value' => $department->code,
-                        'text' => $department->name,
-                    ];
-
-                    if ($staff->isNotEmpty()) {
-                        return $department->toArray() + [
-                            'option' => $departmentOptions,
+                return $staff->isNotEmpty()
+                    ? $department->toArray() + [
                             'staff' => $staff
                                 ->map(function ($user) {
                                     $firstRole = $user->roles->first();
                                     return $user->toArray() + ['first_role' => $firstRole ? $firstRole->name : null];
                                 })
                                 ->toArray(),
-                        ];
-                    }
-                })
-                ->filter()
-                ->values()
-                ->toArray();
+                        ]
+                    : null;
+            })
+            ->filter()
+            ->toArray();
 
-            $this->departmentOptions = collect($this->departments)
-                ->pluck('option')
-                ->toArray();
-        }
+        $this->departmentOptions = $departments
+            ->map(function ($department) {
+                return [
+                    'value' => $department->code,
+                    'text' => $department->name,
+                ];
+            })
+            ->toArray();
     }
 
     #[On('department-updated', 'department-deleted')]
-    public function handleDepartmentUpdated()
+    public function refreshAdminData()
     {
         $this->loadAdminData();
         $this->loadDepartmentStaffData();
@@ -110,85 +103,148 @@ new class extends Component {
 
     public function addAdmin()
     {
+        $this->resetForm();
         $this->showEditAdminModal = true;
     }
 
     public function editAdmin($userId)
     {
-        $user = User::with('roles')->findOrFail($userId);
+        $user = User::with('roles', 'departments')->findOrFail($userId);
         $this->userData = $user->toArray();
-        dd($this->userData);
+        $this->userData['role'] = $user->roles->first()->name;
+        $this->userData['department_code'] = $user->departments->first()->code ?? '';
 
+        $this->showDepartmentSelector = $this->userData['role'] === 'Staff';
         $this->showEditAdminModal = true;
     }
 
     public function saveAdmin()
     {
-        $this->validate([
-            'userData.name' => 'required|string|max:255',
-            'userData.email' => 'required|string|email|max:255',
-            'userData.username' => 'required|string|max:255|unique:users,username,' . $this->userData['id'],
-            'userData.old_password' => 'nullable|string|min:8|max:255',
-            'userData.new_password' => 'nullable|string|min:8|max:255|confirmed',
-            'userData.role' => 'required|string|in:Admin,Staff',
-            'userData.department_code' => 'nullable|string|max:50',
-        ]);
+        // Validate input data
+        $this->validate();
 
-        if ($this->userData['id']) {
-            $user = User::with('roles')->find($this->userData['id']);
+        // Determine if we're updating an existing user or creating a new one
+        $isNewAccount = empty($this->userData['id']);
+        $user = $isNewAccount ? new User() : User::findOrFail($this->userData['id']);
 
-            if (isset($this->userData['old_password']) && !empty($this->userData['old_password'])) {
-                if (!Hash::check($this->userData['old_password'], $user->password)) {
-                    $this->addError('userData.old_password', 'The provided password does not match our records.');
-                    return;
-                }
-
-                $user->password = Hash::make($this->userData['new_password']);
+        if (!$isNewAccount) {
+            // Check if old password is correct before updating password
+            if (!empty($this->userData['old_password']) && !Hash::check($this->userData['old_password'], $user->password)) {
+                $this->addError('userData.old_password', 'The provided password does not match our records.');
+                return;
             }
 
-            $user->name = $this->userData['name'];
-            $user->email = $this->userData['email'];
-            $user->username = $this->userData['username'];
-            $user->save();
+            // Update password if provided
+            if (!empty($this->userData['password'])) {
+                $user->password = Hash::make($this->userData['password']);
+            }
         } else {
-            $user = User::create($this->userData);
+            // Set new password for new user account
+            $user->password = Hash::make($this->userData['password']);
         }
 
+        // Fill and save user data
+        $user
+            ->fill([
+                'name' => $this->userData['name'],
+                'email' => $this->userData['email'],
+            ])
+            ->save();
+
+        // Manage departments if the user is a staff member
         if ($this->userData['role'] === 'Staff') {
-            $department = Department::where(['code' => $this->userData['department_code']])->first();
-            if ($department) {
-                $user->departments()->attach($department->id);
+            $department = Department::where('code', $this->userData['department_code'])->first();
+
+            if ($department && !$user->departments->contains($department->id)) {
+                $user->departments()->sync([$department->id]);
+            }
+        } else {
+            if ($user->departments()->exists()) {
+                $user->departments()->detach();
             }
         }
 
-        $user->assignRole($this->userData['role']);
+        // Assign role to the user if it has changed
+        if (!$user->roles->contains('name', $this->userData['role'])) {
+            $user->assignRoles($this->userData['role']);
+        }
+
+        // Flash message based on whether it's a new account
+        flash()->success($isNewAccount ? 'New admin account created successfully!' : 'Admin account saved successfully!');
+
+        // Reset form and refresh admin data
+        $this->resetForm();
+        $this->refreshAdminData();
+
+        // Close the modal
         $this->showEditAdminModal = false;
     }
 
     public function removeAdmin($userId)
     {
-        $user = User::with('roles')->findOrFail($userId);
+        $user = User::findOrFail($userId);
         $this->userData = $user->toArray();
         $this->showRemoveAdminModal = true;
     }
 
     public function deleteAdmin()
     {
-        $user = User::with('roles')->findOrFail($this->userData['id']);
-        $firstRole = $user->roles->first();
+        $user = User::findOrFail($this->userData['id']);
 
-        if ($firstRole && $firstRole->name === 'Owner') {
-            $this->errors['role'] = 'You cannot delete a user with the Owner role.';
+        if (!Hash::check($this->userData['password'], $user->password)) {
+            $this->addError('userData.password', 'The provided password does not match our records.');
+            return;
+        }
+
+        if ($user->roles->first()->name === 'Owner') {
+            flash()->warning('You cannot delete a user with the Owner role.');
             return;
         }
 
         $user->delete();
+
         $this->showRemoveAdminModal = false;
+        flash()->info('Account has been deleted!');
+
+        $this->resetForm();
+        $this->refreshAdminData();
+    }
+
+    public function rules()
+    {
+        $rules = [
+            'userData.name' => 'required|string|max:255',
+            'userData.email' => 'required|string|email|max:255|unique:users,email' . $this->userData['id'],
+            'userData.old_password' => 'nullable|string|min:8|max:255',
+            'userData.password' => 'nullable|string|min:8|max:255|confirmed',
+            'userData.role' => 'required|string|in:Admin,Staff',
+            'userData.department_code' => 'required_if:userData.role,Staff|string|max:50',
+        ];
+
+        if (empty($this->userData['id'])) {
+            $rules['userData.password'] = 'required|string|min:8|max:255|confirmed';
+        }
+
+        return $rules;
     }
 
     public function placeholder()
     {
         return view('components.skeleton-loading');
+    }
+
+    #[On('modal-closed')]
+    public function closeModal()
+    {
+        $this->showEditAdminModal = false;
+        $this->showRemoveAdminModal = false;
+        $this->resetForm();
+    }
+
+    private function resetForm()
+    {
+        $this->reset(['userData']);
+        $this->resetErrorBag();
     }
 };
 ?>
@@ -201,7 +257,7 @@ new class extends Component {
     <div>
         <div class="flex justify-end pb-4">
             <x-button-primary wire:click="addAdmin">
-                + Tambah Admin
+                + Tambah Akun
             </x-button-primary>
         </div>
         <table class="custom-table">
@@ -217,7 +273,7 @@ new class extends Component {
                 <tr class="font-bold bg-gray-100">
                     <td colspan="4">Administrator</td>
                 </tr>
-                @foreach ($admin as $admin)
+                @foreach ($admins as $admin)
                     <tr class="{{ $admin['first_role'] === 'Owner' ? 'italic font-medium' : '' }}">
                         <td>{{ $admin['name'] }}</td>
                         <td>{{ $admin['email'] }}</td>
@@ -278,40 +334,116 @@ new class extends Component {
         <x-slot name="header">Edit Admin</x-slot>
         <div>
             <form wire:submit.prevent="saveAdmin">
-                <div>
-                    // Input Field
-                </div>
-                <div class="flex items-center justify-end gap-2 mt-4">
-                    <x-button-secondary wire:click="$set('showEditAdminModal', false)">
-                        <span>Batal</span>
-                    </x-button-secondary>
-                    <x-button-primary type="submit">
-                        <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
-                        <span class="hidden lg:block">Simpan</span>
-                    </x-button-primary>
-                </div>
+                <table class="w-full table-auto">
+                    <tr>
+                        <td class="font-medium">Nama</td>
+                        <td>
+                            <x-input-text required type="text" custom="person" name="name" model="userData.name"
+                                placeholder="Masukkan nama" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Email</td>
+                        <td>
+                            <x-input-text required type="email" name="email" model="userData.email"
+                                placeholder="Masukkan email" />
+                        </td>
+                    </tr>
+                    @if ($userData['id'])
+                        <tr>
+                            <td class="font-medium">Password Lama</td>
+                            <td>
+                                <x-input-text type="password" name="oldPassword" model="userData.old_password"
+                                    placeholder="Masukkan password lama" />
+                            </td>
+                        </tr>
+                    @endif
+                    <tr>
+                        <td class="font-medium">Buat Password Baru</td>
+                        <td>
+                            <x-input-text type="password" name="password" model="userData.password"
+                                placeholder="Masukkan password baru" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Konfirmasi Password Baru</td>
+                        <td>
+                            <x-input-text type="password" name="password_confirmation"
+                                model="userData.password_confirmation" placeholder="Konfirmasi password baru" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Role</td>
+                        <td>
+                            <x-input-select name="role" :options="[
+                                ['value' => 'Admin', 'text' => 'Admin'],
+                                ['value' => 'Staff', 'text' => 'Staff'],
+                            ]" model="userData.role"
+                                placeholder="Pilih role pengguna..." required />
+                        </td>
+                    </tr>
+
+                    @if ($showDepartmentSelector)
+                        <tr>
+                            <td class="font-medium">Jurusan</td>
+                            <td>
+                                <x-input-select name="department_code" :options="$departmentOptions"
+                                    model="userData.department_code" placeholder="Pilih jurusan..." required />
+                            </td>
+                        </tr>
+                    @endif
+                </table>
             </form>
         </div>
+
+        <x-slot name="footer">
+            <x-button-secondary wire:click="closeModal">
+                <span>Batal</span>
+            </x-button-secondary>
+            <x-button-primary wire:click="saveAdmin">
+                <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
+                <span class="hidden lg:block">Simpan</span>
+            </x-button-primary>
+        </x-slot>
     </x-modal>
 
     <!-- Remove Admin Modal -->
-    <x-modal show="showRemoveAdminModal">
+    <x-modal show="showRemoveAdminModal" fit>
         <x-slot name="header">Hapus Admin</x-slot>
-        <div>
+        <div class="flex flex-col gap-4">
             <div>
-                <p>Apakah kamu yakin ingin menghapus akun admin ini?</p>
+                <p>Apakah kamu yakin ingin menghapus akun ini?</p>
             </div>
-            <div class="flex items-center justify-end gap-2 mt-4">
-                <x-button-secondary wire:click="$set('showRemoveDepartmentModal', false)"
-                    class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
-                    <span>Batal</span>
-                </x-button-secondary>
-                <x-button-primary wire:click="deleteDepartment"
-                    class="flex items-center gap-2 bg-red-600 border-red-600 w-fit hover:ring-red-600 focus:ring-red-600">
-                    <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
-                    <span class="hidden lg:block">Hapus</span>
-                </x-button-primary>
+
+            <div class="p-4 bg-gray-100 rounded-xl space-y-2">
+                <div class="flex items-center gap-4">
+                    <span class="w-1/5 font-medium">Nama</span>
+                    <span>{{ $userData['name'] ?? '' }}</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="w-1/5 font-medium">Email</span>
+                    <span>{{ $userData['email'] ?? '' }}</span>
+                </div>
             </div>
+
+            <form wire:submit.prevent="deleteAdmin">
+                <div class="flex flex-col gap-2">
+                    <span class="font-medium">Password</span>
+                    <x-input-text required type="password" name="password" model="userData.password"
+                        placeholder="Konfirmasi password..." />
+                </div>
+            </form>
         </div>
+
+        <x-slot name="footer">
+            <x-button-secondary wire:click="closeModal"
+                class="text-gray-900 bg-gray-100 border cursor-pointer w-fit hover:bg-black hover:text-white">
+                <span>Batal</span>
+            </x-button-secondary>
+            <x-button-danger type="submit" wire:click="deleteAdmin">
+                <iconify-icon icon="tabler:trash" class="text-xl"></iconify-icon>
+                <span class="hidden lg:block">Hapus</span>
+            </x-button-danger>
+        </x-slot>
     </x-modal>
 </div>
