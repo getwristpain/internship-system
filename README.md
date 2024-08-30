@@ -1,4 +1,4 @@
-# Simapekael Development Version (smpkl-dev)
+# Simapekael Internship Management System (smpkl-ims
 
 ## Description
 
