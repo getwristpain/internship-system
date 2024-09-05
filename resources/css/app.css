@@ -5,7 +5,15 @@
 @tailwind utilities;
 
 body {
-    @apply font-sans text-sm antialiased w-screen min-h-screen overflow-x-hidden text-gray-950;
+    @apply font-sans antialiased screen-full;
+}
+
+.screen-full {
+    @apply min-h-screen w-screen overflow-x-hidden overflow-y-auto;
+}
+
+.livewire-loading {
+    border-top-color: #00a3fb;
 }
 
 iconify-icon {

@@ -90,11 +90,12 @@
             {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
             @focus="focused = true; filled = true" @blur="if (!$el.value) { focused = false; filled = false }"
             @input="filled = $el.value.length > 0" x-ref="input"
-            {{ $attributes->merge(['class' => 'block bg-white border-0 border-b px-10 py-2 text-sm w-full focus:ring-0 focus:border-black disabled:opacity-100 disabled:bg-gray-100 disabled:cursor-not-allowed peer']) }}
+            {{ $attributes->merge(['class' => 'input input-bordered w-full pl-10 peer focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed']) }}
             aria-describedby="{{ $name }}-error">
+
     </div>
 
     <div>
-        <x-input-error :messages="$errorMessages" class="mt-2" />
+        <x-input-error :messages="$errorMessages" class="mt-2 text-red-500" />
     </div>
 </div>

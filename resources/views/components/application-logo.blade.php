@@ -1,6 +1,6 @@
 @props(['logo' => ''])
 
-<a href="{{ url('/') }}" {{ $attributes->merge(['class' => 'block']) }} wire:navigate>
+<a href="{{ url('/') }}" {{ $attributes->merge(['class' => 'block h-full ratio-square']) }} wire:navigate>
     @if ($logo)
         <img src="{{ $logo ?? asset('img/logo.png') }}" alt="Logo"
             {{ $attributes->merge(['class' => 'square h-full']) }} />

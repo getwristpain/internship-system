@@ -4,13 +4,14 @@ use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\VerifyEmailController;
 
+
 Route::middleware('guest')->group(function () {
     // Register
     Volt::route('register', 'pages.auth.register')
         ->name('register');
 
     // Register Multi-steps
-    Route::prefix('/auth/u/step')->group(function () {
+    Route::prefix('/register/user/step')->group(function () {
         Volt::route('two', 'pages.auth.register.step-account')
             ->name('register.account');
     });
@@ -20,7 +21,7 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     // Company Login
-    Volt::route('c/login', 'pages.auth.c-login')
+    Volt::route('company/login', 'pages.auth.c-login')
         ->name('login.company');
 
     // Forgot Password
