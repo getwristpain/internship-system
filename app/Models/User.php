@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use App\Listeners\AssignAuthorRole;
 use Ramsey\Uuid\Uuid;
-use Illuminate\Auth\Events\Registered;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
@@ -63,12 +61,6 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected $listen = [
-        Registered::class => [
-            AssignAuthorRole::class,
-        ],
-    ];
-
     /**
      * Boot function from Laravel.
      */
@@ -82,47 +74,6 @@ class User extends Authenticatable
                 $model->{$model->getKeyName()} = (string) Uuid::uuid4();
             }
         });
-    }
-    /**
-     * Assign roles to the user.
-     *
-     * @param array $roles
-     * @return void
-     */
-    public function assignRoles($roles)
-    {
-        // Normalize the $roles input to always be an array
-        if (!is_array($roles)) {
-            $roles = explode(',', $roles);
-        }
-
-        // Define roles that should automatically grant Author role
-        $rolesThatGrantAuthor = ['Owner', 'Admin'];
-
-        foreach ($roles as $roleName) {
-            $roleName = trim($roleName); // Trim any extra whitespace
-            $role = Role::firstOrCreate(['name' => $roleName]);
-
-            if (!$this->hasRole($roleName)) {
-                $this->assignRole($roleName);
-            }
-        }
-
-        // Check if the user has any of the roles that grant Author
-        $this->grantToRole('Author', $rolesThatGrantAuthor);
-    }
-
-    private function grantToRole($name, $roles)
-    {
-        foreach ($roles as $role) {
-            if ($this->hasRole($role)) {
-                $grantToRole = Role::firstOrCreate(['name' => $name]);
-                if (!$this->hasRole($grantToRole)) {
-                    $this->assignRole($grantToRole);
-                }
-                break;
-            }
-        }
     }
 
     public function getFirstRole()

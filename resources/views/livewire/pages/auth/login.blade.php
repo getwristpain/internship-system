@@ -10,10 +10,6 @@ new #[Layout('layouts.guest')] class extends Component {
     public function login()
     {
         $this->form->attemptLogin();
-
-        if (!$this->form->getErrorBag()->isNotEmpty()) {
-            return $this->redirectIntended(route('dashboard'), navigate: true);
-        }
     }
 
     public function clogin()
@@ -40,15 +36,15 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form class="w-full space-y-12" wire:submit.prevent="login">
         <div class="space-y-4">
-            <x-input-text type="email" :model="$form->email" placeholder="Email" />
-            <x-input-text type="password" :model="$form->password" placeholder="Password" />
-            <x-input-checkbox name="remember" :model="$form->remember" label="Ingat saya" />
+            <x-input-text type="email" model="form.email" placeholder="Email" />
+            <x-input-text type="password" model="form.password" placeholder="Password" />
+            <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
         </div>
 
         <div class="flex items-center justify-end space-x-4">
-            <button wire:click.prevent="resetPassword">Lupa password?</button>
-            <button wire:click.prevent="register" class="btn btn-outline btn-neutral">Register</button>
-            <button wire:click.prevent="login" class="btn bgn-outline btn-neutral">Login</button>
+            <button wire:click="resetPassword">Lupa password?</button>
+            <button wire:click="register" class="btn btn-outline btn-neutral">Register</button>
+            <button wire:click="login" class="btn bgn-outline btn-neutral">Login</button>
         </div>
 
         <div class="flex items-center justify-center w-full space-x-4 text-sm text-gray-500">
@@ -58,7 +54,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <div class="flex flex-col items-center justify-center w-full space-y-8 text-center">
-            <button wire:click.prevent="clogin" class="btn bg-base-100">Login untuk Perusahaan</button>
+            <button disabled wire:click.prevent="clogin" class="btn bg-base-100">Login untuk Perusahaan</button>
         </div>
     </form>
 </div>

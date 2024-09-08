@@ -2,12 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Str;
+use Illuminate\Console\Command;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
+use function Laravel\Prompts\{text, password, select};
 
 class CreateUser extends Command
 {
@@ -30,11 +32,13 @@ class CreateUser extends Command
      */
     public function handle()
     {
-        $name = $this->ask("What is the user's name?");
-        $email = $this->ask("What is the user's email?");
-        $password = $this->secret("What is the user's password?");
-        $password_confirmation = $this->secret("Please confirm the user's password");
+        // Prompt for user input
+        $name = text("What is the user's name?");
+        $email = text("What is the user's email?");
+        $password = password("What is the user's password?");
+        $password_confirmation = password("Please confirm the user's password");
 
+        // Validate input
         $validator = Validator::make([
             'name' => $name,
             'email' => $email,
@@ -51,13 +55,14 @@ class CreateUser extends Command
             return;
         }
 
+        // Get roles and allow new role creation
         $roles = Role::all()->pluck('name')->toArray();
         $roles[] = 'Create new role';
-        $roleName = $this->choice('Select a role for the user or create a new one', $roles);
+        $roleName = select('Select a role for the user or create a new one', $roles, 'student');
 
         if ($roleName === 'Create new role') {
-            $roleName = $this->ask('Enter the name of the new role');
-            $roleName = Str::studly($roleName);
+            $roleName = text('Enter the name of the new role');
+            $roleName = Str::slug($roleName);
 
             if (Role::where('name', $roleName)->exists()) {
                 $this->error('Role already exists. Please choose a different name.');
@@ -80,6 +85,8 @@ class CreateUser extends Command
         // Assign the role to the user
         $user->assignRole($role->name);
 
-        $this->info("User created successfully with the role: {$roleName}");
+        $this->info("User created successfully!");
+        $this->info("Name: {$user->name}");
+        $this->info("Role: {$role->name}");
     }
 }

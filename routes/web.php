@@ -9,6 +9,5 @@ use App\Http\Controllers\AvatarController;
 Route::redirect('/', '/dashboard', 301);
 Route::get('assets/uploads/avatars/{userId}/{filename}', [AvatarController::class, 'show'])->middleware('auth')->name('assets.avatar');
 
-require __DIR__ . '/api.php';
 require __DIR__ . '/auth.php';
 require __DIR__ . '/app.php';

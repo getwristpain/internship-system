@@ -2,12 +2,11 @@
 
 namespace App\Livewire\Forms;
 
-use Livewire\Component;
-use Laravel\Fortify\Fortify;
+use Livewire\Form;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
-class LoginForm extends Component
+class LoginForm extends Form
 {
     public string $email = '';
     public string $password = '';
@@ -15,35 +14,62 @@ class LoginForm extends Component
 
     public function attemptLogin()
     {
-        $this->validateLoginInputs();
+        $this->validate();
 
-        try {
-            $this->loginUser();
-            session()->flash('success', 'Login successful!');
-            return redirect()->intended(Fortify::redirects('login'));
-        } catch (ValidationException $e) {
-            $this->addError('email', 'These credentials do not match our records.');
+        if (!$this->isUserValid()) {
+            return;
         }
+
+        if (!$this->authenticateUser()) {
+            return;
+        }
+
+        return redirect()->intended()->route('dashboard');
     }
 
-    protected function validateLoginInputs()
+    public function rules(): array
     {
-        $this->validate([
+        return [
             'email' => 'required|string|email',
             'password' => 'required|string',
             'remember' => 'boolean',
-        ]);
+        ];
     }
 
-    protected function loginUser()
+    /**
+     * Checks if the user exists and adds an error if not.
+     */
+    protected function isUserValid(): bool
+    {
+        if (!$this->userExists()) {
+            $this->addError('email', __('auth.user_not_found'));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifies if the user exists in the database.
+     */
+    protected function userExists(): bool
+    {
+        return User::where('email', $this->email)->exists();
+    }
+
+    /**
+     * Attempts to authenticate the user and adds an error if authentication fails.
+     */
+    protected function authenticateUser(): bool
     {
         if (!Auth::attempt([
             'email' => $this->email,
             'password' => $this->password
         ], $this->remember)) {
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
+            $this->addError('email', __('auth.failed'));
+            return false;
         }
+
+        return true;
     }
 }

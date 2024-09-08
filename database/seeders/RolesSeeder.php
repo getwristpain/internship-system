@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Spatie\Permission\Models\Role;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class RolesSeeder extends Seeder
 {
@@ -14,29 +14,17 @@ class RolesSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            [
-                'name' => 'Owner',
-            ],
-            [
-                'name' => 'Admin',
-            ],
-            [
-                'name' => 'Staff',
-            ],
-            [
-                'name' => 'Student',
-            ],
-            [
-                'name' => 'Teacher',
-            ],
-            [
-                'name' => 'Supervisor',
-            ],
+            'owner',
+            'admin',
+            'staff',
+            'student',
+            'teacher',
+            'supervisor',
         ];
 
         foreach ($roles as $role) {
             Role::firstOrCreate(
-                ['name' => $role['name']]
+                ['name' => $role]
             );
         }
     }

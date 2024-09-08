@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ $title ?? 'Sistem Informasi Manajemen PKL - SMK Negeri 2 Klaten' }}</title>
+        <title>{{ ($title ?? 'Sistem Informasi Manajemen PKL') . ($brand ?? '' ? ' - ' . $brand : '') }}</title>
 
-        <link rel="shortcut icon" href="{{ asset('img/logo.png') }}" type="image/x-icon">
+        <link rel="shortcut icon" href="{{ $logo ?? (asset('img/logo.png') ?? '') }}" type="image/x-icon">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -19,7 +19,7 @@
     <body class="flex flex-col">
 
         {{-- Header --}}
-        <header class="sticky top-0 z-50 w-full px-8 border-b bg-base-100">
+        <header class="sticky top-0 z-10 w-full px-8 border-b bg-base-100">
             {{-- Navbar --}}
             <div class="navbar bg-base-100">
                 <div class="navbar-start">
@@ -28,13 +28,11 @@
             </div>
         </header>
 
-        <main class="flex items-center justify-center w-full h-full grow">
+        <main class="flex items-center justify-center grow">
             <div class="container p-8 mx-auto">
                 {{ $slot }}
             </div>
         </main>
-
-        <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
         @stack('scripts')
         @livewireScripts()

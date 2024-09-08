@@ -5,9 +5,11 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\School;
 use Illuminate\Console\Command;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
+
+use function Laravel\Prompts\{text, password, confirm};
 
 class InstallApp extends Command
 {
@@ -55,6 +57,9 @@ class InstallApp extends Command
         return 0;
     }
 
+    /**
+     * Clear application caches.
+     */
     protected function clearCache()
     {
         $this->info('Clearing all caches...');
@@ -85,11 +90,13 @@ class InstallApp extends Command
     {
         $this->info('Creating owner user...');
 
-        $name = $this->ask("What is the owner's name?");
-        $email = $this->ask("What is the owner's email?");
-        $password = $this->secret("What is the owner's password?");
-        $password_confirmation = $this->secret("Please confirm the owner's password");
+        // Prompt user for input using Laravel Prompts
+        $name = text("What is the owner's name?");
+        $email = text("What is the owner's email?");
+        $password = password("What is the owner's password?");
+        $password_confirmation = password("Please confirm the owner's password");
 
+        // Validate user input
         $validator = Validator::make([
             'name' => $name,
             'email' => $email,
@@ -106,6 +113,7 @@ class InstallApp extends Command
             return;
         }
 
+        // Create user
         $user = User::create([
             'name' => $name,
             'email' => $email,
@@ -113,7 +121,8 @@ class InstallApp extends Command
         ]);
 
         if ($user) {
-            $user->assignRoles(['Owner']);
+            // Assign roles
+            $user->syncRoles(['admin', 'owner']);
             $this->info('Owner user created successfully!');
         } else {
             $this->error('Error in creating user.');

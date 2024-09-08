@@ -9,7 +9,7 @@ body {
 }
 
 .screen-full {
-    @apply min-h-screen w-screen overflow-x-hidden overflow-y-auto;
+    @apply h-screen w-screen overflow-x-hidden overflow-y-auto;
 }
 
 .livewire-loading {

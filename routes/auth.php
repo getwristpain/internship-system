@@ -10,12 +10,6 @@ Route::middleware('guest')->group(function () {
     Volt::route('register', 'pages.auth.register')
         ->name('register');
 
-    // Register Multi-steps
-    Route::prefix('/register/user/step')->group(function () {
-        Volt::route('two', 'pages.auth.register.step-account')
-            ->name('register.account');
-    });
-
     // Login
     Volt::route('login', 'pages.auth.login')
         ->name('login');
@@ -34,6 +28,12 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    // Register Multi-steps
+    Route::prefix('/register/user/step')->group(function () {
+        Volt::route('two', 'pages.auth.register.step-account')
+            ->name('register.steptwo');
+    });
+
     Volt::route('verify-email', 'pages.auth.verify-email')
         ->name('verification.notice');
 

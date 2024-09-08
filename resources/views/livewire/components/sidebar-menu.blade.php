@@ -7,7 +7,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public array $menuItems = [
-        'All' => [
+        'all' => [
             [
                 'name' => 'Dashboard',
                 'route' => 'dashboard',
@@ -16,7 +16,7 @@ new class extends Component {
                 'submenu' => [],
             ],
         ],
-        'Author' => [
+        'admin' => [
             [
                 'name' => 'Management',
                 'icon' => 'ic:round-manage-accounts',
@@ -59,7 +59,7 @@ new class extends Component {
     {
         $user = Auth::user();
         $roles = $user->roles->pluck('name')->toArray();
-        $this->filteredMenuItems = $this->menuItems['All'];
+        $this->filteredMenuItems = $this->menuItems['all'];
 
         foreach ($roles as $role) {
             if (isset($this->menuItems[$role])) {
@@ -92,14 +92,14 @@ new class extends Component {
         <div>
             <!-- Main menu items -->
             <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate('{{ $item['name'] }}')"
-                class="group relative flex cursor-pointer gap-2 p-2 w-full rounded-xl items-center {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}">
+                class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center p-2' : 'px-4 py-2' }}">
 
                 <!-- Icon -->
-                <iconify-icon class="text-xl" icon="{{ $item['icon'] ?? '' }}"></iconify-icon>
+                <iconify-icon class="scale-125" icon="{{ $item['icon'] ?? '' }}"></iconify-icon>
 
                 <!-- Label that appears on hover -->
                 <span
-                    class="items-center gap-2 {{ $open ? 'flex' : 'hidden group-hover:flex absolute left-full p-2 pl-2 whitespace-nowrap rounded-r-xl transition-transform transform -translate-x-2' }} {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
+                    class="items-center gap-2 {{ $open ? 'flex' : 'hidden group-hover:flex absolute left-full pl-2 pr-4 py-1 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
                     {{ $item['label'] ?? '' }}
 
                     <!-- Dropdown icon -->
@@ -117,14 +117,14 @@ new class extends Component {
                     <div class="{{ !$open ?: 'pl-8' }}" :key="$submenu">
                         <a type="button" title="{{ $submenu['label'] ?? '' }}"
                             wire:click="navigate('{{ $submenu['name'] }}')"
-                            class="group relative flex cursor-pointer gap-2 p-2 w-full rounded-xl items-center {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}">
+                            class="group relative flex cursor-pointer gap-2 p-2 w-full rounded-lg items-center {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}">
 
                             <!-- Icon -->
                             <iconify-icon class="text-xl" icon="{{ $submenu['icon'] ?? '' }}"></iconify-icon>
 
                             <!-- Label that appears on hover -->
                             <span
-                                class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full p-2 pl-2 whitespace-nowrap rounded-r-xl transition-transform transform -translate-x-2' }} {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
+                                class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full p-2 pl-2 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
                                 {{ $submenu['label'] ?? '' }}
                             </span>
                         </a>
