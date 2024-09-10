@@ -37,14 +37,14 @@ new class extends Component {
 ?>
 
 <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate"
-    class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $active ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center p-2' : 'px-4 py-2' }}">
+    class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $active ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center p-3' : 'px-4 py-2' }}">
 
     <!-- Icon -->
     <iconify-icon class="scale-125" icon="{{ $item['icon'] ?? '' }}"></iconify-icon>
 
     <!-- Label that appears on hover -->
     <span
-        class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full py-1 pl-2 pr-4 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $active ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
+        class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full p-2 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $active ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
         {{ $item['label'] ?? '' }}
     </span>
 </a>

@@ -18,7 +18,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         $status = Password::sendResetLink($this->only('email'));
 
-        if ($status != Password::RESET_LINK_SENT) {
+        if ($status !== Password::RESET_LINK_SENT) {
             $this->addError('email', __($status));
             return;
         }
@@ -44,8 +44,8 @@ new #[Layout('layouts.guest')] class extends Component {
             <x-input-text type="email" name="email" model="email" placeholder="Email" required autofocus />
         </div>
         <div class="flex items-center justify-end space-x-4">
-            <button class="btn btn-outline btn-neutral" wire:click="back">Kembali</button>
-            <button class="btn btn-neutral" wire:click="sendPasswordResetLink">Kirim</button>
+            <button type="button" class="btn btn-outline btn-neutral" wire:click="back">Kembali</button>
+            <button type="submit" class="btn btn-neutral">Kirim</button>
         </div>
     </form>
 </div>

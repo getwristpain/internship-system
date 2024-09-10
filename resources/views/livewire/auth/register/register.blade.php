@@ -31,7 +31,7 @@ new #[Layout('layouts.guest')] class extends Component {
             <button class="w-auto grow btn btn-outline btn-neutral" type="button" wire:click="register('teacher')">
                 Daftar Sebagai Guru
             </button>
-            <button class="w-auto grow btn btn-neutral" type="submit" wire:click="register('student')">
+            <button class="w-auto grow btn btn-neutral" type="submit">
                 Daftar Sebagai Siswa
             </button>
         </div>

@@ -36,15 +36,15 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form class="w-full space-y-12" wire:submit.prevent="login">
         <div class="space-y-4">
-            <x-input-text type="email" model="form.email" placeholder="Email" />
-            <x-input-text type="password" model="form.password" placeholder="Password" />
+            <x-input-text required type="email" model="form.email" placeholder="Email" autofocus />
+            <x-input-text required type="password" model="form.password" placeholder="Password" />
             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
         </div>
 
         <div class="flex items-center justify-end space-x-4">
-            <button wire:click="resetPassword">Lupa password?</button>
-            <button wire:click="register" class="btn btn-outline btn-neutral">Register</button>
-            <button wire:click="login" class="btn bgn-outline btn-neutral">Login</button>
+            <button type="button" wire:click="resetPassword">Lupa password?</button>
+            <button type="button" wire:click="register" class="btn btn-outline btn-neutral">Register</button>
+            <button type="submit" class="btn bgn-outline btn-neutral">Login</button>
         </div>
 
         <div class="flex items-center justify-center w-full space-x-4 text-sm text-gray-500">

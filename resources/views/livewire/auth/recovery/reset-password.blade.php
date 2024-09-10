@@ -61,50 +61,31 @@ new #[Layout('layouts.guest')] class extends Component {
             return;
         }
 
-        Session::flash('status', __($status));
+        session()->flash('status', __($status));
 
         $this->redirectRoute('login', navigate: true);
     }
 }; ?>
 
-<div class="w-full h-full flex justify-center items-center p-8 lg:pb-24">
-    <div class="flex flex-col gap-16 w-full max-w-md">
+<div class="flex flex-col space-y-12 w-full max-w-md mx-auto">
 
-        <!-- Heading -->
-        <div class="flex flex-col gap-2 text-center my-5 w-full">
-            <h1 class="font-heading text-xl">Buat Password Baru</h1>
-            <p>Reset passwordmu dan jangan sampai lupa lagi.</p>
+    <!-- Heading -->
+    <div class="flex flex-col gap-2 text-center w-full">
+        <h1 class="font-heading text-xl">Buat Password Baru</h1>
+        <p>Reset passwordmu dan jangan sampai lupa.</p>
+    </div>
+
+    <form wire:submit="resetPassword" class="flex flex-col gap-16 w-full">
+        <div class="flex flex-col space-y-4 w-full">
+            <x-input-text disabled type="email" name="email" model="email" placeholder="Email" required autofocus />
+            <x-input-text type="password" name="password" model="password" placeholder="Password" required />
+            <x-input-text type="password" name="password_confirmation" model="password_confirmation"
+                Placeholder="Konfirmasi Password" required />
         </div>
 
-        <form wire:submit="resetPassword" class="flex flex-col gap-16 w-full">
-            <div class="flex flex-col gap-4 w-full">
-                <!-- Email Address -->
-                <div class="w-full">
-                    <x-input-text type="email" name="email" model="email" label="Email" required autofocus />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
-
-                <!-- Password -->
-                <div class="w-full">
-                    <x-input-text type="password" name="password" model="password" label="Password" required />
-                </div>
-
-                <!-- Confirm Password -->
-                <div class="w-full">
-                    <x-input-text type="password" name="password_confirmation" model="password_confirmation"
-                        label="Konfirmasi Password" required autofocus />
-                </div>
-            </div>
-
-            <div class="flex items-center justify-center w-full gap-2">
-                <x-button-secondary onclick="window.history.back()">
-                    {{ __('Batal') }}
-                </x-button-secondary>
-
-                <x-button-primary type="submit">
-                    {{ __('Reset Password') }}
-                </x-button-primary>
-            </div>
-        </form>
-    </div>
+        <div class="flex items-center justify-end w-full space-x-4">
+            <button type="button" wire:click="back" class="btn btn-outline btn-neutral">Batal</button>
+            <button type="submit" class="btn btn-neutral">Reset Password</button>
+        </div>
+    </form>
 </div>
