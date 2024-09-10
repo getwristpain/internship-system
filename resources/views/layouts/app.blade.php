@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Sistem Informasi Manajemen PKL - SMK Negeri 2 Klaten</title>
+        <title>Sistem Informasi Manajemen PKL - SMK Negeri 2 Klaten</title>
 
-    <link rel="shortcut icon" href="" type="image/x-icon">
+        <link rel="shortcut icon" href="" type="image/x-icon">
 
-    <!-- Vite Load -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <!-- Vite Load -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @livewireStyles
-</head>
+        @livewireStyles
+    </head>
 
-<body class="flex w-full min-h-screen bg-slate-100">
-    <!-- Page Sidebar -->
-    <livewire:components.sidebar />
+    <body class="flex w-full min-h-screen bg-slate-100">
+        <!-- Page Sidebar -->
+        <livewire:components.sidebar />
 
-    <div class="flex flex-col w-full">
-        <!-- Page Navbar -->
-        <livewire:components.navbar />
+        <div class="flex flex-col w-full min-h-screen overflow-y-auto">
+            <!-- Page Navbar -->
+            <livewire:components.navbar />
 
-        <!-- Page Content -->
-        <main class="p-4">
-            {{ $slot }}
-        </main>
-    </div>
+            <!-- Page Content -->
+            <main class="p-4 grow">
+                {{ $slot }}
+            </main>
+        </div>
 
-    @livewireScripts
-</body>
+        @livewireScripts
+    </body>
 
 </html>

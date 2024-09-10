@@ -8,7 +8,7 @@ export default {
     daisyui: {
         themes: [
             {
-                light: {
+                mytheme: {
                     ...require("daisyui/src/theming/themes")["bumblebee"],
                 },
             },
