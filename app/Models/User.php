@@ -8,6 +8,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status_id',
     ];
 
     /**
@@ -79,6 +81,16 @@ class User extends Authenticatable
     public function getFirstRole()
     {
         return $this->roles->pluck('name')->first();
+    }
+
+    /**
+     * Get the user status associated with the user.
+     *
+     * @return BelongsTo
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(UserStatus::class);
     }
 
     /**

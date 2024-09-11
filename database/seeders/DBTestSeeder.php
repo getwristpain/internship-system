@@ -13,10 +13,7 @@ class DBTestSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RolesSeeder::class,
             UsersSeeder::class,
-            SchoolSeeder::class,
-            DepartmentsSeeder::class,
         ]);
     }
 }

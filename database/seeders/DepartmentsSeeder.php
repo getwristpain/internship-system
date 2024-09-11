@@ -2,12 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Models\Department;
-use App\Models\Group;
 use App\Models\User;
+use App\Models\Group;
+use App\Models\Department;
+use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class DepartmentsSeeder extends Seeder
 {
@@ -27,6 +28,7 @@ class DepartmentsSeeder extends Seeder
                             'email' => 'tkgsp@mail.test',
                             'password' => 'password',
                             'role' => 'Staff',
+                            'status' => 'Active',
                         ],
                     ],
                     'groups' => [
@@ -46,6 +48,7 @@ class DepartmentsSeeder extends Seeder
                             'email' => 'tsija@mail.test',
                             'password' => 'password',
                             'role' => 'Staff',
+                            'status' => 'Active',
                         ],
                     ],
                     'groups' => [
@@ -70,6 +73,14 @@ class DepartmentsSeeder extends Seeder
             // Handle users
             if (isset($departmentData['users']) && is_array($departmentData['users'])) {
                 foreach ($departmentData['users'] as $userData) {
+                    // Fetch the user status by name
+                    $status = UserStatus::where('name', $userData['status'])->first();
+
+                    if (!$status) {
+                        // Handle missing status (optional)
+                        continue;
+                    }
+
                     // Create or get the role
                     $role = Role::firstOrCreate(['name' => $userData['role']]);
 
@@ -79,6 +90,7 @@ class DepartmentsSeeder extends Seeder
                         [
                             'name' => $userData['name'],
                             'password' => Hash::make($userData['password']),
+                            'status_id' => $status->id, // Set the status_id
                         ]
                     );
 

@@ -20,19 +20,19 @@ new class extends Component {
             [
                 'name' => 'User Management',
                 'icon' => 'ic:round-manage-accounts',
-                'label' => 'Manajemen Pengguna',
+                'label' => 'Pengguna',
                 'submenu' => [
                     [
-                        'name' => 'User Overview',
+                        'name' => 'Overview',
                         'route' => 'user-overview',
                         'icon' => 'material-symbols:overview',
                         'label' => 'Overview',
                     ],
                     [
-                        'name' => 'User Manager',
+                        'name' => 'Manager',
                         'route' => 'user-manager',
                         'icon' => 'mdi:account-group',
-                        'label' => 'Pengguna',
+                        'label' => 'Manager',
                     ],
                 ],
             ],

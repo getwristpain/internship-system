@@ -3,13 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Models\School;
+use App\Models\UserStatus;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
-use function Laravel\Prompts\{text, password, confirm};
+use function Laravel\Prompts\{text, password};
 
 class InstallApp extends Command
 {
@@ -30,102 +28,113 @@ class InstallApp extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Starting application installation...');
 
-        // Run clearCache
         $this->clearCache();
-
-        // Run migrations
-        $this->call('migrate:fresh', [
-            '--force' => true
-        ]);
-
-        // Seed the database
-        $this->call('db:seed', [
-            '--force' => true
-        ]);
-
-        // Other installation steps (e.g., setting up storage links)
+        $this->runMigrations();
+        $this->seedDatabase();
         $this->call('storage:link');
 
-        // Create owner (user)
-        $this->createOwner();
+        if ($this->createOwner()) {
+            $this->info('Application installed successfully!');
+            return 0;
+        }
 
-        $this->info('Application installed successfully!');
-        return 0;
+        $this->error('Application installation failed!');
+        return 1;
     }
 
     /**
      * Clear application caches.
      */
-    protected function clearCache()
+    protected function clearCache(): void
     {
         $this->info('Clearing all caches...');
-
-        // Clear application cache
         $this->call('cache:clear');
         $this->info('Application cache cleared.');
 
-        // Clear route cache
         $this->call('route:clear');
         $this->info('Route cache cleared.');
 
-        // Clear configuration cache
         $this->call('config:clear');
         $this->info('Configuration cache cleared.');
 
-        // Clear compiled views cache
         $this->call('view:clear');
         $this->info('View cache cleared.');
     }
 
     /**
+     * Run database migrations.
+     */
+    protected function runMigrations(): void
+    {
+        $this->info('Running migrations...');
+        $this->call('migrate:fresh', ['--force' => true]);
+    }
+
+    /**
+     * Seed the database.
+     */
+    protected function seedDatabase(): void
+    {
+        $this->info('Seeding the database...');
+        $this->call('db:seed', ['--force' => true]);
+    }
+
+    /**
      * Create an owner user.
      *
-     * @return void
+     * @return bool
      */
-    protected function createOwner()
+    protected function createOwner(): bool
     {
         $this->info('Creating owner user...');
 
-        // Prompt user for input using Laravel Prompts
         $name = text("What is the owner's name?");
         $email = text("What is the owner's email?");
         $password = password("What is the owner's password?");
-        $password_confirmation = password("Please confirm the owner's password");
+        $passwordConfirmation = password("Please confirm the owner's password");
 
-        // Validate user input
         $validator = Validator::make([
             'name' => $name,
             'email' => $email,
             'password' => $password,
-            'password_confirmation' => $password_confirmation,
+            'password_confirmation' => $passwordConfirmation,
         ], [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required_with:password', 'same:password'],
         ]);
 
         if ($validator->fails()) {
             $this->error($validator->errors()->first());
-            return;
+            return false;
         }
 
-        // Create user
+        $status = UserStatus::where('name', 'Active')->first();
+
+        if (!$status) {
+            $this->error('User status "Active" not found.');
+            return false;
+        }
+
         $user = User::create([
             'name' => $name,
             'email' => $email,
             'password' => Hash::make($password),
+            'status_id' => $status->id,
         ]);
 
         if ($user) {
-            // Assign roles
             $user->syncRoles(['admin', 'owner']);
             $this->info('Owner user created successfully!');
-        } else {
-            $this->error('Error in creating user.');
+            return true;
         }
+
+        $this->error('Error creating user.');
+        return false;
     }
 }
