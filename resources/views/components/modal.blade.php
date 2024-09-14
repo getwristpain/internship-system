@@ -11,7 +11,7 @@
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center w-screen min-h-screen p-4 bg-black bg-opacity-10 sm:p-6 lg:p-8">
+        <div class="flex items-center justify-center w-screen min-h-screen bg-black bg-opacity-10 p-4 sm:p-6 lg:p-8">
             <div
                 class="relative overflow-visible flex flex-col bg-white rounded-xl shadow-xl transform transition-all mx-auto max-w-lg md:max-w-xl lg:max-w-2xl p-4 space-y-2 {{ $fit ? 'w-fit' : 'w-full' }}">
 

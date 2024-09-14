@@ -2,12 +2,15 @@
 
 namespace Database\Seeders;
 
+use Exception;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Department;
 use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 
 class DepartmentsSeeder extends Seeder
@@ -27,8 +30,8 @@ class DepartmentsSeeder extends Seeder
                             'name' => 'Admin TKGSP',
                             'email' => 'tkgsp@mail.test',
                             'password' => 'password',
-                            'role' => 'Staff',
-                            'status' => 'Active',
+                            'role' => 'staff',
+                            'status' => 'active',
                         ],
                     ],
                     'groups' => [
@@ -47,8 +50,8 @@ class DepartmentsSeeder extends Seeder
                             'name' => 'Admin SIJA',
                             'email' => 'tsija@mail.test',
                             'password' => 'password',
-                            'role' => 'Staff',
-                            'status' => 'Active',
+                            'role' => 'staff',
+                            'status' => 'active',
                         ],
                     ],
                     'groups' => [
@@ -63,58 +66,74 @@ class DepartmentsSeeder extends Seeder
             ],
         ];
 
-        foreach ($data['departments'] as $departmentData) {
-            // Create or update the department
-            $department = Department::updateOrCreate(
-                ['code' => $departmentData['code']],
-                ['name' => $departmentData['name']]
-            );
+        // Start a database transaction
+        DB::beginTransaction();
 
-            // Handle users
-            if (isset($departmentData['users']) && is_array($departmentData['users'])) {
-                foreach ($departmentData['users'] as $userData) {
-                    // Fetch the user status by name
-                    $status = UserStatus::where('name', $userData['status'])->first();
+        try {
+            foreach ($data['departments'] as $departmentData) {
+                // Create or update the department
+                $department = Department::updateOrCreate(
+                    ['code' => $departmentData['code']],
+                    ['name' => $departmentData['name']]
+                );
 
-                    if (!$status) {
-                        // Handle missing status (optional)
-                        continue;
+                // Handle users
+                if (isset($departmentData['users']) && is_array($departmentData['users'])) {
+                    foreach ($departmentData['users'] as $userData) {
+                        // Fetch the user status by name
+                        $status = UserStatus::where('name', $userData['status'])->first();
+
+                        if (!$status) {
+                            throw new Exception("User status '{$userData['status']}' not found.");
+                        }
+
+                        // Create or get the role
+                        $role = Role::firstOrCreate(['name' => $userData['role']]);
+
+                        // Create or update the user
+                        $user = User::updateOrCreate(
+                            ['email' => $userData['email']],
+                            [
+                                'name' => $userData['name'],
+                                'password' => Hash::make($userData['password']),
+                                'status_id' => $status->id,
+                            ]
+                        );
+
+                        // Assign the role to the user
+                        $user->assignRole($role);
+
+                        // Attach the user to the department
+                        $user->departments()->syncWithoutDetaching($department->id);
                     }
+                }
 
-                    // Create or get the role
-                    $role = Role::firstOrCreate(['name' => $userData['role']]);
-
-                    // Create or update the user
-                    $user = User::updateOrCreate(
-                        ['email' => $userData['email']],
-                        [
-                            'name' => $userData['name'],
-                            'password' => Hash::make($userData['password']),
-                            'status_id' => $status->id, // Set the status_id
-                        ]
-                    );
-
-                    // Assign the role to the user
-                    $user->assignRole($role);
-
-                    // Attach the user to the department
-                    $user->departments()->syncWithoutDetaching($department->id);
+                // Handle groups
+                if (isset($departmentData['groups']) && is_array($departmentData['groups'])) {
+                    foreach ($departmentData['groups'] as $groupData) {
+                        Group::updateOrCreate(
+                            ['code' => $groupData['code']],
+                            [
+                                'name' => $groupData['name'],
+                                'level' => $groupData['level'],
+                                'department_id' => $department->id,
+                            ]
+                        );
+                    }
                 }
             }
 
-            // Handle groups
-            if (isset($departmentData['groups']) && is_array($departmentData['groups'])) {
-                foreach ($departmentData['groups'] as $groupData) {
-                    Group::updateOrCreate(
-                        ['code' => $groupData['code']],
-                        [
-                            'name' => $groupData['name'],
-                            'level' => $groupData['level'],
-                            'department_id' => $department->id,
-                        ]
-                    );
-                }
-            }
+            // Commit the transaction if everything is successful
+            DB::commit();
+        } catch (Exception $e) {
+            // Rollback the transaction if an error occurs
+            DB::rollBack();
+
+            // Log the error message
+            Log::error('Error seeding departments: ' . $e->getMessage());
+
+            // Optionally, rethrow the exception if you want it to break the seeder
+            throw $e;
         }
     }
 }

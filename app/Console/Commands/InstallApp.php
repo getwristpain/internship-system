@@ -52,17 +52,7 @@ class InstallApp extends Command
     protected function clearCache(): void
     {
         $this->info('Clearing all caches...');
-        $this->call('cache:clear');
-        $this->info('Application cache cleared.');
-
-        $this->call('route:clear');
-        $this->info('Route cache cleared.');
-
-        $this->call('config:clear');
-        $this->info('Configuration cache cleared.');
-
-        $this->call('view:clear');
-        $this->info('View cache cleared.');
+        $this->call('optimize:clear');
     }
 
     /**
@@ -114,7 +104,7 @@ class InstallApp extends Command
             return false;
         }
 
-        $status = UserStatus::where('name', 'Active')->first();
+        $status = UserStatus::where('name', 'active')->first();
 
         if (!$status) {
             $this->error('User status "Active" not found.');

@@ -15,27 +15,27 @@ class UserStatusesSeeder extends Seeder
     {
         $statuses = [
             [
-                'name' => 'Active',
+                'name' => 'active',
                 'description' => 'Pengguna ini aktif dan memiliki akses penuh ke sistem.'
             ],
             [
-                'name' => 'Pending',
+                'name' => 'pending',
                 'description' => 'Pengguna ini belum terverifikasi dan aksesnya terbatas.'
             ],
             [
-                'name' => 'Blocked',
+                'name' => 'blocked',
                 'description' => 'Pengguna ini diblokir dan tidak dapat mengakses sistem.'
             ],
             [
-                'name' => 'Suspended',
+                'name' => 'suspended',
                 'description' => 'Akses pengguna ini sementara ditangguhkan karena pelanggaran.'
             ],
             [
-                'name' => 'Deactivated',
+                'name' => 'deactivated',
                 'description' => 'Akun pengguna ini dinonaktifkan oleh admin.'
             ],
             [
-                'name' => 'Guest',
+                'name' => 'guest',
                 'description' => 'Pengguna ini adalah tamu dengan akses terbatas.'
             ]
         ];

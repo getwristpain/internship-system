@@ -9,7 +9,52 @@
     'label' => '',
     'allowCreate' => false,
     'searchbar' => false,
+    'badge' => '',
 ])
+
+@php
+    switch ($badge) {
+        case 'primary':
+            $badgeClass = 'badge badge-primary';
+            break;
+
+        case 'secondary':
+            $badgeClass = 'badge badge-secondary';
+            break;
+
+        case 'neutral':
+            $badgeClass = 'badge badge-neutral';
+            break;
+
+        case 'success':
+            $badgeClass = 'badge badge-success';
+            break;
+
+        case 'info':
+            $badgeClass = 'badge badge-info';
+            break;
+
+        case 'warning':
+            $badgeClass = 'badge badge-warning';
+            break;
+
+        case 'error':
+            $badgeClass = 'badge badge-error';
+            break;
+
+        case 'ghost':
+            $badgeClass = 'badge badge-ghost';
+            break;
+
+        case 'outline-neutral':
+            $badgeClass = 'badge badge-outline badge-neutral';
+            break;
+
+        default:
+            $badgeClass = '';
+            break;
+    }
+@endphp
 
 <div class="flex flex-col gap-1 w-full font-medium {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
     <div class="flex gap-4 w-full">
@@ -43,18 +88,19 @@
         }">
             <div @click="if (!{{ $disabled ? 'true' : 'false' }}) { open = !open }"
                 class="flex w-full items-center justify-between cursor-pointer border-b px-4 py-2 text-sm {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
-                <span x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
+                <span class="{{ $badgeClass }}"
+                    x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-2" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </div>
 
-            <div x-show="open" @click.away="open = false" class="absolute bg-white border mt-1 rounded w-full z-50">
+            <div x-show="open" @click.away="open = false" class="absolute bg-white border mt-1 rounded-md w-full z-50">
                 <!-- Search Input -->
                 <template x-if="showSearch">
                     <input type="text" x-model="search" placeholder="{{ $placeholder }}"
-                        class="w-full border p-2 rounded-t" {{ $disabled ? 'disabled' : '' }}
+                        class="w-full border p-2 rounded-t-md" {{ $disabled ? 'disabled' : '' }}
                         {{ $required ? 'required' : '' }} {{ $autofocus ? 'autofocus' : '' }}>
                 </template>
 
