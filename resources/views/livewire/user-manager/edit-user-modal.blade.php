@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\{User, UserStatus};
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
@@ -11,7 +12,7 @@ new class extends Component {
     public string $userStatus = 'pending';
     public array $roles = [];
     public array $statuses = [];
-    public string $statusBadge = '';
+    public string $badgeClass = '';
     public bool $showEditUserModal = false;
 
     public function mount()
@@ -21,7 +22,7 @@ new class extends Component {
 
     public function updated()
     {
-        $this->switchStatusBadge();
+        //
     }
 
     #[On('openEditUserModal')]
@@ -29,12 +30,12 @@ new class extends Component {
     {
         $this->showEditUserModal = $show;
         $this->loadSelectedUser($userId);
-        $this->switchStatusBadge();
     }
 
     protected function loadSelectedUser($userId)
     {
-        $user = User::with('roles', 'profile', 'status')->find($userId);
+        $user = $this->getUser($userId);
+
         if ($user) {
             $this->user = $user->toArray();
             $this->userRole = $this->user['roles'][0]['name'];
@@ -62,105 +63,197 @@ new class extends Component {
                     return [
                         'value' => $status->name,
                         'text' => Str::title($status->name),
+                        'description' => $status->description,
+                        'badgeClass' => $this->statusBadgeClass($status->name),
                     ];
                 })
                 ->toArray();
         }
     }
 
-    protected function switchStatusBadge()
+    protected function statusBadgeClass($statusName)
     {
-        switch ($this->userStatus) {
+        switch ($statusName) {
             case 'active':
-                $this->statusBadge = 'success';
+                return 'badge badge-success';
                 break;
 
             case 'pending':
-                $this->statusBadge = 'warning';
+                return 'badge badge-warning';
                 break;
 
             case 'blocked':
-                $this->statusBadge = 'error';
+                return 'badge badge-error';
                 break;
 
             case 'suspended':
-                $this->statusBadge = 'warning';
+                return 'badge badge-warning';
                 break;
 
             case 'deactivated':
-                $this->statusBadge = 'ghost';
+                return 'badge badge-ghost';
                 break;
 
             case 'guest':
-                $this->statusBadge = 'outline-neutral';
+                return 'badge badge-outline badge-neutral';
                 break;
 
             default:
-                $this->statusBadge = '';
+                return 'badge';
                 break;
         }
     }
 
+    protected function getUser($userId)
+    {
+        $user = User::with(['roles', 'profile', 'status'])->find($userId);
+
+        if (!$user) {
+            $flash->error('User not found!');
+            return null;
+        }
+
+        return $user;
+    }
+
+    protected function getStatus(string $statusName)
+    {
+        $status = UserStatus::where(['name' => $statusName])->first();
+
+        if (!$status) {
+            flash()->error("User status for '${statusName}' not found!");
+            return null;
+        }
+
+        return $status;
+    }
+
+    public function saveEditUser()
+    {
+        $user = $this->getUser($this->user['id']);
+        $status = $this->getStatus($this->userStatus);
+
+        // Validate data
+        $this->validate([
+            'user.name' => 'required|string|max:255',
+            'user.email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'user.password' => 'nullable|confirmed|min:8',
+            'userRole' => 'required|string',
+            'userStatus' => 'required|string',
+        ]);
+
+        // Update user data
+        $user->name = $this->user['name'];
+        $user->email = $this->user['email'];
+        $user->status_id = $status->id;
+
+        // Update password if provided
+        if (!empty($this->user['password'])) {
+            $user->password = Hash::make($this->user['password']);
+        }
+
+        // Sync roles with provided role(s)
+        $user->syncRoles([$this->userRole]);
+
+        // Save changes
+        $user->save();
+        $this->dispatch('user-updated');
+        $this->reset('user');
+
+        flash()->success('User updated successfully.');
+        $this->showEditUserModal = false;
+    }
+
     public function closeEditUserModal()
     {
+        $this->reset('user');
         $this->showEditUserModal = false;
     }
 }; ?>
 
 <x-modal show="showEditUserModal">
     <x-slot name="header">
-        Edit User
+        Edit Pengguna
     </x-slot>
     <x-slot name="content">
-        <table class="table">
-            <tr>
-                <th class="font-bold">Nama</th>
-                <td>
-                    <x-input-text name="name" type="text" model="user.name" placeholder="Masukkan nama..." required />
-                </td>
-            </tr>
-            <tr>
-                <th class="font-bold">Email</th>
-                <td>
-                    <x-input-text name="email" type="email" model="user.email" placeholder="Masukkan email..."
-                        required />
-                </td>
-            </tr>
-            <tr>
-                <th class="font-bold">Role</th>
-                <td>
-                    <x-input-select name="role" :options="$roles" model="userRole" placeholder="Pilih role..."
-                        :searchbar="true" badge="outline-neutral" required></x-input-select>
-                </td>
-            </tr>
-            <tr>
-                <th class="font-bold">Status</th>
-                <td>
-                    <x-input-select badge="{{ $statusBadge }}" name="status" :options="$statuses" model="userStatus"
-                        :searchbar="true" placeholder="Pilih status..." required></x-input-select>
-                </td>
-            </tr>
-        </table>
-
-        <div class="border border-error rounded-md space-y-4 mt-8 p-4">
-            <div class="font-bold text-lg text-error flex items-center space-x-2">
-                <iconify-icon icon="ph:warning-fill"></iconify-icon>
-                <span>Danger Zone</span>
-            </div>
-
-            <table class="table">
+        <div class="flex space-y-8 flex-col">
+            <table class="table table-list">
                 <tr>
-                    <th class="font-bold">Ubah Password</th>
+                    <th>Nama</th>
                     <td>
-                        <x-input-text name="password" type="password" model="user.password"
-                            placeholder="Masukkan password baru..." required />
+                        <x-input-text name="name" type="text" model="user.name" placeholder="Masukkan nama..."
+                            required />
                     </td>
                 </tr>
                 <tr>
-                    <th class="font-bold">Konfirmasi Password</th>
+                    <th>Email</th>
                     <td>
-                        <x-input-text name="password_confirmation" type="password" model="user.password_confirmation"
-                            placeholder="Konfirmasi password..." required />
+                        <x-input-text name="email" type="email" model="user.email" placeholder="Masukkan email..."
+                            required />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="border border-error rounded-md space-y-4 p-4">
+                            <div class="font-bold text-lg text-error flex items-center space-x-2">
+                                <iconify-icon icon="ph:warning-fill"></iconify-icon>
+                                <span>Danger Zone</span>
+                            </div>
+
+                            <table class="table table-list">
+                                <tr>
+                                    <th>Ubah Password</th>
+                                    <td>
+                                        <x-input-text name="password" type="password" model="user.password"
+                                            placeholder="Masukkan password baru..." required />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Konfirmasi Password</th>
+                                    <td>
+                                        <x-input-text name="password_confirmation" type="password"
+                                            model="user.password_confirmation" placeholder="Konfirmasi password baru.."
+                                            required />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Role</th>
+                                    <td>
+                                        <x-input-select name="role" :options="$roles" model="userRole"
+                                            placeholder="Pilih role..." :searchbar="true" badge="outline-neutral"
+                                            required></x-input-select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th class="align-top">Status</th>
+                                    <td class="space-y-4 align-top">
+                                        @foreach ($statuses as $status)
+                                            <div class="flex items-start space-x-3 w-2/3">
+                                                <!-- Radio input for each status -->
+                                                <input type="radio" id="status-{{ $status['value'] }}" name="status"
+                                                    value="{{ $status['value'] }}" wire:model="userStatus"
+                                                    class="radio radio-sm"
+                                                    {{ $userStatus === $status['value'] ? 'checked' : '' }}>
+
+                                                <div>
+                                                    <!-- Label with badge class -->
+                                                    <label for="status-{{ $status['value'] }}"
+                                                        class="font-semibold {{ $status['badgeClass'] }}">
+                                                        {{ $status['text'] }}
+                                                    </label>
+
+                                                    <!-- Description below the label -->
+                                                    <p class="text-sm text-gray-500">
+                                                        {{ $status['description'] ?? 'No description available' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
                     </td>
                 </tr>
             </table>
@@ -170,9 +263,9 @@ new class extends Component {
         <button class="btn btn-outline btn-neutral" wire:click="closeEditUserModal">
             Batal
         </button>
-        <button class="btn btn-neutral">
+        <button class="btn btn-neutral" wire:click="saveEditUser">
             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
-            <span class="hidden lg:block">Simpan</span>
+            <span>Simpan</span>
         </button>
     </x-slot>
 </x-modal>

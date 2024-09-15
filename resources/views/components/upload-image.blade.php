@@ -13,7 +13,7 @@ new class extends Component {
     public $currentImage = null;
     public string $disk = 'public';
     public string $aspect = '1/1';
-    public string $label = 'Upload Image';
+    public string $label = '';
     public string $imagePreview = '';
     public string $identifier;
     public bool $circle = false;
@@ -124,8 +124,8 @@ new class extends Component {
 ?>
 
 @volt
-    <div x-data="{ hovering: false, imagePreview: @entangle('imagePreview'), loading: @entangle('loading') }" class="relative flex h-full">
-        <div class="relative flex flex-col items-center h-full gap-2">
+    <div x-data="{ hovering: false, imagePreview: @entangle('imagePreview'), loading: @entangle('loading') }" class="relative flex w-fit h-full">
+        <div class="relative flex flex-col items-center gap-2 h-full">
             <!-- Image Preview -->
             <div class="relative h-full bg-gray-200 overflow-hidden cursor-pointer hover:opacity-75 {{ $circle ? 'rounded-full' : '' }}"
                 style="aspect-ratio: {{ $aspect }};" @mouseenter="hovering = true" @mouseleave="hovering = false"
@@ -179,7 +179,9 @@ new class extends Component {
 
             <!-- Image input and error handling -->
             <div class="flex flex-col items-center space-y-2">
-                <label for="image" class="text-sm font-medium text-gray-700">{{ $label }}</label>
+                @if ($label)
+                    <label for="image" class="text-sm font-medium text-gray-700">{{ $label }}</label>
+                @endif
                 <input type="file" wire:model="image" id="image" class="hidden" x-ref="image"
                     @change="const reader = new FileReader(); reader.onload = e => imagePreview = e.target.result; reader.readAsDataURL($refs.image.files[0])">
                 @error('image')

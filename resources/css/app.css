@@ -49,3 +49,7 @@ iconify-icon {
 .custom-input {
     @apply border-0 w-fit px-2 py-1 bg-transparent focus:ring-0 focus:border-b focus:border-black;
 }
+
+.table-list th {
+    @apply font-bold;
+}

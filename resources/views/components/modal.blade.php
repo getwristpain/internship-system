@@ -11,24 +11,26 @@
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex items-center justify-center w-screen min-h-screen bg-black bg-opacity-10 p-4 sm:p-6 lg:p-8">
+        <div class="flex items-center justify-center w-screen min-h-screen bg-black bg-opacity-10 p-4">
             <div
-                class="relative overflow-visible flex flex-col bg-white rounded-xl shadow-xl transform transition-all mx-auto max-w-lg md:max-w-xl lg:max-w-2xl p-4 space-y-2 {{ $fit ? 'w-fit' : 'w-full' }}">
+                class="relative overflow-visible flex flex-col bg-base-100 rounded-xl shadow-xl transform transition-all mx-auto max-w-full md:max-w-xl lg:max-w-2xl space-y-2 {{ $fit ? 'w-fit' : 'w-full' }}">
 
-                <!-- Close Button -->
-                <button x-on:click="closeModal" class="absolute text-xl font-medium text-red-400 top-3 right-3">
-                    <iconify-icon icon="carbon:close-filled"></iconify-icon>
-                </button>
-
-                <div class="grow line-clamp-1 sm:px-2 lg:px-4">
+                <!-- Header -->
+                <div
+                    class="grow line-clamp-1 p-4 bg-gray-100 flex justify-between items-center border-b border-gray-300 rounded-t-lg">
                     <h3 class="text-lg font-bold text-gray-900 font-heading">{{ $header }}</h3>
+                    <button x-on:click="closeModal" class="font-medium text-red-400 scale-125">
+                        <iconify-icon icon="carbon:close-filled"></iconify-icon>
+                    </button>
                 </div>
 
-                <div class="w-full sm:p-2 lg:p-4">
+                <!-- Content -->
+                <div class="w-full p-4">
                     {{ $content ?? $slot }}
                 </div>
 
-                <div class="flex items-center justify-end gap-4 pt-4">
+                <!-- Footer -->
+                <div class="flex items-center justify-end gap-4 p-4 bg-gray-100 border-t border-gray-300 rounded-b-lg">
                     {{ $footer ?? '' }}
                 </div>
             </div>

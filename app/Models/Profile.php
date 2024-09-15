@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
+use Laravolt\Avatar\Avatar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravolt\Avatar\Avatar;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Profile extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'avatar',
         'id_number',
         'position',
@@ -28,6 +27,10 @@ class Profile extends Model
         'parent_name',
         'parent_address',
         'parent_phone',
+    ];
+
+    protected $hidden = [
+        'user_id',
     ];
 
     /**
