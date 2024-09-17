@@ -12,9 +12,17 @@ new class extends Component {
     public array $userProfile = [];
     public string $userRole = 'guest';
     public string $userStatus = 'pending';
+
+    public array $initialUser = [];
+    public array $initialUserProfile = [];
+    public string $initialUserRole = 'guest';
+    public string $initialUserStatus = 'pending';
+
     public array $roles = [];
     public array $statuses = [];
-    public bool $showEditUserModal = false;
+
+    public bool $isDirty = false;
+    public bool $show = false;
 
     public function mount()
     {
@@ -22,10 +30,11 @@ new class extends Component {
     }
 
     #[On('openEditUserModal')]
-    public function handleOpenEditUserModal(bool $show = false, string $userId = '')
+    public function handleOpenModal(bool $show = false, string $userId = '')
     {
-        $this->showEditUserModal = $show;
+        $this->show = $show;
         $this->loadSelectedUser($userId);
+        $this->setInitialState();
     }
 
     protected function loadSelectedUser(string $userId): void
@@ -38,6 +47,25 @@ new class extends Component {
             $this->userRole = $this->user['roles'][0]['name'] ?? 'guest';
             $this->userStatus = $this->user['status']['name'] ?? 'pending';
         }
+    }
+
+    protected function setInitialState(): void
+    {
+        $this->initialUser = $this->user;
+        $this->initialUserProfile = $this->userProfile;
+        $this->initialUserRole = $this->userRole;
+        $this->initialUserStatus = $this->userStatus;
+        $this->checkIfDirty();
+    }
+
+    protected function checkIfDirty(): void
+    {
+        $this->isDirty = $this->user !== $this->initialUser || $this->userProfile !== $this->initialUserProfile || $this->userRole !== $this->initialUserRole || $this->userStatus !== $this->initialUserStatus;
+    }
+
+    public function updated($propertyName)
+    {
+        $this->checkIfDirty();
     }
 
     protected function loadUserAttributes(): void
@@ -101,13 +129,28 @@ new class extends Component {
         return $status;
     }
 
-    public function saveEditUser(): void
+    public function saveEditedUser(): void
     {
-        $user = $this->getUser($this->user['id']);
-        $status = $this->getStatus($this->userStatus);
+        if (!$this->isDirty) {
+            return;
+        }
 
-        // Validate data
-        $this->validate([
+        // Step 1: Get the user (Ambil data user)
+        $user = $this->getUser($this->user['id']);
+        if (!$user) {
+            flash()->error('Pengguna tidak ditemukan!');
+            return;
+        }
+
+        // Step 2: Get status (Ambil status)
+        $status = $this->getStatus($this->userStatus);
+        if (!$status) {
+            flash()->error('Status tidak valid!');
+            return;
+        }
+
+        // Step 3: Validate data (Validasi data)
+        $validated = $this->validate([
             'user.name' => 'required|string|max:255',
             'user.email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'user.password' => 'nullable|confirmed|min:8',
@@ -120,38 +163,60 @@ new class extends Component {
             'userProfile.gender' => 'nullable|in:male,female',
         ]);
 
-        // Update user data
-        $user->name = $this->user['name'];
-        $user->email = $this->user['email'];
-        $user->status_id = $status->id;
+        if ($validated) {
+            // Only save if changes are detected
+            if ($this->isDirty) {
+                // Step 4: Update user data if validation passes (Update data user jika validasi lolos)
+                $user->name = $this->user['name'];
+                $user->email = $this->user['email'];
+                $user->status_id = $status->id;
 
-        if (!empty($this->user['password'])) {
-            $user->password = Hash::make($this->user['password']);
+                // Step 5: Update password if not empty (Update password jika tidak kosong)
+                if (!empty($this->user['password'])) {
+                    $user->password = Hash::make($this->user['password']);
+                }
+
+                // Step 6: Update user profile (Update profil pengguna)
+                if (!$user->profile->update($this->userProfile)) {
+                    flash()->error('Gagal memperbarui profil pengguna!');
+                    return;
+                }
+
+                // Step 7: Sync roles (Update role pengguna)
+                if (!$user->syncRoles([$this->userRole])) {
+                    flash()->error('Gagal memperbarui peran pengguna!');
+                    return;
+                }
+
+                // Step 8: Save the user (Simpan data user)
+                if (!$user->save()) {
+                    flash()->error('Gagal memperbarui pengguna!');
+                    return;
+                }
+
+                // Step 9: If all steps succeed (Jika semua berhasil)
+                $this->dispatch('user-updated');
+                flash()->success('Pengguna berhasil diperbarui.');
+                $this->handleCloseModal();
+            } else {
+                flash()->info('Tidak ada perubahan pada data pengguna.');
+            }
         }
-
-        $user->profile->update($this->userProfile);
-        $user->syncRoles([$this->userRole]);
-        $user->save();
-
-        $this->dispatch('user-updated');
-        flash()->success('Pengguna berhasil diperbarui.');
-
-        $this->closeEditUserModal();
     }
 
     #[On('modal-closed')]
-    public function closeEditUserModal(): void
+    public function handleCloseModal(): void
     {
-        $this->reset(['user', 'userRole', 'userStatus', 'userProfile']);
-        $this->showEditUserModal = false;
+        $this->reset(['user', 'userRole', 'userStatus', 'userProfile', 'isDirty']);
+        $this->show = false;
     }
 };
 
 ?>
 
-<x-modal show="showEditUserModal" :form="true" action="saveEditUser" :key="$user['id'] ?? ''">
+<x-modal show="show" :form="true" action="saveEditedUser" :key="$user['id'] ?? ''">
     <x-slot name="header">
-        Edit User
+        Edit Pengguna
     </x-slot>
 
     <x-slot name="content">
@@ -293,8 +358,8 @@ new class extends Component {
         </div>
     </x-slot>
     <x-slot name="footer">
-        <button type="button" class="btn btn-outline btn-neutral" wire:click="closeEditUserModal">Cancel</button>
-        <button type="submit" class="btn btn-neutral" wire:click="saveEditUser">
+        <button type="button" class="btn btn-outline btn-neutral" wire:click="handleCloseModal">Cancel</button>
+        <button type="submit" class="btn btn-neutral" wire:click="saveEditedUser">
             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
             <span>Save</span>
         </button>

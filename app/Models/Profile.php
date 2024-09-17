@@ -12,6 +12,11 @@ class Profile extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'user_id',
         'avatar',
@@ -27,6 +32,11 @@ class Profile extends Model
         'parent_phone',
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
     protected $hidden = [
         'user_id',
     ];
@@ -41,16 +51,14 @@ class Profile extends Model
         return Attribute::make(
             get: function (?string $value) {
                 $avatar = new Avatar();
-
-                return $value
-                    ? $value
-                    : $avatar->create($this->user->name)->toBase64();
+                return $value ?: $avatar->create($this->user->name)->toBase64();
             }
         );
     }
 
     /**
-     * User Profile with one-to-one Relation
+     * Get the user that owns the profile.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo

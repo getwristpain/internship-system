@@ -54,6 +54,12 @@ new class extends Component {
                     ],
                 ],
             ],
+            [
+                'name' => 'Setting',
+                'route' => 'setting',
+                'icon' => 'ph:gear-fill',
+                'label' => 'Pengaturan',
+            ],
         ],
     ];
 

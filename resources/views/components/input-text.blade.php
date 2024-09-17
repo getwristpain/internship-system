@@ -94,7 +94,7 @@
         @endif
 
         <!-- Input Field -->
-        <input id="{{ $name }}" type="{{ $type }}" wire:model.change="{{ $model }}"
+        <input id="{{ $name }}" type="{{ $type }}" wire:model.live="{{ $model }}"
             placeholder="{{ $placeholder }}" autocomplete="{{ $name }}" {{ $disabled ? 'disabled' : '' }}
             {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
             @if (isset($max)) max="{{ $max }}" @endif

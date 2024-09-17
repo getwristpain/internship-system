@@ -14,7 +14,7 @@ new class extends Component {
     public string $userStatus = 'pending';
     public array $roles = [];
     public array $statuses = [];
-    public bool $showAddUserModal = false;
+    public bool $show = false;
 
     public function mount()
     {
@@ -22,9 +22,9 @@ new class extends Component {
     }
 
     #[On('openAddUserModal')]
-    public function handleOpenAddUserModal(bool $show = false): void
+    public function handleOpenModal(bool $show = false): void
     {
-        $this->showAddUserModal = $show;
+        $this->show = $show;
         $this->initUser();
     }
 
@@ -36,15 +36,19 @@ new class extends Component {
             'password' => '',
             'password_confirmation' => '',
         ];
+
         $this->userProfile = [
-            'address' => '',
-            'phone' => '',
             'id_number' => '',
             'position' => '',
+            'group' => '',
+            'school_year' => '',
+            'address' => '',
+            'phone' => '',
             'gender' => '',
+            'parent_name' => '',
+            'parent_address' => '',
+            'parent_phone' => '',
         ];
-        $this->userRole = 'guest';
-        $this->userStatus = 'pending';
     }
 
     protected function loadUserAttributes(): void
@@ -84,7 +88,7 @@ new class extends Component {
         };
     }
 
-    public function saveAddUser(): void
+    public function saveNewUser(): void
     {
         // Validate input
         $this->validate([
@@ -114,22 +118,22 @@ new class extends Component {
         // Assign role
         $user->assignRole($this->userRole);
 
-        $this->dispatch('user-added');
+        $this->dispatch('user-updated');
         flash()->success('Pengguna berhasil ditambahkan.');
 
-        $this->closeAddUserModal();
+        $this->handleCloseModal();
     }
 
     #[On('modal-closed')]
-    public function closeAddUserModal(): void
+    public function handleCloseModal(): void
     {
-        $this->showAddUserModal = false;
+        $this->show = false;
     }
 };
 
 ?>
 
-<x-modal show="showAddUserModal" :form="true" action="saveAddUser">
+<x-modal show="show" :form="true" action="saveNewUser">
     <x-slot name="header">
         Tambah Pengguna Baru
     </x-slot>
@@ -165,18 +169,18 @@ new class extends Component {
                 </tr>
 
                 <tr>
-                    <th>Kata Sandi</th>
+                    <th>Password</th>
                     <td>
                         <x-input-text name="password" type="password" model="user.password"
-                            placeholder="Masukkan kata sandi..." required />
+                            placeholder="Masukkan password..." required />
                     </td>
                 </tr>
 
                 <tr>
-                    <th>Konfirmasi Kata Sandi</th>
+                    <th>Konfirmasi Password</th>
                     <td>
                         <x-input-text name="password_confirmation" type="password" model="user.password_confirmation"
-                            placeholder="Konfirmasi kata sandi..." required />
+                            placeholder="Konfirmasi password..." required />
                     </td>
                 </tr>
 
@@ -258,8 +262,8 @@ new class extends Component {
     </x-slot>
 
     <x-slot name="footer">
-        <button type="button" class="btn btn-outline btn-neutral" wire:click="closeAddUserModal">Batal</button>
-        <button type="submit" class="btn btn-neutral" wire:click="saveAddUser">
+        <button type="button" class="btn btn-outline btn-neutral" wire:click="handleCloseModal">Batal</button>
+        <button type="submit" class="btn btn-neutral" wire:click="saveNewUser">
             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
             <span>Simpan</span>
         </button>

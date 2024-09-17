@@ -12,14 +12,11 @@ new #[Layout('layouts.app')] class extends Component {
     public string $search = '';
 
     // Event Listener for user updates
-    #[On('user-added')]
     #[On('user-updated')]
     public function with(): array
     {
-        $users = $this->loadPaginatedUsers();
-
         return [
-            'users' => $users,
+            'users' => $this->loadUsersData(),
         ];
     }
 
@@ -38,7 +35,7 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     // Load paginated users with search functionality
-    protected function loadPaginatedUsers()
+    protected function loadUsersData()
     {
         $users = User::with(['roles', 'status', 'profile'])
             ->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
@@ -50,14 +47,14 @@ new #[Layout('layouts.app')] class extends Component {
                     $query->where('users.name', 'like', '%' . $this->search . '%')->orWhere('users.email', 'like', '%' . $this->search . '%');
                 });
             })
+            ->where('users.id', '!=', Auth::id())
             ->orderByRaw("MAX(CASE WHEN roles.name = 'owner' THEN 1 ELSE 0 END) DESC")
             ->orderBy('roles.name')
             ->orderBy('users.name')
             ->paginate(20);
 
         if ($users->isEmpty()) {
-            flash()->error('Users cannot be loaded!');
-            return null;
+            return collect();
         }
 
         return $users;
@@ -86,7 +83,7 @@ new #[Layout('layouts.app')] class extends Component {
 <div class="w-full h-full">
     <x-card class="h-full">
         <x-slot name="heading">
-            Manage Users
+            Manajemen Pengguna
         </x-slot>
 
         <x-slot name="content">
@@ -94,8 +91,8 @@ new #[Layout('layouts.app')] class extends Component {
                 <!-- Search Input -->
                 <div class="flex space-x-8 justify-beetween">
                     <div class="grow">
-                        <x-input-text name="search" type="text" model="search" placeholder="Search by name or email..."
-                            custom="search" />
+                        <x-input-text name="search" type="text" model="search"
+                            placeholder="Cari berdasarkan nama atau email..." custom="search" />
                     </div>
                     <div>
                         <button class="btn btn-neutral" wire:click="openAddUserModal">
@@ -163,7 +160,7 @@ new #[Layout('layouts.app')] class extends Component {
                                             <button wire:click="openDeleteUserModal('{{ $user['id'] }}')"
                                                 class="btn btn-sm btn-outline btn-error">
                                                 <iconify-icon icon="mdi:delete"></iconify-icon>
-                                                <span class="hidden md:inline-block">Delete</span>
+                                                <span class="hidden md:inline-block">Hapus</span>
                                             </button>
                                         @else
                                             <span class="italic font-medium opacity-80">Owner</span>
@@ -172,7 +169,9 @@ new #[Layout('layouts.app')] class extends Component {
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-gray-500">No users found.</td>
+                                    <td colspan="4" class="text-center text-gray-500">Tidak ada pengguna yang
+                                        ditemukan.
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -189,7 +188,9 @@ new #[Layout('layouts.app')] class extends Component {
                     </table>
 
                     <!-- Pagination -->
-                    <div>{{ $users->links() }}</div>
+                    @if ($users->isNotEmpty())
+                        <div>{{ $users->links() }}</div>
+                    @endif
                 </div>
             </div>
         </x-slot>

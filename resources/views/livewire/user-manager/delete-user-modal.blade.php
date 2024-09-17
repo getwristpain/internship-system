@@ -5,14 +5,15 @@ use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    public bool $show = false;
+
     public array $user = [];
-    public bool $showDeleteUserModal = false;
     public bool $delete_confirmation = false;
 
     #[On('openDeleteUserModal')]
-    public function handleOpenDeleteUserModal(bool $show = false, string $userId = '')
+    public function handleOpenModal(bool $show = false, string $userId = '')
     {
-        $this->showDeleteUserModal = $show;
+        $this->show = $show;
         $this->loadSelectedUser($userId);
     }
 
@@ -46,18 +47,18 @@ new class extends Component {
         $this->dispatch('user-updated');
         flash()->info('User has been deleted!');
 
-        $this->closeDeleteUserModal();
+        $this->handleCloseModal();
     }
 
     #[On('modal-closed')]
-    public function closeDeleteUserModal()
+    public function handleCloseModal()
     {
         $this->reset('user');
-        $this->showDeleteUserModal = false;
+        $this->show = false;
     }
 }; ?>
 
-<x-modal show="showDeleteUserModal">
+<x-modal show="show">
     <x-slot name="header">
         Konfirmasi
     </x-slot>
@@ -86,7 +87,7 @@ new class extends Component {
         </div>
     </x-slot>
     <x-slot name="footer">
-        <button class="btn btn-outline btn-neutral" wire:click="closeDeleteUserModal">
+        <button class="btn btn-outline btn-neutral" wire:click="handleCloseModal">
             Batal
         </button>
         <button class="btn btn-error" wire:click="deleteUser">

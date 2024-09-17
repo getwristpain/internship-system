@@ -12,12 +12,6 @@ new class extends Component {
 
     public array $additionalMenu = [
         [
-            'name' => 'Setting',
-            'route' => 'setting',
-            'icon' => 'ph:gear-fill',
-            'label' => 'Pengaturan',
-        ],
-        [
             'name' => 'Help',
             'route' => 'help',
             'icon' => 'mage:question-mark-circle-fill',

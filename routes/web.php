@@ -17,8 +17,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('profile');
 });
 
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:admin|staff'])->group(function () {
     Volt::route('/user-manager', 'user-manager.manage-users')->name('user-manager');
+    Volt::route('/student-manager', 'student-manager.manage-students')->name('student-manager');
 });
 
 Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
