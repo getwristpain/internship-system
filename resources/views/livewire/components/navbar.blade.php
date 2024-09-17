@@ -4,7 +4,7 @@ use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public bool $open = false;
+    public bool $open = true;
 
     public function toggleSidebar()
     {

@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 body {
-    @apply font-sans antialiased screen-full;
+    @apply font-sans antialiased screen-full text-gray-900;
 }
 
 .screen-full {
@@ -14,6 +14,19 @@ body {
 
 .livewire-loading {
     border-top-color: #00a3fb;
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.no-drag {
+    -webkit-user-drag: none;
+    user-drag: none;
+    pointer-events: none;
 }
 
 iconify-icon {
@@ -51,5 +64,5 @@ iconify-icon {
 }
 
 .table-list th {
-    @apply font-bold;
+    @apply font-bold text-gray-600;
 }

@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class UsersSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,16 +20,16 @@ class UsersSeeder extends Seeder
         $users = [
             [
                 'name' => 'Student Test',
-                'email' => 'student@mail.test',
+                'email' => 'student@example.com',
                 'password' => 'password',
-                'role' => 'Student',
+                'role' => 'student',
                 'status' => 'pending',
             ],
             [
                 'name' => 'Teacher Test',
-                'email' => 'teacher@mail.test',
+                'email' => 'teacher@example.com',
                 'password' => 'password',
-                'role' => 'Teacher',
+                'role' => 'teacher',
                 'status' => 'pending',
             ],
         ];

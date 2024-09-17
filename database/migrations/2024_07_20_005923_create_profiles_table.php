@@ -17,14 +17,11 @@ return new class extends Migration
             $table->string('avatar')->nullable();
             $table->string('id_number')->nullable();
             $table->string('position')->nullable();
-            $table->string('class')->nullable();
-            $table->string('school_year')->nullable();
+            $table->string('group')->nullable();
+            $table->year('school_year')->nullable();
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
-            $table->string('birth_place')->nullable();
-            $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();
-            $table->string('blood_type')->nullable();
             $table->string('parent_name')->nullable();
             $table->string('parent_address')->nullable();
             $table->string('parent_phone')->nullable();

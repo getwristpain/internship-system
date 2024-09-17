@@ -13,17 +13,15 @@ class Profile extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'avatar',
         'id_number',
         'position',
-        'class',
+        'group',
         'school_year',
         'address',
         'phone',
-        'birth_place',
-        'birth_date',
         'gender',
-        'blood_type',
         'parent_name',
         'parent_address',
         'parent_phone',

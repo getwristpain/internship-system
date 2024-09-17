@@ -7,7 +7,7 @@ use Livewire\Volt\Component;
 new class extends Component {
     public array $item = [];
     public bool $active = false;
-    public bool $open = false;
+    public bool $open = true;
 
     public function mount(array $item)
     {

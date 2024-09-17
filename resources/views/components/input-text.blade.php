@@ -10,6 +10,10 @@
     'custom' => '',
     'icon' => 'tabler:edit',
     'error' => null,
+    'max' => null,
+    'min' => null,
+    'step' => null,
+    'pattern' => null,
 ])
 
 @php
@@ -20,7 +24,7 @@
 <div x-data="{ focused: false, filled: false }" x-init="$nextTick(() => {
     filled = $refs.input.value.length > 0 || @this.get('{{ $model }}').length > 0;
 })"
-    class="relative flex flex-col w-full {{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }}">
+    class="relative flex flex-col w-full {{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }}" :key="$name">
 
     <div class="relative w-full">
         <!-- Icon Switch -->
@@ -37,6 +41,11 @@
 
             @case('number')
                 <iconify-icon icon="tabler:number-123"
+                    class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
+            @break
+
+            @case('search')
+                <iconify-icon icon="ion:search-sharp"
                     class="absolute text-lg text-gray-400 transform -translate-y-1/2 left-3 top-1/2"></iconify-icon>
             @break
 
@@ -85,14 +94,17 @@
         @endif
 
         <!-- Input Field -->
-        <input type="{{ $type }}" wire:model.live.debounce.1500ms="{{ $model }}" id="{{ $name }}"
+        <input id="{{ $name }}" type="{{ $type }}" wire:model.change="{{ $model }}"
             placeholder="{{ $placeholder }}" autocomplete="{{ $name }}" {{ $disabled ? 'disabled' : '' }}
             {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
+            @if (isset($max)) max="{{ $max }}" @endif
+            @if (isset($min)) min="{{ $min }}" @endif
+            @if (isset($step)) step="{{ $step }}" @endif
+            @if (isset($pattern)) pattern="{{ $pattern }}" @endif
             @focus="focused = true; filled = true" @blur="if (!$el.value) { focused = false; filled = false }"
             @input="filled = $el.value.length > 0" x-ref="input"
             {{ $attributes->merge(['class' => 'input input-bordered w-full pl-10 peer focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed']) }}
-            aria-describedby="{{ $name }}-error">
-
+            aria-describedby="{{ $name }}-error" :key="$name">
     </div>
 
     <div>

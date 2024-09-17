@@ -59,7 +59,7 @@ new class extends Component {
 
     public array $filteredMenuItems = [];
     public array $openSubmenus = [];
-    public bool $open = false;
+    public bool $open = true;
 
     public function mount(): void
     {
@@ -128,7 +128,7 @@ new class extends Component {
         <div>
             <!-- Main menu items -->
             <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate('{{ $item['name'] }}')"
-                class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center p-3' : 'px-4 py-2' }}">
+                class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ $open ? 'px-4 py-2' : 'justify-center p-3' }}">
 
                 <!-- Icon -->
                 <iconify-icon class="scale-125" icon="{{ $item['icon'] ?? '' }}"></iconify-icon>

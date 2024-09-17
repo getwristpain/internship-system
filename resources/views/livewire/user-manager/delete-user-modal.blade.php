@@ -16,12 +16,6 @@ new class extends Component {
         $this->loadSelectedUser($userId);
     }
 
-    public function closeDeleteUserModal()
-    {
-        $this->reset('user');
-        $this->showDeleteUserModal = false;
-    }
-
     protected function loadSelectedUser($userId)
     {
         $user = $this->getUser($userId);
@@ -50,10 +44,16 @@ new class extends Component {
 
         $user->delete();
         $this->dispatch('user-updated');
-        $this->reset('user');
-
-        $this->showDeleteUserModal = false;
         flash()->info('User has been deleted!');
+
+        $this->closeDeleteUserModal();
+    }
+
+    #[On('modal-closed')]
+    public function closeDeleteUserModal()
+    {
+        $this->reset('user');
+        $this->showDeleteUserModal = false;
     }
 }; ?>
 
