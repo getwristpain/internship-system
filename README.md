@@ -1,4 +1,4 @@
-# Simapekael Internship Management System (smpkl-ims
+# Simapekael - Internship Management System
 
 ## Description
 
