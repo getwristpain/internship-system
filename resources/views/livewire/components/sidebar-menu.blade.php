@@ -1,68 +1,12 @@
 <?php
 
+use App\Models\Menu;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public array $menuItems = [
-        'all' => [
-            [
-                'name' => 'Dashboard',
-                'route' => 'dashboard',
-                'icon' => 'mage:dashboard-fill',
-                'label' => 'Dashboard',
-                'submenu' => [],
-            ],
-        ],
-        'admin' => [
-            [
-                'name' => 'User Management',
-                'icon' => 'ic:round-manage-accounts',
-                'label' => 'Pengguna',
-                'submenu' => [
-                    [
-                        'name' => 'Overview',
-                        'route' => 'user-overview',
-                        'icon' => 'material-symbols:overview',
-                        'label' => 'Overview',
-                    ],
-                    [
-                        'name' => 'Management',
-                        'route' => 'user-manager',
-                        'icon' => 'mdi:account-group',
-                        'label' => 'Manajemen',
-                    ],
-                    [
-                        'name' => 'Student',
-                        'route' => 'student-manager',
-                        'icon' => 'mingcute:idcard-fill',
-                        'label' => 'Siswa',
-                    ],
-                    [
-                        'name' => 'Teacher',
-                        'route' => 'teacher-manager',
-                        'icon' => 'dashicons:businessman',
-                        'label' => 'Guru',
-                    ],
-                    [
-                        'name' => 'Admin',
-                        'route' => 'admin-manager',
-                        'icon' => 'eos-icons:admin',
-                        'label' => 'Admin',
-                    ],
-                ],
-            ],
-            [
-                'name' => 'Setting',
-                'route' => 'setting',
-                'icon' => 'ph:gear-fill',
-                'label' => 'Pengaturan',
-            ],
-        ],
-    ];
-
     public array $filteredMenuItems = [];
     public array $openSubmenus = [];
     public bool $open = true;
@@ -81,59 +25,71 @@ new class extends Component {
     private function loadMenu(): void
     {
         $user = Auth::user();
-        $roles = $user->roles->pluck('name')->toArray();
-        $this->filteredMenuItems = $this->menuItems['all'];
+        $userRoles = $user->roles->pluck('name')->toArray();
 
-        foreach ($roles as $role) {
-            if (isset($this->menuItems[$role])) {
-                $this->filteredMenuItems = array_merge($this->filteredMenuItems, $this->menuItems[$role]);
-            }
-        }
+        $this->filteredMenuItems = Menu::with('submenus')
+            ->root() // Get only root menus
+            ->get()
+            ->filter(function ($item) use ($userRoles) {
+                // Check if the user has access based on roles
+                if (empty($item->roles) || array_intersect($userRoles, $item->roles)) {
+                    // Filter submenus based on roles
+                    $item->submenus = $item->submenus->filter(function ($subItem) use ($userRoles) {
+                        return empty($subItem->roles) || array_intersect($userRoles, $subItem->roles);
+                    });
+
+                    return true;
+                }
+
+                return false;
+            })
+            ->toArray();
     }
 
-    public function navigate(string $menuName): void
+    public function navigate(string $menuSlug): void
     {
-        $item = $this->findMenuItem($menuName);
+        $item = $this->findMenuItem($menuSlug);
 
         if ($item) {
             $this->handleNavigation($item);
         } else {
-            session()->flash('error', "Menu item not found: $menuName");
+            flash()->error("Menu item not found: $menuSlug");
         }
     }
 
-    private function findMenuItem(string $menuName): ?array
+    private function findMenuItem(string $menuSlug): ?array
     {
-        return collect($this->filteredMenuItems)->firstWhere('name', $menuName);
+        return collect($this->filteredMenuItems)->firstWhere('slug', $menuSlug);
     }
 
     private function handleNavigation(array $item): void
     {
-        if (!empty($item['submenu'])) {
-            $this->toggleSubmenu($item['name']);
+        if (!empty($item['submenus'])) {
+            $this->toggleSubmenu($item['slug']);
         } elseif (isset($item['route']) && Route::has($item['route'])) {
             $this->redirect(route($item['route']), navigate: true);
         } else {
-            session()->flash('error', 'Route not found for menu item: ' . $item['name']);
+            flash()->error('Route not found for menu item: ' . $item['label']);
         }
     }
 
-    private function toggleSubmenu(string $menuName): void
+    private function toggleSubmenu(string $menuSlug): void
     {
-        $this->openSubmenus = in_array($menuName, $this->openSubmenus) ? array_filter($this->openSubmenus, fn($name) => $name !== $menuName) : [...$this->openSubmenus, $menuName];
+        $this->openSubmenus = in_array($menuSlug, $this->openSubmenus) ? array_filter($this->openSubmenus, fn($name) => $name !== $menuSlug) : [...$this->openSubmenus, $menuSlug];
     }
 
     public function isActive(string $routeName): bool
     {
         return Route::currentRouteName() === $routeName;
     }
-}; ?>
+};
+?>
 
 <nav class="flex flex-col gap-2">
     @foreach ($filteredMenuItems as $item)
         <div>
             <!-- Main menu items -->
-            <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate('{{ $item['name'] }}')"
+            <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate('{{ $item['slug'] }}')"
                 class="group relative flex cursor-pointer gap-2 w-full rounded-lg items-center {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ $open ? 'px-4 py-2' : 'justify-center p-3' }}">
 
                 <!-- Icon -->
@@ -145,18 +101,18 @@ new class extends Component {
                     {{ $item['label'] ?? '' }}
 
                     <!-- Dropdown icon -->
-                    @if (!empty($item['submenu']))
+                    @if (!empty($item['submenus']))
                         <iconify-icon
-                            class="text-xl transition-transform duration-300 {{ in_array($item['name'], $openSubmenus) ? 'rotate-180' : '' }}"
+                            class="text-xl transition-transform duration-300 {{ in_array($item['slug'], $openSubmenus) ? 'rotate-180' : '' }}"
                             icon="mdi:chevron-down"></iconify-icon>
                     @endif
                 </span>
             </a>
 
             <!-- Submenu items -->
-            @if (!empty($item['submenu']) && in_array($item['name'], $openSubmenus))
-                @foreach ($item['submenu'] as $submenu)
-                    <div class="{{ !$open ?: 'pl-8' }}" :key="$submenu['name']">
+            @if (!empty($item['submenus']) && in_array($item['slug'], $openSubmenus))
+                @foreach ($item['submenus'] as $submenu)
+                    <div class="{{ !$open ?: 'pl-8' }}" :key="$submenu['slug']">
                         <a href="{{ Route::has($submenu['route']) ? route($submenu['route']) : '' }}" type="button"
                             title="{{ $submenu['label'] ?? '' }}"
                             class="group relative flex cursor-pointer gap-2 p-3 w-full rounded-lg items-center {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white font-bold' : 'hover:bg-gray-200 font-medium transition ease-in-out duration-150' }} {{ !$open ? 'justify-center' : '' }}"

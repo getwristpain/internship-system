@@ -13,6 +13,7 @@ class DBTestSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            MenuSeeder::class,
             UserSeeder::class,
         ]);
     }
