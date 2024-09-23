@@ -4,6 +4,8 @@
 
 A Laravel-based web application for managing internship information systems (PKL) at a Vocational High School. This project includes features for user management, assessment, reporting, and more.
 
+**Docs:** [Notion](https://www.notion.so/reasnovynt/Internship-Management-System-da500b3e108a4612ba81c75516ccf83e?pvs=4)
+
 ## Features
 
 - **User Management**: Roles include admin, staff, student, teacher, supervisor.
