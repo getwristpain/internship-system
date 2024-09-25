@@ -1,0 +1,47 @@
+[90m= [39m[34;4mIlluminate\Database\Eloquent\Collection[39;24m {#6639
+    [34mall[39m: [
+      [34;4mApp\Models\UserStatus[39;24m {#6640
+        [34mid[39m: [35m1[39m,
+        [34mname[39m: "[32mactive[39m",
+        [34mdescription[39m: "[32mPengguna ini aktif dan memiliki akses penuh ke sistem.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:24[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:24[39m",
+      },
+      [34;4mApp\Models\UserStatus[39;24m {#6641
+        [34mid[39m: [35m2[39m,
+        [34mname[39m: "[32mpending[39m",
+        [34mdescription[39m: "[32mPengguna ini belum terverifikasi dan aksesnya terbatas.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:25[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:25[39m",
+      },
+      [34;4mApp\Models\UserStatus[39;24m {#6642
+        [34mid[39m: [35m3[39m,
+        [34mname[39m: "[32mblocked[39m",
+        [34mdescription[39m: "[32mPengguna ini diblokir dan tidak dapat mengakses sistem.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:25[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:25[39m",
+      },
+      [34;4mApp\Models\UserStatus[39;24m {#6643
+        [34mid[39m: [35m4[39m,
+        [34mname[39m: "[32msuspended[39m",
+        [34mdescription[39m: "[32mAkses pengguna ini sementara ditangguhkan karena pelanggaran.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:25[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:25[39m",
+      },
+      [34;4mApp\Models\UserStatus[39;24m {#6644
+        [34mid[39m: [35m5[39m,
+        [34mname[39m: "[32mdeactivated[39m",
+        [34mdescription[39m: "[32mAkun pengguna ini dinonaktifkan oleh admin.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:25[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:25[39m",
+      },
+      [34;4mApp\Models\UserStatus[39;24m {#6645
+        [34mid[39m: [35m6[39m,
+        [34mname[39m: "[32mguest[39m",
+        [34mdescription[39m: "[32mPengguna ini adalah tamu dengan akses terbatas.[39m",
+        [34mcreated_at[39m: "[32m2024-09-17 17:18:25[39m",
+        [34mupdated_at[39m: "[32m2024-09-17 17:18:25[39m",
+      },
+    ],
+  }
+

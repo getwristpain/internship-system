@@ -91,7 +91,7 @@ class MenuSeeder extends Seeder
                 'label' => 'Pengaturan',
                 'route' => 'setting',
                 'icon' => 'ph:gear-fill',
-                'roles' => [], // Accessible by everyone
+                'roles' => ['admin'],
                 'submenu' => [],
             ],
         ];

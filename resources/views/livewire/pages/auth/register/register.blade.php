@@ -7,10 +7,9 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component {
     public RegisterForm $form;
 
-    public function register(string $type = 'student')
+    public function register(string $accountType = 'student')
     {
-        $this->form->account_type = $type;
-        $this->form->handleStepOne();
+        $this->form->handleStepOne($accountType);
     }
 }; ?>
 

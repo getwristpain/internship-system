@@ -6,13 +6,7 @@ export default {
         "./resources/views/**/*.blade.php",
     ],
     daisyui: {
-        themes: [
-            {
-                mytheme: {
-                    ...require("daisyui/src/theming/themes")["bumblebee"],
-                },
-            },
-        ],
+        themes: ["light"],
     },
     theme: {
         extend: {
