@@ -8,6 +8,10 @@ body {
     @apply font-sans antialiased screen-full text-gray-900;
 }
 
+.text-lg {
+    @apply text-gray-700;
+}
+
 .screen-full {
     @apply h-screen w-screen overflow-x-hidden overflow-y-auto;
 }

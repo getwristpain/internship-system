@@ -65,7 +65,7 @@ new class extends Component {
     <x-slot name="content">
         <div class="flex flex-col space-y-8">
             <div class="font-bold text-lg">
-                Apakah kamu yakin ingin menghapus pengguna ini?
+                Apakah Anda yakin ingin menghapus pengguna ini?
             </div>
 
             <div class="p-4 bg-gray-200 rounded-lg">

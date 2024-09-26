@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Models\UserStatus;
+use App\Models\Status;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -104,7 +104,7 @@ class InstallApp extends Command
             return false;
         }
 
-        $status = UserStatus::where('name', 'active')->first();
+        $status = Status::where('name', 'active')->first();
 
         if (!$status) {
             $this->error('User status "Active" not found.');

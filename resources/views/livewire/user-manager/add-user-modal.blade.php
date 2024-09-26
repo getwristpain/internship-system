@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{User, UserStatus};
+use App\Models\{User, Status};
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Livewire\Volt\Component;
@@ -63,7 +63,7 @@ new class extends Component {
             )
             ->toArray();
 
-        $this->statuses = UserStatus::all()
+        $this->statuses = Status::all()
             ->map(
                 fn($status) => [
                     'value' => $status->name,
@@ -109,7 +109,7 @@ new class extends Component {
             'name' => $this->user['name'],
             'email' => $this->user['email'],
             'password' => Hash::make($this->user['password']),
-            'status_id' => UserStatus::where('name', $this->userStatus)->first()->id,
+            'status_id' => Status::where('name', $this->userStatus)->first()->id,
         ]);
 
         // Assign profile details

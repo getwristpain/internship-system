@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\User;
+use App\Models\AccessKey;
 use Illuminate\Support\Facades\Auth;
 
 class LoginForm extends Form
@@ -11,10 +12,15 @@ class LoginForm extends Form
     public string $email = '';
     public string $password = '';
     public bool $remember = false;
+    public string $accessKey = '';
 
     public function attemptLogin()
     {
-        $this->validate();
+        $this->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+            'remember' => 'boolean',
+        ]);
 
         if (!$this->isUserValid()) {
             return;
@@ -27,13 +33,35 @@ class LoginForm extends Form
         return redirect()->intended()->route('dashboard');
     }
 
-    public function rules(): array
+    public function attemptLoginWithKey(string $accessKey = '')
     {
-        return [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'remember' => 'boolean',
-        ];
+        $this->validate([
+            'accessKey' => 'required|string',
+        ]);
+
+        $this->accessKey = !$accessKey ?: $accessKey;
+
+        $accessKeyRecord = AccessKey::where('hashed_key', $this->accessKey)
+            ->where('expires_at', '>=', now())
+            ->first();
+
+        if (!$accessKeyRecord) {
+            $this->addError('accessKey', __('Kunci akses tidak valid atau sudah kadaluarsa.'));
+            return;
+        }
+
+        $user = $accessKeyRecord->user;
+
+        if (!$user || !$user->hasRole('supervisor')) {
+            $this->addError('accessKey', __('Pengguna ini bukan supervisor.'));
+            return;
+        }
+
+        // Login user
+        Auth::login($user, $this->remember);
+
+        // Redirect ke halaman dashboard
+        return redirect()->route('dashboard');
     }
 
     /**

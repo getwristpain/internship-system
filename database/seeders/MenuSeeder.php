@@ -58,7 +58,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'slug' => 'user-manager',
-                        'label' => 'Manajemen',
+                        'label' => 'Semua',
                         'route' => 'user-manager',
                         'icon' => 'mdi:account-group',
                         'roles' => ['admin'],
@@ -75,6 +75,13 @@ class MenuSeeder extends Seeder
                         'label' => 'Guru',
                         'route' => 'teacher-manager',
                         'icon' => 'dashicons:businessman',
+                        'roles' => ['admin', 'staff'],
+                    ],
+                    [
+                        'slug' => 'supervisor-manager',
+                        'label' => 'Supervisor',
+                        'route' => 'supervisor-manager',
+                        'icon' => 'icon-park-solid:user-business',
                         'roles' => ['admin', 'staff'],
                     ],
                     [

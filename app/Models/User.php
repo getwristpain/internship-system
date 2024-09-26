@@ -7,6 +7,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -48,9 +49,14 @@ class User extends Authenticatable
         });
     }
 
+    public function accessKey(): HasOne
+    {
+        return $this->hasOne(AccessKey::class);
+    }
+
     public function status(): BelongsTo
     {
-        return $this->belongsTo(UserStatus::class);
+        return $this->belongsTo(Status::class);
     }
 
     public function profile(): HasOne

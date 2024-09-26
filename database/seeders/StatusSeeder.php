@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\UserStatus;
+use App\Models\Status;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-class UserStatusSeeder extends Seeder
+class StatusSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -41,7 +41,7 @@ class UserStatusSeeder extends Seeder
         ];
 
         foreach ($statuses as $status) {
-            UserStatus::create($status);
+            Status::create($status);
         }
     }
 }

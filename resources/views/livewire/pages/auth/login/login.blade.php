@@ -14,7 +14,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     public function clogin()
     {
-        return $this->redirect(route('login.company'), navigate: true);
+        return $this->redirect(route('company.login'), navigate: true);
     }
 
     public function register()
@@ -54,7 +54,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <div class="flex flex-col items-center justify-center w-full space-y-8 text-center">
-            <button disabled wire:click.prevent="clogin" class="btn bg-base-100">Login untuk Perusahaan</button>
+            <button wire:click.prevent="clogin" class="btn btn-neutral btn-outline">Login untuk Perusahaan</button>
         </div>
     </form>
 </div>

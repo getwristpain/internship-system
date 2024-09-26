@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\{User, UserStatus};
+use App\Models\{User, Status};
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Livewire\Volt\Component;
@@ -16,7 +16,7 @@ new class extends Component {
     public array $initialUser = [];
     public array $initialUserProfile = [];
     public string $initialUserRole = 'guest';
-    public string $initialUserStatus = 'pending';
+    public string $initialStatus = 'pending';
 
     public array $roles = [];
     public array $statuses = [];
@@ -54,13 +54,13 @@ new class extends Component {
         $this->initialUser = $this->user;
         $this->initialUserProfile = $this->userProfile;
         $this->initialUserRole = $this->userRole;
-        $this->initialUserStatus = $this->userStatus;
+        $this->initialStatus = $this->userStatus;
         $this->checkIfDirty();
     }
 
     protected function checkIfDirty(): void
     {
-        $this->isDirty = $this->user !== $this->initialUser || $this->userProfile !== $this->initialUserProfile || $this->userRole !== $this->initialUserRole || $this->userStatus !== $this->initialUserStatus;
+        $this->isDirty = $this->user !== $this->initialUser || $this->userProfile !== $this->initialUserProfile || $this->userRole !== $this->initialUserRole || $this->userStatus !== $this->initialStatus;
     }
 
     public function updated($propertyName)
@@ -80,7 +80,7 @@ new class extends Component {
             )
             ->toArray();
 
-        $this->statuses = UserStatus::all()
+        $this->statuses = Status::all()
             ->map(
                 fn($status) => [
                     'value' => $status->name,
@@ -117,9 +117,9 @@ new class extends Component {
         return $user;
     }
 
-    protected function getStatus(string $statusName): ?UserStatus
+    protected function getStatus(string $statusName): ?Status
     {
-        $status = UserStatus::where('name', $statusName)->first();
+        $status = Status::where('name', $statusName)->first();
 
         if (!$status) {
             flash()->error("Status pengguna '${statusName}' tidak ditemukan!");
