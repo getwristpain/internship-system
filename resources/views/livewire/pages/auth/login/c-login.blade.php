@@ -1,9 +1,9 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use Illuminate\Http\Request;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
-use Illuminate\Http\Request;
 
 new #[Layout('layouts.guest')] class extends Component {
     public LoginForm $form;
@@ -12,7 +12,7 @@ new #[Layout('layouts.guest')] class extends Component {
     // Method to handle the access key from the request
     public function mount(Request $request)
     {
-        $this->accessKey = $request->input('accessKey', ''); // Default to empty string if not present
+        $this->accessKey = $request->input('accessKey', '');
     }
 
     public function login()
@@ -32,7 +32,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     {{-- Display Error Message --}}
     @if (session()->has('error'))
-        <div class="bg-red-100 text-red-700 p-4 rounded-md text-center">
+        <div class="p-4 text-center text-red-700 bg-red-100 rounded-md">
             {{ session('error') }}
         </div>
     @endif

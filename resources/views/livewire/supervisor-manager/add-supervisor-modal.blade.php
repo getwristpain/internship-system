@@ -69,13 +69,22 @@ new class extends Component {
 
     private function createNewUser()
     {
+        $startTime = microtime(true); // Get the start time
+        $timeoutDuration = 60; // Set the timeout duration in seconds
+
         do {
-            $name = 'supervisor-' . Str::random(16);
+            // Check if the timeout duration has been exceeded
+            if (microtime(true) - $startTime > $timeoutDuration) {
+                flash()->error('Proses pembuatan pengguna baru gagal karena waktu habis!');
+                return null;
+            }
+
+            $name = 'sv-' . Str::random(8);
             $email = $name . '@example.com';
         } while (User::where('email', $email)->exists());
 
         $password = Hash::make(Str::random(16));
-        $status = Status::where(['name' => 'pending'])->first();
+        $status = Status::firstOrCreate('name', 'guest');
 
         $user = User::create([
             'name' => $name,

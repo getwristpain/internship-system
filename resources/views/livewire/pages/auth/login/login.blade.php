@@ -1,7 +1,8 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
-use Livewire\Attributes\Layout;
+use Illuminate\Http\Request;
+use Livewire\Attributes\{Layout, On};
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component {
@@ -28,14 +29,15 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col items-center justify-center max-w-md mx-auto space-y-12">
+<div class="flex flex-col items-center justify-center max-w-md mx-auto space-y-8">
     <div class="w-full px-16 space-y-2 text-center">
         <h1 class="text-2xl font-heading">Masuk</h1>
         <p>Selamat datang di Sistem Informasi Manajemen PKL</p>
     </div>
 
-    <form class="w-full space-y-12" wire:submit.prevent="login">
-        <div class="space-y-4">
+    <form class="w-full space-y-8" wire:submit.prevent="login">
+        <div class="space-y-2">
+            <x-input-session-status></x-input-session-status>
             <x-input-text required type="email" model="form.email" placeholder="Email" autofocus />
             <x-input-text required type="password" model="form.password" placeholder="Password" />
             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />

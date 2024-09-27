@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\Models\AccessKey;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Crypt;
@@ -53,14 +54,24 @@ class AccessKeyGen
     }
 
     /**
-     * Verify if the given access key matches the hashed key.
+     * Verify if the provided access key matches any stored key,
+     * and return the associated AccessKey instance if verification succeeds.
      *
      * @param string $key
-     * @param string $hashedKey
-     * @return bool
+     * @return AccessKey|null
      */
-    public static function verifyKey(string $key, string $hashedKey): bool
+    public static function verifyKey(string $key): ?AccessKey
     {
-        return Hash::check($key, $hashedKey);
+        // Retrieve all access keys that are still valid
+        $accessKeys = AccessKey::where('expires_at', '>=', now())->get();
+
+        foreach ($accessKeys as $accessKey) {
+            // Compare the plain key from the database with the provided key
+            if (Hash::check($key, $accessKey->hashed_key)) {
+                return $accessKey; // Return the matching access key
+            }
+        }
+
+        return null; // Return null if no match is found
     }
 }

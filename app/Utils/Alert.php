@@ -29,7 +29,6 @@ class Alert
      */
     protected function checkForAlerts(): void
     {
-        $this->checkUserRole();
         $this->checkUserProfileCompletion();
     }
 
@@ -47,16 +46,6 @@ class Alert
                     return;
                 }
             }
-        }
-    }
-
-    /**
-     * Add an alert if the user is logged in as a guest.
-     */
-    protected function checkUserRole(): void
-    {
-        if ($this->userRole === 'guest') {
-            $this->addAlert('warning', 'Anda saat ini masuk sebagai tamu. Silakan daftar untuk mengakses lebih banyak fitur.', 'daftar', 'Daftar');
         }
     }
 

@@ -4,7 +4,7 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\User;
-use App\Models\AccessKey;
+use App\Utils\AccessKeyGen;
 use Illuminate\Support\Facades\Auth;
 
 class LoginForm extends Form
@@ -35,15 +35,14 @@ class LoginForm extends Form
 
     public function attemptLoginWithKey(string $accessKey = '')
     {
+        // Mengatur accessKey jika tidak ada input dari parameter
+        $this->accessKey = $accessKey ?: $this->accessKey;
+
         $this->validate([
             'accessKey' => 'required|string',
         ]);
 
-        $this->accessKey = !$accessKey ?: $accessKey;
-
-        $accessKeyRecord = AccessKey::where('hashed_key', $this->accessKey)
-            ->where('expires_at', '>=', now())
-            ->first();
+        $accessKeyRecord = AccessKeyGen::verifyKey($this->accessKey);
 
         if (!$accessKeyRecord) {
             $this->addError('accessKey', __('Kunci akses tidak valid atau sudah kadaluarsa.'));
@@ -57,7 +56,7 @@ class LoginForm extends Form
             return;
         }
 
-        // Login user
+        // Melakukan login user supervisor
         Auth::login($user, $this->remember);
 
         // Redirect ke halaman dashboard

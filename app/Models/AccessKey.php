@@ -12,7 +12,7 @@ class AccessKey extends Model
     use HasFactory;
 
     protected $fillable = ['key', 'hashed_key', 'user_id', 'expires_at'];
-    protected $hidden = ['key', 'user_id']; // Kunci tetap tersembunyi
+    protected $hidden = ['key', 'user_id'];
 
     /**
      * Generate and store a new access key.
@@ -20,16 +20,21 @@ class AccessKey extends Model
      * @param int $length
      * @param int|null $userId
      * @param int $expiryDays
-     * @return AccessKey
+     * @return self
      */
     public static function createNewKey(int $length = 32, ?string $userId = null, int $expiryDays = 7): self
     {
         do {
-            // Generate a new access key
+            // Generate a new plain access key
             $plainKey = AccessKeyGen::generate($length);
-        } while (self::where('key', $plainKey)->exists());
+        } while (self::where('hashed_key', AccessKeyGen::hashKey($plainKey))->exists());
 
-        // Create and store the access key with the hashed version
+        // Validate userId if provided
+        if ($userId && !User::find($userId)) {
+            throw new \InvalidArgumentException('Invalid user ID provided.');
+        }
+
+        // Create and store the access key with the encrypted and hashed version
         return self::create([
             'key' => AccessKeyGen::encryptKey($plainKey),
             'hashed_key' => AccessKeyGen::hashKey($plainKey),
@@ -39,26 +44,21 @@ class AccessKey extends Model
     }
 
     /**
-     * Verify if the provided access key matches the stored hashed key.
-     *
-     * @param string $key
-     * @return bool
-     */
-    public function verifyKey(string $key): bool
-    {
-        return AccessKeyGen::verifyKey($key, $this->hashed_key);
-    }
-
-    /**
      * Decrypt the stored access key.
      *
      * @return string
      */
     public function getDecryptedKey(): string
     {
+        // Decrypt and return the plain access key
         return AccessKeyGen::decryptKey($this->key);
     }
 
+    /**
+     * Define the relationship to the User model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

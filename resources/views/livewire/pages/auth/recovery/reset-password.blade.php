@@ -57,30 +57,34 @@ new #[Layout('layouts.guest')] class extends Component {
         // redirect them back to where they came from with their error message.
         if ($status != Password::PASSWORD_RESET) {
             $this->addError('email', __($status));
-
             return;
         }
 
         session()->flash('status', __($status));
+        return redirect(route('login'), navigate: true)->with('status', 'Password berhasil diperbarui, masuk untuk melanjutkan');
+    }
 
-        $this->redirectRoute('login', navigate: true);
+    public function back()
+    {
+        return $this->redirect(route('login'), navigate: true);
     }
 }; ?>
 
-<div class="flex flex-col space-y-12 w-full max-w-md mx-auto">
+<div class="flex flex-col w-full max-w-md mx-auto space-y-12">
 
     <!-- Heading -->
-    <div class="flex flex-col gap-2 text-center w-full">
-        <h1 class="font-heading text-xl">Buat Password Baru</h1>
+    <div class="flex flex-col w-full gap-2 text-center">
+        <h1 class="text-xl font-heading">Buat Password Baru</h1>
         <p>Reset passwordmu dan jangan sampai lupa.</p>
     </div>
 
-    <form wire:submit="resetPassword" class="flex flex-col gap-16 w-full">
-        <div class="flex flex-col space-y-4 w-full">
+    <form wire:submit="resetPassword" class="flex flex-col w-full gap-4">
+        <div class="flex flex-col w-full space-y-4">
             <x-input-text disabled type="email" name="email" model="email" placeholder="Email" required autofocus />
             <x-input-text type="password" name="password" model="password" placeholder="Password" required />
             <x-input-text type="password" name="password_confirmation" model="password_confirmation"
                 Placeholder="Konfirmasi Password" required />
+            <x-input-session-status></x-input-session-status>
         </div>
 
         <div class="flex items-center justify-end w-full space-x-4">

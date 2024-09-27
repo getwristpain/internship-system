@@ -19,9 +19,7 @@
 
             <div
                 style="margin-top: 1rem; width: 100%; padding: 0.5rem; border-radius: 0.375rem; background-color: #edf2f7; text-align: center; font-size: 1.125rem; font-weight: 700;">
-                <p>
-                    <span style="font-weight: 900;">Access Key: </span>{{ $accessKey }}
-                </p>
+                <span>{{ $accessKey }}</span>
             </div>
 
             <p style="margin-top: 1rem; color: #4a5568;">Please ensure that you keep this access key secure, as it is

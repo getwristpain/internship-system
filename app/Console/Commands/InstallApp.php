@@ -104,10 +104,10 @@ class InstallApp extends Command
             return false;
         }
 
-        $status = Status::where('name', 'active')->first();
+        $status = Status::firstOrCreate(['name' => 'verified']);
 
         if (!$status) {
-            $this->error('User status "Active" not found.');
+            $this->error('User status "Verified" not found.');
             return false;
         }
 

@@ -89,7 +89,7 @@ new #[Layout('layouts.app')] class extends Component {
         <x-slot name="content">
             <div class="space-y-4">
                 <!-- Search Input -->
-                <div class="flex space-x-8 justify-beetween">
+                <div class="flex items-center gap-4 justify-beetween">
                     <div class="grow">
                         <x-input-text name="search" type="text" model="search"
                             placeholder="Cari berdasarkan nama atau email..." custom="search" />

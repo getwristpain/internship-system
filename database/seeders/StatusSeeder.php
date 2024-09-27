@@ -16,7 +16,11 @@ class StatusSeeder extends Seeder
         $statuses = [
             [
                 'name' => 'active',
-                'description' => 'Pengguna ini aktif dan memiliki akses penuh ke sistem.'
+                'description' => 'Pengguna ini aktif dan memiliki akses ke sistem.'
+            ],
+            [
+                'name' => 'verified',
+                'description' => 'Pengguna ini terverifikasi identitasnya.'
             ],
             [
                 'name' => 'pending',

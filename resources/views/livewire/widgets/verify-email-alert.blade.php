@@ -6,6 +6,7 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public int $countdown = 0;
+    public bool $emailSended = false;
     public bool $showAlert = true;
 
     /**
@@ -18,8 +19,9 @@ new class extends Component {
         }
 
         Auth::user()->sendEmailVerificationNotification();
-        Session::flash('status', 'verification-link-sent');
-        $this->countdown = 60;
+        flash()->success('Link verifikasi email berhasil terkirim.');
+        $this->countdown = 30;
+        $this->emailSended = true;
 
         // Start countdown
         $this->dispatch('start-countdown');
@@ -43,7 +45,7 @@ new class extends Component {
 
 <div>
     @if ($showAlert && !Auth::user()->hasVerifiedEmail())
-        <div class="alert alert-warning rounded-md">
+        <div class="rounded-md alert alert-warning">
             <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     class="w-6 h-6 stroke-current shrink-0">
@@ -52,22 +54,19 @@ new class extends Component {
                     </path>
                 </svg>
             </div>
-            <div class="flex-1 flex flex-wrap items-center gap-2">
+            <div class="flex flex-wrap items-center flex-1 gap-2">
                 <div class="flex flex-col gap-2">
                     <p>{{ __('Anda belum memverifikasi email. Mohon verifikasi untuk mengakses semua fitur.') }}</p>
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="text-success">
-                            {{ __('Tautan verifikasi telah dikirim ke email Anda.') }}
-                        </p>
-                    @endif
                 </div>
 
                 <div>
                     <button class="btn btn-neutral btn-outline btn-sm" wire:click="sendVerification"
-                        wire:loading.attr="disabled" wire:target="sendVerification" @disabled($countdown > 0)">
+                        wire:loading.attr="disabled" wire:target="sendVerification" @disabled($countdown > 0)>
                         <span>
                             @if ($countdown > 0)
-                                {{ __('Kirim Ulang Email Verifikasi (') }} {{ $countdown }} {{ __(' detik)') }}
+                                {{ __('Kirim Ulang (') }} {{ $countdown }} {{ __(' detik)') }}
+                            @elseif ($emailSended === true)
+                                {{ __('Kirim Ulang') }}
                             @else
                                 {{ __('Kirim Email Verifikasi') }}
                             @endif

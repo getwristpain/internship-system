@@ -37,14 +37,24 @@ new #[Layout('layouts.app')] class extends Component {
 
     public function sendAccessKeyEmail($supervisorId)
     {
+        if (!$supervisorId) {
+            return 1;
+        }
+
+        // Mencari supervisor beserta access key-nya
         $supervisor = User::with('accessKey')->find($supervisorId);
-        $accessKey = AccessKey::find($supervisor->accessKey->id);
 
         if ($supervisor && $supervisor->accessKey) {
-            // Mengirim email dengan kunci akses
-            // FIXME:  An email must have a "To", "Cc", or "Bcc" header. 
-            Mail::to($supervisor->email)->send(new AccessKeyMail($accessKey->getDecryptedKey()));
-            flash()->success('Kunci akses berhasil dikirim ke email supervisor.');
+            $accessKey = AccessKey::find($supervisor->accessKey->id);
+
+            // Memastikan email supervisor ada dan valid
+            if (filter_var($supervisor->email, FILTER_VALIDATE_EMAIL)) {
+                // Mengirim email dengan kunci akses
+                Mail::to($supervisor->email)->send(new AccessKeyMail($accessKey->getDecryptedKey()));
+                flash()->success('Kunci akses berhasil dikirim ke email supervisor.');
+            } else {
+                flash()->error('Email supervisor tidak valid.');
+            }
         } else {
             flash()->error('Supervisor tidak ditemukan atau tidak memiliki kunci akses.');
         }
@@ -62,7 +72,7 @@ new #[Layout('layouts.app')] class extends Component {
 };
 ?>
 
-<div class="h-full w-full">
+<div class="w-full h-full">
     <x-card class="min-h-full">
         <x-slot name="heading">
             Manajemen Supervisor
@@ -77,7 +87,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <thead>
                         <tr>
                             <th>Pengguna</th>
-                            <th>Kunci Akses</th>
+                            <th>Email</th>
                             <th>Kadaluarsa</th>
                             <th></th>
                         </tr>
@@ -86,13 +96,7 @@ new #[Layout('layouts.app')] class extends Component {
                         @forelse ($supervisors as $supervisor)
                             <tr :key="$supervisor['id']">
                                 <td>{{ $supervisor['name'] ?? '' }}</td>
-                                <td>
-                                    @if (!empty($supervisor['access_key']))
-                                        <span>{{ $supervisor['access_key']['hashed_key'] }}</span>
-                                    @else
-                                        <span>Tidak ada kunci akses.</span>
-                                    @endif
-                                </td>
+                                <td>{{ $supervisor['email'] ?? '' }}</td>
                                 <td>
                                     @if (!empty($supervisor['access_key']))
                                         @php
@@ -112,12 +116,12 @@ new #[Layout('layouts.app')] class extends Component {
                                     @endif
                                 </td>
                                 <td>
-                                    @if (!empty($supervisor['access_key']))
-                                        <div class="flex flex-wrap md:flex-nowrap gap-2 items-center justify-center">
-                                            <button class="btn btn-error btn-outline btn-sm" title="Hapus"
-                                                wire:click="openDeleteSupervisorModal('{{ $supervisor['id'] }}')">
-                                                <iconify-icon icon="mdi:delete"></iconify-icon>
-                                            </button>
+                                    <div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap">
+                                        <button class="btn btn-error btn-outline btn-sm" title="Hapus"
+                                            wire:click="openDeleteSupervisorModal('{{ $supervisor['id'] }}')">
+                                            <iconify-icon icon="mdi:delete"></iconify-icon>
+                                        </button>
+                                        @if (!empty($supervisor['access_key']))
                                             <button class="btn btn-neutral btn-outline btn-sm !flex-nowrap"
                                                 wire:click="sendAccessKeyEmail('{{ $supervisor['id'] }}')"
                                                 title="Kirim kunci akses melalui email supervisor."
@@ -127,8 +131,8 @@ new #[Layout('layouts.app')] class extends Component {
                                                 <iconify-icon icon="carbon:send-alt-filled"></iconify-icon>
                                                 <span class="hidden md:inline-block">Kirim</span>
                                             </button>
-                                        </div>
-                                    @endif
+                                        @endif
+                                    </div>
                                 </td>
 
                             </tr>
@@ -143,7 +147,7 @@ new #[Layout('layouts.app')] class extends Component {
                     <tfoot>
                         <tr>
                             <th>Pengguna</th>
-                            <th>Kunci Akses</th>
+                            <th>Email</th>
                             <th>Kadaluarsa</th>
                             <th></th>
                         </tr>
