@@ -50,9 +50,9 @@ class MenuSeeder extends Seeder
                 'roles' => ['admin', 'staff'], // Restricted to admin and staff
                 'submenu' => [
                     [
-                        'slug' => 'user-overview',
+                        'slug' => 'users-overview',
                         'label' => 'Overview',
-                        'route' => 'user-overview',
+                        'route' => 'users-overview',
                         'icon' => 'material-symbols:overview',
                         'roles' => ['admin', 'staff'],
                     ],
@@ -67,7 +67,7 @@ class MenuSeeder extends Seeder
                         'slug' => 'student-manager',
                         'label' => 'Siswa',
                         'route' => 'student-manager',
-                        'icon' => 'mingcute:idcard-fill',
+                        'icon' => 'mdi:account-school',
                         'roles' => ['admin', 'staff'],
                     ],
                     [
@@ -81,7 +81,7 @@ class MenuSeeder extends Seeder
                         'slug' => 'supervisor-manager',
                         'label' => 'Supervisor',
                         'route' => 'supervisor-manager',
-                        'icon' => 'icon-park-solid:user-business',
+                        'icon' => 'mdi:account-check',
                         'roles' => ['admin', 'staff'],
                     ],
                     [

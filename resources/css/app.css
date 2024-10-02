@@ -34,6 +34,7 @@ body {
 }
 
 iconify-icon {
+    @apply opacity-90;
     display: inline-block;
     width: 1em;
     height: 1em;

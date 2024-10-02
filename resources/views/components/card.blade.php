@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => 'w-full h-fit py-4 px-8 rounded-xl border bg-white']) }}>
+<div {{ $attributes->merge(['class' => 'w-full h-fit p-4 rounded-xl border bg-white']) }}>
     {{-- Header --}}
     @if (isset($heading))
         <div class="mb-8">
