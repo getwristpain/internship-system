@@ -19,19 +19,19 @@
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-10 overflow-y-auto" :class="{ 'hidden': !show }">
 
-        <div class="flex items-center justify-center w-screen min-h-screen bg-black bg-opacity-10 p-4">
-            <div class="relative overflow-visible flex flex-col bg-base-100 rounded-xl shadow-xl transform transition-all mx-auto max-w-full md:max-w-xl lg:max-w-2xl space-y-2"
+        <div class="flex items-center justify-center w-screen min-h-screen p-4 bg-black bg-opacity-10">
+            <div class="relative flex flex-col max-w-full mx-auto space-y-2 overflow-visible transition-all transform shadow-xl bg-base-100 rounded-xl md:max-w-xl lg:max-w-2xl"
                 :class="{ 'w-fit': {{ $fit }}, 'w-full': !{{ $fit }} }">
 
                 <!-- Header -->
                 <div
-                    class="bg-gray-100 flex justify-between items-center border-b border-gray-300 rounded-t-lg p-4 space-x-8 text-lg">
+                    class="flex items-center justify-between p-4 space-x-8 text-lg bg-gray-100 border-b border-gray-300 rounded-t-lg">
                     <div class="grow line-clamp-1 text-nowrap">
-                        <h3 class="font-bold text-gray-900 font-heading">{{ $header }}</h3>
+                        <h3 class="font-bold text-gray-800 font-heading">{{ $header }}</h3>
                     </div>
                     <div>
                         <button x-on:click="closeModal"
-                            class="text-red-400 hover:text-red-600 transition ease-in-out duration-150">
+                            class="text-red-400 transition duration-150 ease-in-out hover:text-red-600">
                             <iconify-icon class="scale-125" icon="carbon:close-filled"></iconify-icon>
                         </button>
                     </div>

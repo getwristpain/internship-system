@@ -1,41 +1,37 @@
 <?php
 
-use App\Models\User;
 use App\Services\UserService;
 use Livewire\WithPagination;
-use Livewire\Volt\Component;
 use Livewire\Attributes\{On, Layout};
+use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component {
     use WithPagination;
 
-    // Property for storing search query
     public string $search = '';
 
-    public function with(): array
+    public function with()
     {
         return [
-            'users' => UserService::paginatedUsers($this->search),
+            'admins' => UserService::paginatedUsers($this->search, ['admin', 'staff']),
         ];
     }
 
-    // Event Listener for user updates
     #[On('user-updated')]
-    public function refreshUsers()
+    public function refreshAdmins()
     {
         $this->resetPage(); // Reset pagination when user list is updated
     }
-};
-?>
+}; ?>
 
 <div class="w-full h-full">
     <x-card class="h-full">
         <x-slot name="heading">
-            Manajemen Pengguna
+            Manajemen Admin
         </x-slot>
 
         <x-slot name="content">
-            <x-users-table-view :users="$users" identifier="user" />
+            <x-users-table-view :users="$admins" identifier="admin" />
         </x-slot>
     </x-card>
 </div>

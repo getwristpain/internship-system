@@ -6,14 +6,17 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public bool $show = false;
+    public string $identifier = '';
 
     public array $user = [];
     public bool $delete_confirmation = false;
 
-    #[On('openDeleteUserModal')]
-    public function handleOpenModal(bool $show = false, string $userId = '')
+    #[On('open-delete-user-modal')]
+    public function handleOpenModal(string $userId = '', string $identifier = '')
     {
-        $this->show = $show;
+        $this->show = true;
+        $this->identifier = $identifier;
+
         $this->loadSelectedUser($userId);
     }
 
@@ -64,7 +67,7 @@ new class extends Component {
     </x-slot>
     <x-slot name="content">
         <div class="flex flex-col space-y-8">
-            <div class="font-bold text-lg">
+            <div class="text-lg font-bold">
                 Apakah Anda yakin ingin menghapus pengguna ini?
             </div>
 

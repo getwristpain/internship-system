@@ -28,7 +28,7 @@ new class extends Component {
         // Ubah koleksi ke array dengan hitungan per tahun
         $usersPerYear = [];
         foreach ($usersGroupedByYear as $year => $users) {
-            $usersPerYear[$year] = $users->count();
+            $usersPerYear[$year] = $users->count() ?? 0;
         }
 
         return $usersPerYear;

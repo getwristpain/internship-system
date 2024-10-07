@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-class Number
+class NumberFormatter
 {
     public static function relative(int $num): string
     {

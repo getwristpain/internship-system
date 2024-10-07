@@ -89,7 +89,7 @@ class MenuSeeder extends Seeder
                         'label' => 'Admin',
                         'route' => 'admin-manager',
                         'icon' => 'eos-icons:admin',
-                        'roles' => ['admin', 'staff'],
+                        'roles' => ['admin'],
                     ],
                 ],
             ],

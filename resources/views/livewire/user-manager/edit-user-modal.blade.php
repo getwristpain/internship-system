@@ -1,11 +1,13 @@
 <?php
 
 use App\Models\{User, Status};
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
+use App\Services\RoleService;
+use App\Services\StatusService;
 use Livewire\Volt\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 new class extends Component {
     public array $user = [];
@@ -23,16 +25,19 @@ new class extends Component {
 
     public bool $isDirty = false;
     public bool $show = false;
+    public string $identifier = '';
 
     public function mount()
     {
         $this->loadUserAttributes();
     }
 
-    #[On('openEditUserModal')]
-    public function handleOpenModal(bool $show = false, string $userId = '')
+    #[On('open-edit-user-modal')]
+    public function handleOpenModal(string $userId = '', string $identifier = '')
     {
-        $this->show = $show;
+        $this->show = true;
+        $this->identifier = $identifier;
+
         $this->loadSelectedUser($userId);
         $this->setInitialState();
     }
@@ -63,45 +68,30 @@ new class extends Component {
         $this->isDirty = $this->user !== $this->initialUser || $this->userProfile !== $this->initialUserProfile || $this->userRole !== $this->initialUserRole || $this->userStatus !== $this->initialStatus;
     }
 
-    public function updated($propertyName)
+    public function updated()
     {
         $this->checkIfDirty();
+
+        if ($this->userRole === 'guest') {
+            $this->userStatus = 'guest';
+        }
     }
 
     protected function loadUserAttributes(): void
     {
-        $this->roles = Role::where('name', '!=', 'owner')
-            ->get()
-            ->map(
-                fn($role) => [
-                    'value' => $role->name,
-                    'text' => Str::title($role->name),
-                ],
-            )
-            ->toArray();
-
-        $this->statuses = Status::all()
-            ->map(
-                fn($status) => [
-                    'value' => $status->name,
-                    'text' => Str::title($status->name),
-                    'description' => $status->description,
-                    'badgeClass' => $this->statusBadgeClass($status->name),
-                ],
-            )
-            ->toArray();
+        $this->roles = $this->getRoles();
+        $this->statuses = StatusService::getStatuses();
     }
 
-    protected function statusBadgeClass(string $statusName): string
+    protected function getRoles()
     {
-        return match ($statusName) {
-            'active' => 'badge badge-success',
-            'pending' => 'badge badge-warning',
-            'blocked' => 'badge badge-error',
-            'suspended' => 'badge badge-warning',
-            'deactivated' => 'badge badge-ghost',
-            'guest' => 'badge badge-outline badge-neutral',
-            default => 'badge',
+        if (auth()->user()->hasRole('admin')) {
+            return RoleService::getRolesExcluding(['owner']);
+        }
+
+        return match ($this->identifier) {
+            'admin' => RoleService::getRolesIncluding(['admin', 'staff']),
+            default => RoleService::getRolesExcluding(['owner', 'admin']),
         };
     }
 
@@ -156,7 +146,7 @@ new class extends Component {
             'user.password' => 'nullable|confirmed|min:8',
             'userRole' => 'required|string',
             'userStatus' => 'required|string',
-            'userProfile.id_number' => 'nullable|string|min:8|max:20',
+            'userProfile.identifier_number' => 'nullable|string|min:8|max:20',
             'userProfile.position' => 'nullable|string|max:20',
             'userProfile.address' => 'nullable|min:10|max:255',
             'userProfile.phone' => ['nullable', 'regex:/^0\d{8,12}$/'],
@@ -220,19 +210,8 @@ new class extends Component {
     </x-slot>
 
     <x-slot name="content">
-        <div class="flex flex-col items-center p-4 space-y-8">
-            <div class="flex w-24 h-24 rounded-full">
-                @if (!empty($userProfile['avatar']))
-                    <img src="{{ $userProfile['avatar'] }}" alt="{{ $user['name'] . ' Avatar' }}">
-                @else
-                    <x-no-image class="opacity-20" />
-                @endif
-            </div>
+        <div class="flex flex-col items-center space-y-8">
             <table class="table table-list">
-                <tr>
-                    <th colspan="2" class="text-lg">Profil Pengguna</th>
-                </tr>
-
                 <tr>
                     <th>Nama</th>
                     <td>
@@ -253,7 +232,7 @@ new class extends Component {
                     <tr>
                         <th>ID Num. (NIS/NIP)</th>
                         <td>
-                            <x-input-text name="id_number" type="text" model="userProfile.id_number"
+                            <x-input-text name="identifier_number" type="text" model="userProfile.identifier_number"
                                 placeholder="Masukkan ID..." custom="idcard" />
                         </td>
                     </tr>
@@ -358,10 +337,10 @@ new class extends Component {
         </div>
     </x-slot>
     <x-slot name="footer">
-        <button type="button" class="btn btn-outline btn-neutral" wire:click="handleCloseModal">Cancel</button>
+        <button type="button" class="btn btn-outline btn-neutral" wire:click="handleCloseModal">Batal</button>
         <button type="submit" class="btn btn-neutral" wire:click="saveEditedUser">
             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
-            <span>Save</span>
+            <span>Simpan</span>
         </button>
     </x-slot>
 </x-modal>

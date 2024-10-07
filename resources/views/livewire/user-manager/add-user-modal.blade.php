@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\{User, Status};
+use App\Services\RoleService;
+use App\Services\StatusService;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Livewire\Volt\Component;
@@ -8,24 +10,35 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Str;
 
 new class extends Component {
+    public string $identifier = '';
+    public bool $show = false;
+
     public array $user = [];
     public array $userProfile = [];
-    public string $userRole = 'guest';
+    public string $userRole = 'student';
     public string $userStatus = 'pending';
+
     public array $roles = [];
     public array $statuses = [];
-    public bool $show = false;
 
     public function mount()
     {
         $this->loadUserAttributes();
     }
 
-    #[On('openAddUserModal')]
-    public function handleOpenModal(bool $show = false): void
+    #[On('open-add-user-modal')]
+    public function handleOpenModal(string $identifier = ''): void
     {
-        $this->show = $show;
+        $this->show = true;
+        $this->identifier = $identifier;
+
         $this->initUser();
+    }
+
+    #[On('modal-closed')]
+    public function handleCloseModal(): void
+    {
+        $this->show = false;
     }
 
     protected function initUser(): void
@@ -38,7 +51,7 @@ new class extends Component {
         ];
 
         $this->userProfile = [
-            'id_number' => '',
+            'identifier_number' => '',
             'position' => '',
             'group' => '',
             'school_year' => '',
@@ -53,39 +66,23 @@ new class extends Component {
 
     protected function loadUserAttributes(): void
     {
-        $this->roles = Role::where('name', '!=', 'owner')
-            ->get()
-            ->map(
-                fn($role) => [
-                    'value' => $role->name,
-                    'text' => Str::title($role->name),
-                ],
-            )
-            ->toArray();
-
-        $this->statuses = Status::all()
-            ->map(
-                fn($status) => [
-                    'value' => $status->name,
-                    'text' => Str::title($status->name),
-                    'description' => $status->description,
-                    'badgeClass' => $this->statusBadgeClass($status->name),
-                ],
-            )
-            ->toArray();
+        $this->roles = $this->getRoles();
+        $this->statuses = StatusService::getStatuses();
     }
 
-    protected function statusBadgeClass(string $statusName): string
+    protected function getRoles()
     {
-        return match ($statusName) {
-            'active' => 'badge badge-success',
-            'pending' => 'badge badge-warning',
-            'blocked' => 'badge badge-error',
-            'suspended' => 'badge badge-warning',
-            'deactivated' => 'badge badge-ghost',
-            'guest' => 'badge badge-outline badge-neutral',
-            default => 'badge',
+        return match ($this->identifier) {
+            'admin' => RoleService::getRolesIncluding(['admin', 'staff']),
+            default => RoleService::getRolesExcluding(['owner']),
         };
+    }
+
+    public function updated()
+    {
+        if ($this->userRole === 'guest') {
+            $this->userStatus = 'guest';
+        }
     }
 
     public function saveNewUser(): void
@@ -97,12 +94,16 @@ new class extends Component {
             'user.password' => 'required|confirmed|min:8',
             'userRole' => 'required|string',
             'userStatus' => 'required|string',
-            'userProfile.id_number' => 'nullable|string|min:8|max:20',
+            'userProfile.identifier_number' => 'nullable|string|min:8|max:20',
             'userProfile.position' => 'nullable|string|max:20',
             'userProfile.address' => 'nullable|min:10|max:255',
             'userProfile.phone' => ['nullable', 'regex:/^0\d{8,12}$/'],
-            'userProfile.gender' => 'nullable|in:male,female',
+            'userProfile.gender' => 'nullable|in:male,female,other',
         ]);
+
+        if (empty($this->userProfile['gender'])) {
+            $this->userProfile['gender'] = 'other';
+        }
 
         // Create new user
         $user = User::create([
@@ -123,12 +124,6 @@ new class extends Component {
 
         $this->handleCloseModal();
     }
-
-    #[On('modal-closed')]
-    public function handleCloseModal(): void
-    {
-        $this->show = false;
-    }
 };
 
 ?>
@@ -139,19 +134,8 @@ new class extends Component {
     </x-slot>
 
     <x-slot name="content">
-        <div class="flex flex-col space-y-8 items-center p-4">
-            <div class="flex w-24 h-24 rounded-full">
-                @if (!empty($userProfile['avatar']))
-                    <img src="{{ $userProfile['avatar'] }}" alt="{{ $user['name'] . ' Avatar' }}">
-                @else
-                    <x-no-image class="opacity-20" />
-                @endif
-            </div>
+        <div class="flex flex-col items-center space-y-8">
             <table class="table table-list">
-                <tr>
-                    <th colspan="2" class="text-lg">Pengguna Baru</th>
-                </tr>
-
                 <tr>
                     <th>Nama</th>
                     <td>
@@ -192,70 +176,78 @@ new class extends Component {
                     </td>
                 </tr>
 
-                <tr>
-                    <th>Status</th>
-                    <td>
-                        @foreach ($statuses as $status)
-                            <div class="flex items-start space-x-3 w-2/3">
-                                <input type="radio" id="status-{{ $status['value'] }}" name="status"
-                                    value="{{ $status['value'] }}" wire:model="userStatus" class="radio radio-sm"
-                                    {{ $userStatus === $status['value'] ? 'checked' : '' }}>
-                                <div>
-                                    <label for="status-{{ $status['value'] }}"
-                                        class="font-semibold {{ $status['badgeClass'] }}">
-                                        {{ $status['text'] }}
-                                    </label>
-                                    <p class="text-sm text-gray-500">
-                                        {{ $status['description'] ?? 'Deskripsi tidak tersedia' }}</p>
-                                </div>
+                @if ($identifier !== 'admin')
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            <div class="space-y-2">
+                                @foreach ($statuses as $status)
+                                    <div class="flex items-start w-2/3 space-x-3">
+                                        <input type="radio" id="status-{{ $status['value'] }}" name="status"
+                                            value="{{ $status['value'] }}" wire:model="userStatus"
+                                            class="radio radio-sm"
+                                            {{ $userStatus === $status['value'] ? 'checked' : '' }}>
+                                        <div>
+                                            <label for="status-{{ $status['value'] }}"
+                                                class="font-semibold {{ $status['badgeClass'] }}">
+                                                {{ $status['text'] }}
+                                            </label>
+                                            <p class="text-sm text-gray-500">
+                                                {{ $status['description'] ?? 'Deskripsi tidak tersedia' }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
-                        @endforeach
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th colspan="2" class="text-lg">Profil Pengguna</th>
-                </tr>
+                    <tr>
+                        <th colspan="2" class="text-lg">Profil Pengguna</th>
+                    </tr>
 
-                <tr>
-                    <th>ID Number (NIS/NIP)</th>
-                    <td>
-                        <x-input-text name="id_number" type="text" model="userProfile.id_number"
-                            placeholder="Masukkan ID..." custom="idcard" />
-                    </td>
-                </tr>
+                    <tr>
+                        <th>Nomor Identitas (NIS/NIP)</th>
+                        <td>
+                            <x-input-text name="identifier_number" type="text" model="userProfile.identifier_number"
+                                placeholder="Masukkan ID..." custom="idcard" />
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>Jabatan</th>
-                    <td>
-                        <x-input-text name="position" type="text" model="userProfile.position"
-                            placeholder="Masukkan jabatan..." custom="person" />
-                    </td>
-                </tr>
+                    <tr>
+                        <th>Jabatan</th>
+                        <td>
+                            <x-input-text name="position" type="text" model="userProfile.position"
+                                placeholder="Masukkan jabatan..." custom="person" />
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>Alamat</th>
-                    <td>
-                        <x-input-text name="address" type="text" model="userProfile.address"
-                            placeholder="Masukkan alamat..." custom="address" />
-                    </td>
-                </tr>
+                    <tr>
+                        <th>Alamat</th>
+                        <td>
+                            <x-input-text name="address" type="text" model="userProfile.address"
+                                placeholder="Masukkan alamat..." custom="address" />
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>Telepon (HP/WA)</th>
-                    <td>
-                        <x-input-text name="phone" type="tel" model="userProfile.phone"
-                            placeholder="Contoh: 08xxxxxxxxxx" custom="phone" />
-                    </td>
-                </tr>
+                    <tr>
+                        <th>Telepon (HP/WA)</th>
+                        <td>
+                            <x-input-text name="phone" type="tel" model="userProfile.phone"
+                                placeholder="Contoh: 08xxxxxxxxxx" custom="phone" />
+                        </td>
+                    </tr>
 
-                <tr>
-                    <th>Jenis Kelamin</th>
-                    <td>
-                        <x-input-select name="gender" :options="[['value' => 'male', 'text' => 'Pria'], ['value' => 'female', 'text' => 'Wanita']]" model="userProfile.gender"
-                            placeholder="Pilih jenis kelamin..." />
-                    </td>
-                </tr>
+                    <tr>
+                        <th>Jenis Kelamin</th>
+                        <td>
+                            <x-input-select name="gender" :options="[
+                                ['value' => 'male', 'text' => 'Pria'],
+                                ['value' => 'female', 'text' => 'Wanita'],
+                            ]" model="userProfile.gender"
+                                placeholder="Pilih jenis kelamin..." />
+                        </td>
+                    </tr>
+                @endif
 
             </table>
         </div>

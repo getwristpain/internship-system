@@ -44,7 +44,7 @@ new class extends Component {
         $pieChartModel = (new PieChartModel())->setTitle('Pengguna Berdasarkan Status');
 
         $this->users->groupBy('status.name')->each(function ($users, $status) use ($pieChartModel) {
-            $pieChartModel->addSlice(ucfirst($status), $users->count(), $this->getStatusColor($status));
+            $pieChartModel->addSlice(ucfirst($status), $users->count() ?? 0, $this->getStatusColor($status));
         });
 
         return $pieChartModel;

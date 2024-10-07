@@ -18,16 +18,16 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             // Nullable string fields
+            $table->string('identifier_number')->nullable();
             $table->string('avatar')->nullable();
-            $table->string('id_number')->nullable();
             $table->string('position')->nullable();
             $table->string('group')->nullable();
             $table->string('school_year')->nullable();
-            $table->string('address')->nullable();
+            $table->text('address')->nullable();
             $table->string('phone')->nullable();
-            $table->string('gender')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
             $table->string('parent_name')->nullable();
-            $table->string('parent_address')->nullable();
+            $table->text('parent_address')->nullable();
             $table->string('parent_phone')->nullable();
 
             $table->timestamps();
