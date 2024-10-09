@@ -15,7 +15,7 @@ class UserService
      * @param string|null $search
      * @return \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public static function paginatedUsers(string $search = null, array $roles = [], int $perPage = 20)
+    public static function getPaginatedUsers(string $search = null, array $roles = [], int $perPage = 20)
     {
         $query = User::with(['roles', 'status', 'profile'])
             ->where('id', '!=', Auth::id())  // Exclude current authenticated user

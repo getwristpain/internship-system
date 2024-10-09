@@ -3,11 +3,11 @@
 @php
     // Define alert classes based on type
     $alertClasses = [
-        'info' => 'alert-info',
-        'success' => 'alert-success',
-        'warning' => 'alert-warning',
-        'error' => 'alert-error',
-        'default' => 'bg-gray-200 text-inherit border-gray-300',
+        'info' => 'alert alert-info bg-blue-100 text-blue-800 border border-blue-300',
+        'success' => 'alert alert-success bg-green-100 text-green-800 border border-green-300',
+        'warning' => 'alert alert-warning bg-yellow-100 text-yellow-800 border border-yellow-300',
+        'error' => 'alert alert-error bg-red-100 text-red-800 border border-red-300',
+        'default' => 'alert bg-gray-100 text-gray-800 border border-gray-300',
     ];
 
     // Define SVG icon paths for each alert type

@@ -84,7 +84,7 @@ new class extends Component {
         } while (User::where('email', $email)->exists());
 
         $password = Hash::make(Str::random(16));
-        $status = Status::firstOrCreate('name', 'guest');
+        $status = Status::firstOrCreate(['name' => 'guest']);
 
         $user = User::create([
             'name' => $name,

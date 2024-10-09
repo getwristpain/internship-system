@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Menu;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 
 class MenuSeeder extends Seeder
 {
@@ -29,79 +30,17 @@ class MenuSeeder extends Seeder
     }
 
     /**
-     * Get the array of menu data.
+     * Get the array of menu data from JSON file.
      */
     private function getMenus(): array
     {
-        return [
-            [
-                'slug' => 'dashboard',
-                'label' => 'Dashboard',
-                'route' => 'dashboard',
-                'icon' => 'mage:dashboard-fill',
-                'roles' => [], // Accessible by everyone
-                'submenu' => [],
-            ],
-            [
-                'slug' => 'user-management',
-                'label' => 'Pengguna',
-                'route' => null, // Parent item, no direct route
-                'icon' => 'ic:round-manage-accounts',
-                'roles' => ['admin', 'staff'], // Restricted to admin and staff
-                'submenu' => [
-                    [
-                        'slug' => 'users-overview',
-                        'label' => 'Overview',
-                        'route' => 'users-overview',
-                        'icon' => 'material-symbols:overview',
-                        'roles' => ['admin', 'staff'],
-                    ],
-                    [
-                        'slug' => 'user-manager',
-                        'label' => 'Semua',
-                        'route' => 'user-manager',
-                        'icon' => 'mdi:account-group',
-                        'roles' => ['admin'],
-                    ],
-                    [
-                        'slug' => 'student-manager',
-                        'label' => 'Siswa',
-                        'route' => 'student-manager',
-                        'icon' => 'mdi:account-school',
-                        'roles' => ['admin', 'staff'],
-                    ],
-                    [
-                        'slug' => 'teacher-manager',
-                        'label' => 'Guru',
-                        'route' => 'teacher-manager',
-                        'icon' => 'dashicons:businessman',
-                        'roles' => ['admin', 'staff'],
-                    ],
-                    [
-                        'slug' => 'supervisor-manager',
-                        'label' => 'Supervisor',
-                        'route' => 'supervisor-manager',
-                        'icon' => 'mdi:account-check',
-                        'roles' => ['admin', 'staff'],
-                    ],
-                    [
-                        'slug' => 'admin-manager',
-                        'label' => 'Admin',
-                        'route' => 'admin-manager',
-                        'icon' => 'eos-icons:admin',
-                        'roles' => ['admin'],
-                    ],
-                ],
-            ],
-            [
-                'slug' => 'setting',
-                'label' => 'Pengaturan',
-                'route' => 'setting',
-                'icon' => 'ph:gear-fill',
-                'roles' => ['admin'],
-                'submenu' => [],
-            ],
-        ];
+        $jsonPath = resource_path('data/menu.json');
+        if (File::exists($jsonPath)) {
+            $menus = File::get($jsonPath);
+            return json_decode($menus, true);
+        }
+
+        return [];
     }
 
     /**

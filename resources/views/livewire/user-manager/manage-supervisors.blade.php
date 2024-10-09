@@ -9,6 +9,7 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component {
     public array $supervisors = [];
+    public string $search = ''; // Add a property for search query
 
     public function mount()
     {
@@ -27,12 +28,27 @@ new #[Layout('layouts.app')] class extends Component {
 
     protected function loadSupervisorsData()
     {
-        $supervisors = User::with(['accessKey', 'status'])
+        // Modify the query to filter based on the search input
+        $query = User::with(['accessKey', 'status'])
             ->role('supervisor')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc');
+
+        // Filter by name or email if search is not empty
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        $supervisors = $query->get();
 
         $this->supervisors = $supervisors->isNotEmpty() ? $supervisors->toArray() : [];
+    }
+
+    // Method to call when search is updated
+    public function updatedSearch()
+    {
+        $this->loadSupervisorsData(); // Load supervisors data when search input is updated
     }
 
     public function sendAccessKeyEmail($supervisorId)
@@ -79,8 +95,17 @@ new #[Layout('layouts.app')] class extends Component {
         </x-slot>
         <x-slot name="content">
             <div class="flex flex-col gap-4">
-                <div class="flex justify-end gap-4">
-                    <button class="btn btn-neutral" wire:click="openAddSupervisorModal">+ Buat Akses Supervisor</button>
+                <div class="flex items-center justify-between gap-4">
+                    <div class="grow">
+                        <!-- Search Input -->
+                        <x-input-text name="search" type="text" model="search"
+                            placeholder="Cari berdasarkan nama atau email..." />
+                    </div>
+                    <div>
+                        <button class="btn btn-neutral" wire:click="openAddSupervisorModal">
+                            + Buat Akses
+                        </button>
+                    </div>
                 </div>
 
                 <table class="table w-full">
@@ -134,7 +159,6 @@ new #[Layout('layouts.app')] class extends Component {
                                         @endif
                                     </div>
                                 </td>
-
                             </tr>
                         @empty
                             <tr>
@@ -157,6 +181,6 @@ new #[Layout('layouts.app')] class extends Component {
         </x-slot>
     </x-card>
 
-    @livewire('supervisor-manager.add-supervisor-modal')
-    @livewire('supervisor-manager.delete-supervisor-modal')
+    @livewire('user-manager.supervisors.add-supervisor-modal')
+    @livewire('user-manager.supervisors.delete-supervisor-modal')
 </div>

@@ -9,7 +9,7 @@ use App\Http\Controllers\AvatarController;
 Route::redirect('/', '/dashboard', 301);
 Route::get('assets/uploads/avatars/{userId}/{filename}', [AvatarController::class, 'show'])->middleware('auth')->name('assets.avatar');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Volt::route('/dashboard', 'pages.dashboard')->name('dashboard');
     Volt::route('/setting', 'pages.setting')
         ->name('setting');
@@ -17,25 +17,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('profile');
 });
 
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Volt::route('/admin-manager', 'user-manager.manage-admins')->name('admin-manager');
 });
 
-Route::middleware(['auth', 'verified', 'role:admin|staff'])->group(function () {
+Route::middleware(['auth', 'role:admin|staff'])->group(function () {
     Volt::route('/users-overview', 'user-manager.users-overview')->name('users-overview');
     Volt::route('/user-manager', 'user-manager.manage-users')->name('user-manager');
+    Volt::route('/supervisor-manager', 'user-manager.manage-supervisors')->name('supervisor-manager');
+    Volt::route('/student-manager', 'user-manager.manage-students')->name('student-manager');
+    Volt::route('/teacher-manager', 'user-manager.manage-teachers')->name('teacher-manager');
 });
 
-Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
-    Volt::route('/registration', 'pages.internships.registration')
-        ->name('registration');
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Volt::route('/attendance', 'pages.internships.attendance')
+        ->name('student.attendance');
 });
 
-Route::middleware(['auth', 'verified', 'role:teacher'])->group(function () {
+Route::middleware(['auth', 'role:teacher'])->group(function () {
     //
 });
 
-Route::middleware(['auth', 'verified', 'role:supervisor'])->group(function () {
+Route::middleware(['auth', 'role:supervisor'])->group(function () {
     //
 });
 

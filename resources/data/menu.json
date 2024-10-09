@@ -1,0 +1,106 @@
+[
+    {
+        "slug": "dashboard",
+        "label": "Dashboard",
+        "route": "dashboard",
+        "icon": "material-symbols:dashboard-outline-rounded",
+        "roles": [],
+        "submenu": []
+    },
+    {
+        "slug": "internship-tasks",
+        "label": "Penugasan",
+        "route": "null",
+        "icon": "mdi:clipboard-text-outline",
+        "roles": ["student"],
+        "submenu": [
+            {
+                "slug": "student-attendance",
+                "label": "Daftar Hadir",
+                "route": "student-attendance",
+                "icon": "mdi:clipboard-check-outline",
+                "roles": ["student"]
+            },
+            {
+                "slug": "student-journal",
+                "label": "Jurnal Kegiatan",
+                "route": "student-journal",
+                "icon": "mdi:notebook-outline",
+                "roles": ["student"]
+            },
+            {
+                "slug": "student-mentoring",
+                "label": "Pembimbingan",
+                "route": "student-mentoring",
+                "icon": "mdi:account-supervisor-outline",
+                "roles": ["student"]
+            },
+            {
+                "slug": "student-assignment",
+                "label": "Laporan Magang",
+                "route": "student-assignment",
+                "icon": "mdi:file-document-outline",
+                "roles": ["student"]
+            }
+        ]
+    },
+    {
+        "slug": "user-management",
+        "label": "Pengguna",
+        "route": null,
+        "icon": "mdi:account-group-outline",
+        "roles": ["admin", "staff"],
+        "submenu": [
+            {
+                "slug": "users-overview",
+                "label": "Overview",
+                "route": "users-overview",
+                "icon": "mdi:view-dashboard-outline",
+                "roles": ["admin", "staff"]
+            },
+            {
+                "slug": "user-manager",
+                "label": "Semua",
+                "route": "user-manager",
+                "icon": "mdi:account-group",
+                "roles": ["admin"]
+            },
+            {
+                "slug": "student-manager",
+                "label": "Siswa",
+                "route": "student-manager",
+                "icon": "mdi:account-school-outline",
+                "roles": ["admin", "staff"]
+            },
+            {
+                "slug": "teacher-manager",
+                "label": "Guru",
+                "route": "teacher-manager",
+                "icon": "mdi:teach-outline",
+                "roles": ["admin", "staff"]
+            },
+            {
+                "slug": "supervisor-manager",
+                "label": "Supervisor",
+                "route": "supervisor-manager",
+                "icon": "mdi:account-tie-outline",
+                "roles": ["admin", "staff"]
+            },
+            {
+                "slug": "admin-manager",
+                "label": "Admin",
+                "route": "admin-manager",
+                "icon": "mdi:account-cog-outline",
+                "roles": ["admin"]
+            }
+        ]
+    },
+    {
+        "slug": "setting",
+        "label": "Pengaturan",
+        "route": "setting",
+        "icon": "mdi:cog-outline",
+        "roles": ["admin"],
+        "submenu": []
+    }
+]

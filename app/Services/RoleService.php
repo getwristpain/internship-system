@@ -10,6 +10,22 @@ use Illuminate\Support\Facades\Auth;
 class RoleService
 {
     /**
+     * Get roles that are included in the specified array.
+     *
+     * @param array $roles
+     * @return array
+     */
+    public static function getRoles(array $roles = []): array
+    {
+        // Check if the user is not an admin and remove 'admin' from the roles if present
+        if (!self::userIsAdmin()) {
+            $roles = array_filter($roles, fn($role) => $role !== 'admin');
+        }
+
+        return self::formatRoles(Role::whereIn('name', $roles)->get());
+    }
+
+    /**
      * Get roles excluding specified roles along with 'owner' and 'admin' if applicable.
      *
      * @param array $excludeRoles
@@ -22,19 +38,6 @@ class RoleService
     }
 
     /**
-     * Get roles including specified roles and ensure 'admin' is omitted if user is not admin.
-     *
-     * @param array $includingRoles
-     * @return array
-     */
-    public static function getRolesIncluding(array $includingRoles): array
-    {
-        $includingRoles = self::adjustIncludingRoles($includingRoles);
-        $roles = self::fetchRolesIncluding($includingRoles);
-        return self::formatRoles($roles->whereNotIn('name', ['owner']));
-    }
-
-    /**
      * Fetch roles excluding specified roles from the database.
      *
      * @param array $excludeRoles
@@ -43,31 +46,6 @@ class RoleService
     private static function fetchRolesExcluding(array $excludeRoles): array
     {
         return self::formatRoles(Role::whereNotIn('name', $excludeRoles)->get());
-    }
-
-    /**
-     * Fetch roles including specified roles from the database.
-     *
-     * @param array $includingRoles
-     * @return \Illuminate\Support\Collection
-     */
-    private static function fetchRolesIncluding(array $includingRoles)
-    {
-        return Role::whereIn('name', $includingRoles)->get();
-    }
-
-    /**
-     * Adjust the including roles by removing 'admin' if the user is not an admin.
-     *
-     * @param array $includingRoles
-     * @return array
-     */
-    private static function adjustIncludingRoles(array $includingRoles): array
-    {
-        if (Auth::check() && !self::userIsAdmin()) {
-            return array_filter($includingRoles, fn($role) => $role !== 'admin');
-        }
-        return $includingRoles;
     }
 
     /**

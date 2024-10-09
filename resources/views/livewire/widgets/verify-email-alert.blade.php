@@ -1,13 +1,36 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Livewire\Volt\Component;
 
 new class extends Component {
     public int $countdown = 0;
     public bool $emailSended = false;
     public bool $showAlert = true;
+
+    public function mount()
+    {
+        $this->initializeCountdown();
+    }
+
+    /**
+     * Initialize countdown from session data.
+     */
+    private function initializeCountdown(): void
+    {
+        $timestamp = session()->get('emailVerLastSentTime');
+
+        if ($timestamp) {
+            $timePassed = now()->timestamp - $timestamp;
+            $remainingTime = 30 - $timePassed;
+
+            if ($remainingTime > 0) {
+                $this->countdown = $remainingTime;
+                $this->emailSended = true;
+                $this->dispatch('start-countdown');
+            }
+        }
+    }
 
     /**
      * Send an email verification notification to the user.
@@ -20,10 +43,19 @@ new class extends Component {
 
         Auth::user()->sendEmailVerificationNotification();
         flash()->success('Link verifikasi email berhasil terkirim.');
+
+        // Start countdown and store the timestamp
+        $this->startCountdown();
+    }
+
+    /**
+     * Start countdown and save the timestamp in session.
+     */
+    private function startCountdown(): void
+    {
         $this->countdown = 30;
         $this->emailSended = true;
-
-        // Start countdown
+        session()->put('emailVerLastSentTime', now()->timestamp);
         $this->dispatch('start-countdown');
     }
 
@@ -45,7 +77,7 @@ new class extends Component {
 
 <div>
     @if ($showAlert && !Auth::user()->hasVerifiedEmail())
-        <div class="rounded-md alert alert-warning">
+        <div class="rounded-md alert alert-warning bg-yellow-100 text-yellow-800 border border-yellow-300">
             <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     class="w-6 h-6 stroke-current shrink-0">
@@ -60,12 +92,13 @@ new class extends Component {
                 </div>
 
                 <div>
-                    <button class="btn btn-neutral btn-outline btn-sm" wire:click="sendVerification"
-                        wire:loading.attr="disabled" wire:target="sendVerification" @disabled($countdown > 0)>
+                    <button class="btn btn-warning bg-yellow-200 text-yellow-800 border-yellow-900 btn-sm"
+                        wire:click="sendVerification" wire:loading.attr="disabled" wire:target="sendVerification"
+                        @disabled($countdown > 0)>
                         <span>
                             @if ($countdown > 0)
                                 {{ __('Kirim Ulang (') }} {{ $countdown }} {{ __(' detik)') }}
-                            @elseif ($emailSended === true)
+                            @elseif ($emailSended)
                                 {{ __('Kirim Ulang') }}
                             @else
                                 {{ __('Kirim Email Verifikasi') }}
@@ -86,16 +119,47 @@ new class extends Component {
 
 @script
     <script>
+        let countdownInterval = null;
+
+        // Initialize countdown from localStorage if it exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const lastSentTime = localStorage.getItem('emailVerLastSentTime');
+            if (lastSentTime) {
+                const timePassed = Math.floor((Date.now() - parseInt(lastSentTime)) / 1000);
+                const remainingTime = 30 - timePassed;
+
+                if (remainingTime > 0) {
+                    $wire.set('countdown', remainingTime);
+                    $wire.set('emailSended', true);
+                    startCountdown();
+                } else {
+                    localStorage.removeItem('emailVerLastSentTime');
+                }
+            }
+        });
+
+        // Listen for Livewire event to start countdown
         $wire.on('start-countdown', () => {
-            const interval = setInterval(() => {
-                // Emit the decreaseCountdown method
+            const timestamp = Date.now().toString();
+            localStorage.setItem('emailVerLastSentTime', timestamp);
+            startCountdown();
+        });
+
+        // Function to handle the countdown timer
+        function startCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownInterval = setInterval(() => {
                 $wire.decreaseCountdown();
 
-                // Stop the interval when countdown reaches 0
-                if ($wire.countdown <= 0) {
-                    clearInterval(interval);
+                const countdown = $wire.get('countdown');
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    localStorage.removeItem('emailVerLastSentTime');
                 }
-            }, 1000); // Run every second
-        });
+            }, 1000);
+        }
     </script>
 @endscript

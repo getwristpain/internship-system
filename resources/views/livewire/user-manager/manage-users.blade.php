@@ -15,13 +15,13 @@ new #[Layout('layouts.app')] class extends Component {
     public function with(): array
     {
         return [
-            'users' => UserService::paginatedUsers($this->search),
+            'users' => UserService::getPaginatedUsers($this->search),
         ];
     }
 
     // Event Listener for user updates
     #[On('user-updated')]
-    public function refreshUsers()
+    public function refreshPage()
     {
         $this->resetPage(); // Reset pagination when user list is updated
     }

@@ -8,7 +8,7 @@
         </div>
         <div>
             <button class="btn btn-neutral"
-                @click="$dispatch('open-add-user-modal', {identifier: '{{ $identifier }}'})">
+                @click="$dispatch('open-add-or-edit-user-modal')">
                 + Tambah Baru
             </button>
         </div>
@@ -66,13 +66,13 @@
                             @unless (collect($user['roles'])->pluck('name')->contains('owner'))
                                 <!-- Actions -->
                                 <button
-                                    @click="$dispatch('open-edit-user-modal', { userId: '{{ $user['id'] }}', identifier: '{{ $identifier }}' })"
+                                    @click="$dispatch('open-add-or-edit-user-modal', { userId: '{{ $user['id'] }}'})"
                                     class="btn btn-sm btn-outline btn-neutral">
                                     <iconify-icon icon="mdi:edit"></iconify-icon>
                                     <span class="hidden md:inline-block">Edit</span>
                                 </button>
                                 <button
-                                    @click="$dispatch('open-delete-user-modal', { userId: '{{ $user['id'] }}', identifier: '{{ $identifier }}' })"
+                                    @click="$dispatch('open-delete-user-modal', { userId: '{{ $user['id'] }}'})"
                                     class="btn btn-sm btn-outline btn-error">
                                     <iconify-icon icon="mdi:delete"></iconify-icon>
                                     <span class="hidden md:inline-block">Hapus</span>
@@ -107,7 +107,6 @@
     </div>
 
     <!-- Modals -->
-    @livewire('user-manager.add-user-modal')
-    @livewire('user-manager.edit-user-modal')
-    @livewire('user-manager.delete-user-modal')
+    @livewire('user-manager.add-or-edit-user-modal', ['identifier' => $identifier])
+    @livewire('user-manager.delete-user-modal', ['identifier' => $identifier])
 </div>
