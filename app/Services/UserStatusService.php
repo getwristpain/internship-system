@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Status;
+use App\Models\UserStatus;
 use Illuminate\Support\Str;
 use App\Helpers\StatusBadgeMapper;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class StatusService
+class UserStatusService
 {
     public static function getStatuses(): array
     {
         try {
-            $statuses = Status::all();
+            $statuses = UserStatus::all();
 
             if ($statuses->isEmpty()) {
                 throw new ModelNotFoundException('No statuses found.');

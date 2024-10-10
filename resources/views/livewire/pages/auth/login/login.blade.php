@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
-use Illuminate\Http\Request;
 use Livewire\Attributes\{Layout, On};
 use Livewire\Volt\Component;
 

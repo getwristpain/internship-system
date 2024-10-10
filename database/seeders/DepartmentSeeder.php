@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Exception;
 use App\Models\User;
 use App\Models\Group;
-use App\Models\Status;
 use App\Models\Department;
+use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -81,7 +81,7 @@ class DepartmentSeeder extends Seeder
                 if (isset($departmentData['users']) && is_array($departmentData['users'])) {
                     foreach ($departmentData['users'] as $userData) {
                         // Fetch the user status by name
-                        $status = Status::where('name', $userData['status'])->first();
+                        $status = UserStatus::where('name', $userData['status'])->first();
 
                         if (!$status) {
                             throw new Exception("User status '{$userData['status']}' not found.");

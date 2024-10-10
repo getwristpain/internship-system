@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 
 use App\Models\User;
-use App\Models\Status;
+use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 ['name' => $userData['role']]
             );
 
-            $status = Status::where(['name' => $userData['status']])->first();
+            $status = UserStatus::where(['name' => $userData['status']])->first();
 
             // Create or update the user
             $user = User::updateOrCreate(

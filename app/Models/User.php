@@ -30,7 +30,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'status_id',
     ];
 
     protected $casts = [
@@ -42,21 +41,21 @@ class User extends Authenticatable
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::creating(function (User $model) {
             if (empty($model->{$model->getKeyName()})) {
                 $model->{$model->getKeyName()} = (string) Uuid::uuid4();
             }
         });
     }
 
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(UserStatus::class, 'status_id');
+    }
+
     public function accessKey(): HasOne
     {
         return $this->hasOne(AccessKey::class);
-    }
-
-    public function status(): BelongsTo
-    {
-        return $this->belongsTo(Status::class);
     }
 
     public function profile(): HasOne
@@ -81,7 +80,7 @@ class User extends Authenticatable
     }
 
     // Method to mark the user's email as verified
-    public function markEmailAsVerified(): static
+    public function markEmailAsVerified(): self
     {
         $this->email_verified_at = now();
         $this->save();

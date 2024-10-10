@@ -3,7 +3,7 @@
         "slug": "dashboard",
         "label": "Dashboard",
         "route": "dashboard",
-        "icon": "material-symbols:dashboard-outline-rounded",
+        "icon": "ic:round-dashboard",
         "roles": [],
         "submenu": []
     },
@@ -11,35 +11,35 @@
         "slug": "internship-tasks",
         "label": "Penugasan",
         "route": "null",
-        "icon": "mdi:clipboard-text-outline",
+        "icon": "mdi:clipboard-text",
         "roles": ["student"],
         "submenu": [
             {
                 "slug": "student-attendance",
                 "label": "Daftar Hadir",
                 "route": "student-attendance",
-                "icon": "mdi:clipboard-check-outline",
+                "icon": "mdi:clipboard-check",
                 "roles": ["student"]
             },
             {
                 "slug": "student-journal",
                 "label": "Jurnal Kegiatan",
                 "route": "student-journal",
-                "icon": "mdi:notebook-outline",
+                "icon": "mdi:notebook",
                 "roles": ["student"]
             },
             {
                 "slug": "student-mentoring",
                 "label": "Pembimbingan",
                 "route": "student-mentoring",
-                "icon": "mdi:account-supervisor-outline",
+                "icon": "material-symbols:group-outline",
                 "roles": ["student"]
             },
             {
                 "slug": "student-assignment",
                 "label": "Laporan Magang",
                 "route": "student-assignment",
-                "icon": "mdi:file-document-outline",
+                "icon": "mdi:file-document",
                 "roles": ["student"]
             }
         ]
@@ -48,14 +48,14 @@
         "slug": "user-management",
         "label": "Pengguna",
         "route": null,
-        "icon": "mdi:account-group-outline",
+        "icon": "mdi:account-group",
         "roles": ["admin", "staff"],
         "submenu": [
             {
                 "slug": "users-overview",
                 "label": "Overview",
                 "route": "users-overview",
-                "icon": "mdi:view-dashboard-outline",
+                "icon": "material-symbols:overview",
                 "roles": ["admin", "staff"]
             },
             {
@@ -69,28 +69,28 @@
                 "slug": "student-manager",
                 "label": "Siswa",
                 "route": "student-manager",
-                "icon": "mdi:account-school-outline",
+                "icon": "mdi:account-student",
                 "roles": ["admin", "staff"]
             },
             {
                 "slug": "teacher-manager",
                 "label": "Guru",
                 "route": "teacher-manager",
-                "icon": "mdi:teach-outline",
+                "icon": "mdi:account-tie",
                 "roles": ["admin", "staff"]
             },
             {
                 "slug": "supervisor-manager",
                 "label": "Supervisor",
                 "route": "supervisor-manager",
-                "icon": "mdi:account-tie-outline",
+                "icon": "mdi:account-check",
                 "roles": ["admin", "staff"]
             },
             {
                 "slug": "admin-manager",
                 "label": "Admin",
                 "route": "admin-manager",
-                "icon": "mdi:account-cog-outline",
+                "icon": "mdi:account-cog",
                 "roles": ["admin"]
             }
         ]
@@ -99,7 +99,7 @@
         "slug": "setting",
         "label": "Pengaturan",
         "route": "setting",
-        "icon": "mdi:cog-outline",
+        "icon": "mdi:cog",
         "roles": ["admin"],
         "submenu": []
     }

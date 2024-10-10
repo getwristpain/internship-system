@@ -5,7 +5,7 @@ namespace App\Livewire\Forms;
 use Exception;
 use Livewire\Form;
 use App\Models\User;
-use App\Models\Status;
+use App\Models\UserStatus;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
@@ -70,7 +70,7 @@ class RegisterForm extends Form
     protected function createNewUser(): User
     {
         $role = $this->getRoleForAccountType($this->account_type);
-        $status = Status::where(['name' => 'pending'])->first();
+        $status = UserStatus::where(['name' => 'pending'])->first();
 
         $user = User::create([
             'email' => $this->email,

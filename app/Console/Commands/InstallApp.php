@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\Models\Status;
+use App\Models\UserStatus;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -104,7 +104,7 @@ class InstallApp extends Command
             return false;
         }
 
-        $status = Status::firstOrCreate(['name' => 'verified']);
+        $status = UserStatus::firstOrCreate(['name' => 'verified']);
 
         if (!$status) {
             $this->error('User status "Verified" not found.');

@@ -15,7 +15,7 @@ new class extends Component {
 
     protected function loadUsersData()
     {
-        return User::with('status')->join('statuses', 'statuses.id', '=', 'users.status_id')->select('users.*')->get();
+        return User::with('status')->join('user_statuses', 'user_statuses.id', '=', 'users.status_id')->select('users.*')->get();
     }
 
     public function rendering(View $view)
