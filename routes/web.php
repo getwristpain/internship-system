@@ -31,7 +31,7 @@ Route::middleware(['auth', 'role:admin|staff'])->group(function () {
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Volt::route('/attendance', 'pages.internships.attendance')
-        ->name('student.attendance');
+        ->name('student-attendance');
 });
 
 Route::middleware(['auth', 'role:teacher'])->group(function () {

@@ -48,14 +48,29 @@ class User extends Authenticatable
         });
     }
 
-    public function status(): BelongsTo
+    // Method to check if the user's email is verified
+    public function hasVerifiedEmail(): bool
     {
-        return $this->belongsTo(UserStatus::class, 'status_id');
+        return !is_null($this->email_verified_at);
+    }
+
+    // Method to mark the user's email as verified
+    public function markEmailAsVerified(): self
+    {
+        $this->email_verified_at = now();
+        $this->save();
+
+        return $this;
     }
 
     public function accessKey(): HasOne
     {
         return $this->hasOne(AccessKey::class);
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(UserStatus::class, 'status_id');
     }
 
     public function profile(): HasOne
@@ -73,18 +88,8 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class);
     }
 
-    // Method to check if the user's email is verified
-    public function hasVerifiedEmail(): bool
+    public function attendances(): HasMany
     {
-        return !is_null($this->email_verified_at);
-    }
-
-    // Method to mark the user's email as verified
-    public function markEmailAsVerified(): self
-    {
-        $this->email_verified_at = now();
-        $this->save();
-
-        return $this;
+        return $this->hasMany(Attendance::class);
     }
 }

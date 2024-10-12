@@ -17,12 +17,14 @@ new #[Layout('layouts.app')] class extends Component {
     }
 
     #[On('supervisor-updated')]
-    public function handleSupervisorUpdated(string $supervisorId = null)
+    public function handleSupervisorUpdated(string $email = null)
     {
         $this->loadSupervisorsData();
 
-        if (isset($supervisorId)) {
-            $this->sendAccessKeyEmail($supervisorId);
+        $supervisor = User::where(['email' => $email])->first();
+
+        if ($supervisor) {
+            $this->sendAccessKeyEmail($supervisor->id);
         }
     }
 
@@ -48,7 +50,7 @@ new #[Layout('layouts.app')] class extends Component {
     // Method to call when search is updated
     public function updatedSearch()
     {
-        $this->loadSupervisorsData(); // Load supervisors data when search input is updated
+        $this->loadSupervisorsData();
     }
 
     public function sendAccessKeyEmail($supervisorId)

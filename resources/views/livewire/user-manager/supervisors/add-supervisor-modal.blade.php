@@ -2,20 +2,13 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\User;
-use App\Models\AccessKey;
-use App\Models\Status;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
+use App\Livewire\Forms\SupervisorForm;
 
 new class extends Component {
+    public SupervisorForm $form;
     public bool $show = false;
-    public int $expiryDays = 180;
-    public string $roleName = 'supervisor';
-
-    public string $email = '';
 
     #[On('openAddSupervisorModal')]
     public function handleOpenModal(bool $show = false)
@@ -29,91 +22,41 @@ new class extends Component {
         $this->show = false;
     }
 
-    public function createNewSupervisor()
+    public function saveSupervisor()
     {
-        $this->validate([
-            'email' => 'nullable|email|unique:users,email',
-            'expiryDays' => 'required|integer|min:7|max:240',
-        ]);
+        // Clear previous errors before attempting to save
+        $this->form->errors = [];
 
-        $user = $this->createNewUser();
-        $accessKey = $this->generateAccessKey($user->id, $this->expiryDays);
+        // Attempt to create a new supervisor
+        $this->form->createNewSupervisor();
 
-        if (!$accessKey) {
-            $user->delete();
-
-            flash()->error('Gagal membuat akses supervisor!');
-            return 1;
-        }
-
-        $this->dispatch('supervisor-updated', supervisorId: $user->id);
-
-        flash()->success('Kunci akses supervisor berhasil ditambahkan.');
-        $this->handleCloseModal();
-    }
-
-    private function generateAccessKey(string $userId = '', int $expiryDays = 180)
-    {
-        $keyLength = 16;
-
-        // Generate and store the access key
-        $accessKey = AccessKey::createNewKey($keyLength, $userId, $expiryDays);
-
-        if (!$accessKey) {
-            flash()->error('Gagal membuat kunci akses!');
-            return null;
-        }
-
-        return $accessKey;
-    }
-
-    private function createNewUser()
-    {
-        $startTime = microtime(true); // Get the start time
-        $timeoutDuration = 60; // Set the timeout duration in seconds
-
-        do {
-            // Check if the timeout duration has been exceeded
-            if (microtime(true) - $startTime > $timeoutDuration) {
-                flash()->error('Proses pembuatan pengguna baru gagal karena waktu habis!');
-                return null;
+        // If there are any errors, flash them and stop the execution
+        if (!empty($this->form->errors)) {
+            foreach ($this->form->errors as $error) {
+                flash()->error($error);
             }
-
-            $name = 'sv-' . Str::random(8);
-            $email = $name . '@example.com';
-        } while (User::where('email', $email)->exists());
-
-        $password = Hash::make(Str::random(16));
-        $status = Status::firstOrCreate(['name' => 'guest']);
-
-        $user = User::create([
-            'name' => $name,
-            'email' => $this->email ?? $email,
-            'password' => $password,
-            'status_id' => $status->id,
-        ]);
-
-        if (!$user) {
-            flash()->error('Gagal membuat pengguna baru!');
-            return null;
+            return; // Do not proceed if there are errors
         }
 
-        $user->assignRole($this->roleName);
+        // Dispatch event and flash success if no errors
+        $this->dispatch('supervisor-updated', supervisorId: $this->form->email);
+        flash()->success('Kunci akses supervisor berhasil ditambahkan.');
 
-        return $user;
+        // Close modal after successful creation
+        $this->handleCloseModal();
     }
 };
 ?>
 
-<x-modal show="show" :form="true" action="createNewSupervisor">
+<x-modal show="show" :form="true" action="saveSupervisor">
     <x-slot name="header">
         Buat Akses Supervisor
     </x-slot>
     <x-slot name="content">
         <div class="flex flex-col gap-4">
-            <x-input-text type="email" name="email" model="email" label="Email (Opsional)"
+            <x-input-text type="email" name="email" model="form.email" label="Email (Opsional)"
                 placeholder="Masukan email..." />
-            <x-input-text name="expiryDays" model="expiryDays" type="number" label="Masa Kadaluarsa"
+            <x-input-text name="expiryDays" model="form.expiryDays" type="number" label="Masa Kadaluarsa"
                 placeholder="Kadaluarsa" unit="Hari" required />
         </div>
     </x-slot>

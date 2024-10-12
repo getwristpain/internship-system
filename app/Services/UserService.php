@@ -17,7 +17,7 @@ class UserService
      */
     public static function getPaginatedUsers(string $search = null, array $roles = [], int $perPage = 20)
     {
-        $query = User::with(['roles', 'status', 'profile'])
+        $query = User::with(['accessKey', 'roles', 'status', 'profile'])
             ->where('id', '!=', Auth::id())  // Exclude current authenticated user
             ->groupBy('users.id');
 
