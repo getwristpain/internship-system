@@ -7,8 +7,7 @@
             <x-input-text name="search" type="text" model="search" placeholder="Cari berdasarkan nama atau email..." />
         </div>
         <div>
-            <button class="btn btn-neutral"
-                @click="$dispatch('open-add-or-edit-user-modal')">
+            <button class="btn btn-neutral" @click="$dispatch('open-add-or-edit-user-modal')">
                 + Tambah Baru
             </button>
         </div>
@@ -65,14 +64,12 @@
                         <td>
                             @unless (collect($user['roles'])->pluck('name')->contains('owner'))
                                 <!-- Actions -->
-                                <button
-                                    @click="$dispatch('open-add-or-edit-user-modal', { userId: '{{ $user['id'] }}'})"
+                                <button @click="$dispatch('open-add-or-edit-user-modal', { userId: '{{ $user['id'] }}'})"
                                     class="btn btn-sm btn-outline btn-neutral">
                                     <iconify-icon icon="mdi:edit"></iconify-icon>
                                     <span class="hidden md:inline-block">Edit</span>
                                 </button>
-                                <button
-                                    @click="$dispatch('open-delete-user-modal', { userId: '{{ $user['id'] }}'})"
+                                <button @click="$dispatch('open-delete-user-modal', { userId: '{{ $user['id'] }}'})"
                                     class="btn btn-sm btn-outline btn-error">
                                     <iconify-icon icon="mdi:delete"></iconify-icon>
                                     <span class="hidden md:inline-block">Hapus</span>
@@ -107,6 +104,6 @@
     </div>
 
     <!-- Modals -->
-    @livewire('user-manager.add-or-edit-user-modal', ['identifier' => $identifier])
-    @livewire('user-manager.delete-user-modal', ['identifier' => $identifier])
+    @livewire('components.user-managements.add-or-edit-user-modal', ['identifier' => $identifier])
+    @livewire('components.user-managements.delete-user-modal', ['identifier' => $identifier])
 </div>

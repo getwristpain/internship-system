@@ -9,7 +9,7 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component {
     public array $supervisors = [];
-    public string $search = ''; // Add a property for search query
+    public string $search = '';
 
     public function mount()
     {
@@ -183,6 +183,6 @@ new #[Layout('layouts.app')] class extends Component {
         </x-slot>
     </x-card>
 
-    @livewire('user-manager.supervisors.add-supervisor-modal')
-    @livewire('user-manager.supervisors.delete-supervisor-modal')
+    @livewire('components.user-managements.supervisors.add-supervisor-modal')
+    @livewire('components.user-managements.supervisors.delete-supervisor-modal')
 </div>

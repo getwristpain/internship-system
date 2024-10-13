@@ -2,10 +2,10 @@
 
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
-{
+new class extends Component {
     //
-}; ?>
+};
+?>
 
 <div>
     //

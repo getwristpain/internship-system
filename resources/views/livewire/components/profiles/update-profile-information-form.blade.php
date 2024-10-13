@@ -2,9 +2,11 @@
 
 use Livewire\Volt\Component;
 
-new class extends Component {
+new class extends Component
+{
     //
-}; ?>
+};
+?>
 
 <div>
     //

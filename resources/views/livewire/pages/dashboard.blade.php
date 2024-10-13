@@ -17,7 +17,7 @@ new #[Layout('layouts.app')] class extends Component {
 ?>
 
 <div class="grid grid-cols-4 gap-4">
-    @livewire('widgets.dashboard-alert')
+    @livewire('components.widgets.dashboard-alert')
 
     // Dashboard
 </div>

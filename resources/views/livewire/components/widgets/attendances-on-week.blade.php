@@ -101,7 +101,7 @@ new class extends Component {
 <!-- View with infinite scroll mechanism -->
 <div id="scroll-container" class="overflow-x-auto whitespace-nowrap" style="scroll-behavior: smooth;"
     wire:target="loadMorePreviousDays" wire:loading.class="opacity-50">
-    <div class="inline-flex space-x-4">
+    <div class="inline-flex justify-between gap-4">
         @foreach ($attendances as $attendance)
             <x-card class="flex items-center justify-between divide-x-2 min-w-[100px] {{ $attendance['cardClass'] }}">
                 <div class="flex flex-col items-center w-full">

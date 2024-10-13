@@ -15,13 +15,6 @@
         "roles": ["student"],
         "submenu": [
             {
-                "slug": "student-attendance",
-                "label": "Daftar Hadir",
-                "route": "student-attendance",
-                "icon": "mdi:clipboard-check",
-                "roles": ["student"]
-            },
-            {
                 "slug": "student-journal",
                 "label": "Jurnal Kegiatan",
                 "route": "student-journal",
