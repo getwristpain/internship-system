@@ -9,6 +9,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     public function register(string $accountType = 'student')
     {
+        $this->form->accountType = $accountType;
         $this->form->handleStepOne($accountType);
     }
 }; ?>
@@ -36,7 +37,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="text-center">
             <span>Sudah punya akun? <a href="{{ route('login') }}" wire:navigate
-                    class="text-blue-500 font-medium">Login</a></span>
+                    class="font-medium text-blue-500">Login</a></span>
         </div>
     </form>
 </div>

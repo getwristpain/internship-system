@@ -5,7 +5,7 @@ namespace App\Livewire\Forms;
 use Exception;
 use Livewire\Form;
 use App\Models\User;
-use App\Models\UserStatus;
+use App\Models\Status;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Hash;
 class RegisterForm extends Form
 {
     public User $user;
-    public string $account_type = '';
+    public string $accountType = '';
     public string $email = '';
     public string $name = '';
     public string $password = '';
@@ -25,16 +25,13 @@ class RegisterForm extends Form
     /**
      * Handle the first step of registration.
      *
-     * @param string $account_type
      * @return \Illuminate\Http\RedirectResponse|void
      */
-    public function handleStepOne(string $account_type)
+    public function handleStepOne()
     {
-        $this->account_type = $account_type;
-
         // Validate the form data
         $this->validate([
-            'account_type' => 'required|in:student,teacher',
+            'accountType' => 'required|in:student,teacher',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'string', 'min:8', 'confirmed', Rules\Password::defaults()],
@@ -69,8 +66,8 @@ class RegisterForm extends Form
      */
     protected function createNewUser(): User
     {
-        $role = $this->getRoleForAccountType($this->account_type);
-        $status = UserStatus::where(['name' => 'pending'])->first();
+        $role = $this->getRoleForAccountType($this->accountType);
+        $status = Status::where(['slug' => 'user-status-pending'])->first();
 
         $user = User::create([
             'email' => $this->email,
@@ -87,11 +84,11 @@ class RegisterForm extends Form
     /**
      * Get or create a role based on the account type.
      *
-     * @param string $account_type
+     * @param string $accountType
      * @return Role
      */
-    protected function getRoleForAccountType(string $account_type): Role
+    protected function getRoleForAccountType(string $accountType): Role
     {
-        return Role::firstOrCreate(['name' => $account_type]);
+        return Role::firstOrCreate(['name' => $accountType]);
     }
 }

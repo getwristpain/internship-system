@@ -75,7 +75,7 @@
                                     <span class="hidden md:inline-block">Hapus</span>
                                 </button>
                             @else
-                                <span class="italic font-medium opacity-80">Owner</span>
+                                <span class="italic font-medium opacity-80">Pemilik</span>
                             @endunless
                         </td>
                     </tr>

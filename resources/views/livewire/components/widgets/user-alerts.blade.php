@@ -1,7 +1,8 @@
 <?php
 
 use App\Models\User;
-use App\Utils\Alert;
+use App\Services\UserService;
+use App\Helpers\UserAlert;
 use Livewire\Volt\Component;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,7 +21,7 @@ new class extends Component {
 
     protected function loadUserData(): void
     {
-        $user = User::with(['profile', 'roles', 'status'])->find(Auth::id());
+        $user = UserService::findUser(Auth::id());
 
         if ($user) {
             $this->user = $user->toArray();
@@ -32,24 +33,13 @@ new class extends Component {
 
     protected function checkForAlerts(): void
     {
-        $alertHelper = new Alert(Auth::user(), $this->userRole, $this->userProfile);
-        $this->alerts = $this->removeDuplicateAlerts($alertHelper->getAlerts());
-    }
-
-    protected function removeDuplicateAlerts(array $alerts): array
-    {
-        $seenMessages = [];
-        return array_filter($alerts, function ($alert) use (&$seenMessages) {
-            if (in_array($alert['message'], $seenMessages)) {
-                return false; // Skip this alert if the message is already seen
-            }
-            $seenMessages[] = $alert['message']; // Mark this message as seen
-            return true; // Keep this alert
-        });
+        // Using UserAlert to get and remove duplicate alerts
+        $userAlerts = new UserAlert(Auth::user(), $this->userRole, $this->userProfile);
+        $this->alerts = UserAlert::removeDuplicateAlerts($userAlerts->getAlerts());
     }
 };
-
 ?>
+
 <div class="flex flex-col col-span-4 space-y-4">
     @role('student|teacher')
         @livewire('components.widgets.verify-email-alert')

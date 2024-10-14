@@ -15,14 +15,14 @@ new class extends Component {
 
     protected function loadUsersData()
     {
-        return User::with('status')->join('user_statuses', 'user_statuses.id', '=', 'users.status_id')->select('users.*')->get();
+        return User::with('roles', 'status')->join('statuses', 'statuses.id', '=', 'users.status_id')->select('users.*')->get();
     }
 
     public function rendering(View $view)
     {
         return $view->with([
             'activeUsersData' => $this->generateUserData('active', 'Pengguna Aktif', 'mdi:account-online', 'bg-green-400'),
-            'guestUsersData' => $this->generateUserData('guest', 'Pengguna Tamu', 'fluent:guest-12-filled', 'bg-gray-200'),
+            'guestUsersData' => $this->generateUserDataWithRole('guest', 'Pengguna Tamu', 'fluent:guest-12-filled', 'bg-gray-200'),
             'usersByStatusPieChartModel' => $this->generatePieChart(),
         ]);
     }
@@ -30,6 +30,23 @@ new class extends Component {
     protected function generateUserData(string $statusName, string $label, string $icon, string $bgColor)
     {
         $count = $this->users->where('status.name', $statusName)->count() ?? 0;
+
+        return [
+            'bgColor' => $bgColor,
+            'icon' => $icon,
+            'count' => $count,
+            'label' => $label,
+        ];
+    }
+
+    protected function generateUserDataWithRole(string $roleName, string $label, string $icon, string $bgColor)
+    {
+        // Count the users with the specified role
+        $count = $this->users
+            ->filter(function ($user) use ($roleName) {
+                return $user->hasRole($roleName);
+            })
+            ->count(); // Use filter to count users with the specified role
 
         return [
             'bgColor' => $bgColor,

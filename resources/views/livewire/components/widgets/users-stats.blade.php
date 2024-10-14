@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Services\UserService;
 use App\Helpers\NumberFormatter;
 use Livewire\Volt\Component;
 
@@ -15,15 +16,8 @@ new class extends Component {
 
     protected function loadUsersStats(): void
     {
-        $this->loadAllUsers();
+        $this->users = UserService::getUsers();
         $this->calculateUsersStats();
-    }
-
-    protected function loadAllUsers(): void
-    {
-        $this->users = User::with(['roles', 'status'])
-            ->orderBy('created_at', 'desc')
-            ->get();
     }
 
     protected function calculateUsersStats(): void

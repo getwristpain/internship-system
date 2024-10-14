@@ -3,6 +3,7 @@
 use App\Models\User;
 use App\Models\AccessKey;
 use App\Mail\AccessKeyMail;
+use App\Helpers\StatusBadgeMapper;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\{On, Layout};
 use Livewire\Volt\Component;
@@ -30,21 +31,46 @@ new #[Layout('layouts.app')] class extends Component {
 
     protected function loadSupervisorsData()
     {
-        // Modify the query to filter based on the search input
+        // Build the query to fetch supervisors
         $query = User::with(['accessKey', 'status'])
             ->role('supervisor')
             ->orderBy('created_at', 'desc');
 
-        // Filter by name or email if search is not empty
+        // Filter by name or email if search is provided
         if (!empty($this->search)) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('email', 'like', '%' . $this->search . '%');
-            });
+            $this->applySearchFilter($query);
         }
 
+        // Fetch the supervisors and transform the status
         $supervisors = $query->get();
+        $this->supervisors = $this->transformSupervisors($supervisors);
+    }
 
-        $this->supervisors = $supervisors->isNotEmpty() ? $supervisors->toArray() : [];
+    private function applySearchFilter($query)
+    {
+        $query->where(function ($q) {
+            $q->where('name', 'like', '%' . $this->search . '%')->orWhere('email', 'like', '%' . $this->search . '%');
+        });
+    }
+
+    private function transformSupervisors($supervisors)
+    {
+        if ($supervisors->isNotEmpty()) {
+            return $supervisors
+                ->map(function ($supervisor) {
+                    $this->assignStatusBadgeClass($supervisor);
+                    return $supervisor;
+                })
+                ->toArray();
+        }
+        return [];
+    }
+
+    private function assignStatusBadgeClass($supervisor)
+    {
+        if ($supervisor->status) {
+            $supervisor->status->badgeClass = StatusBadgeMapper::getStatusBadgeClass($supervisor->status->name);
+        }
     }
 
     // Method to call when search is updated
@@ -116,6 +142,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <th>Pengguna</th>
                             <th>Email</th>
                             <th>Kadaluarsa</th>
+                            <th>Status</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -141,6 +168,11 @@ new #[Layout('layouts.app')] class extends Component {
                                     @else
                                         <span>Tidak ada tanggal kadaluarsa.</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <div class="{{ $supervisor['status']['badgeClass'] }}">
+                                        {{ Str::title($supervisor['status']['name']) ?? 'N/A' }}
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="flex flex-wrap items-center justify-center gap-2 md:flex-nowrap">
@@ -175,6 +207,7 @@ new #[Layout('layouts.app')] class extends Component {
                             <th>Pengguna</th>
                             <th>Email</th>
                             <th>Kadaluarsa</th>
+                            <th>Status</th>
                             <th></th>
                         </tr>
                     </tfoot>

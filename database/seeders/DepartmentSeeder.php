@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Exception;
 use App\Models\User;
 use App\Models\Group;
+use App\Models\Status;
 use App\Models\Department;
-use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -31,7 +31,7 @@ class DepartmentSeeder extends Seeder
                             'email' => 'tkgsp@example.com',
                             'password' => 'password',
                             'role' => 'staff',
-                            'status' => 'active',
+                            'status_slug' => 'user-status-active',
                         ],
                     ],
                     'groups' => [
@@ -51,7 +51,7 @@ class DepartmentSeeder extends Seeder
                             'email' => 'tsija@example.com',
                             'password' => 'password',
                             'role' => 'staff',
-                            'status' => 'active',
+                            'status_slug' => 'user-status-active',
                         ],
                     ],
                     'groups' => [
@@ -80,11 +80,11 @@ class DepartmentSeeder extends Seeder
                 // Handle users
                 if (isset($departmentData['users']) && is_array($departmentData['users'])) {
                     foreach ($departmentData['users'] as $userData) {
-                        // Fetch the user status by name
-                        $status = UserStatus::where('name', $userData['status'])->first();
+                        // Fetch the user status by slug
+                        $status = Status::where('slug', $userData['status_slug'])->first();
 
                         if (!$status) {
-                            throw new Exception("User status '{$userData['status']}' not found.");
+                            throw new Exception("User status '{$userData['status_slug']}' not found.");
                         }
 
                         // Create or get the role

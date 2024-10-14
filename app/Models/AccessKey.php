@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Utils\AccessKeyGen;
+use App\Helpers\AccessKeyGen;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

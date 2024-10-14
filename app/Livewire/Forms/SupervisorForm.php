@@ -5,8 +5,8 @@ namespace App\Livewire\Forms;
 use Exception;
 use Livewire\Form;
 use App\Models\User;
+use App\Models\Status;
 use App\Models\AccessKey;
-use App\Models\UserStatus;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 
@@ -70,14 +70,11 @@ class SupervisorForm extends Form
                 $email = $name . '@example.com';
             } while (User::where('email', $email)->exists());
 
-            $password = Hash::make(Str::random(16));
-            $status = UserStatus::firstOrCreate(['name' => 'guest']);
-
             $user = User::create([
                 'name' => $name,
                 'email' => $this->email ?? $email,
-                'password' => $password,
-                'status_id' => $status->id,
+                'password' => Hash::make(Str::random(16)),
+                'status_id' => Status::where(['slug' => 'user-status-active'])->first()->id,
             ]);
 
             if (!$user) {

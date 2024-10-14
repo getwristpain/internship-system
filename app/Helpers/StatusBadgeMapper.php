@@ -8,13 +8,12 @@ class StatusBadgeMapper
     {
         return match ($statusName) {
             'verified' => 'badge badge-info',
-            'active' => 'badge badge-success',
+            'active' => 'badge badge-success text-white',
             'pending' => 'badge badge-warning',
             'blocked' => 'badge badge-error',
             'suspended' => 'badge badge-warning',
             'deactivated' => 'badge badge-ghost',
-            'guest' => 'badge badge-outline badge-neutral',
-            default => 'badge',
+            default => 'badge badge-outline badge-neutral',
         };
     }
 }

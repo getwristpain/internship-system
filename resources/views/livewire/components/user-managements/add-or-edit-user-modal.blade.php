@@ -36,20 +36,6 @@ new class extends Component {
         $this->form->initUser();
     }
 
-    public function updated()
-    {
-        $this->form->userStatus = $this->setUserStatus();
-    }
-
-    protected function setUserStatus()
-    {
-        return match ($this->form->userRole) {
-            'student' => 'pending',
-            'teacher' => 'pending',
-            default => 'guest',
-        };
-    }
-
     public function saveUser(): void
     {
         $this->form->saveUser();
@@ -110,7 +96,9 @@ new class extends Component {
                     </td>
                 </tr>
 
-                @if (in_array($form->identifier, ['user', 'admin']))
+                @if (
+                    (!in_array($form->userRole, ['admin', 'staff', 'supervisor']) && $form->identifier === 'user') ||
+                        $form->identifier === 'admin')
                     <tr>
                         <th>Peran</th>
                         <td>
@@ -120,7 +108,7 @@ new class extends Component {
                     </tr>
                 @endif
 
-                @if ($form->identifier !== 'admin')
+                @if (auth()->user()->hasRole('admin'))
                     <tr>
                         <th>Status</th>
                         <td>
@@ -144,7 +132,9 @@ new class extends Component {
                             </div>
                         </td>
                     </tr>
+                @endif
 
+                @if ($form->identifier !== 'admin')
                     <x-profile-fields-table></x-profile-fields-table>
                 @endif
             </table>
@@ -153,7 +143,8 @@ new class extends Component {
 
     <x-slot name="footer">
         <button type="button" class="btn btn-outline btn-neutral" wire:click="handleCloseModal">Batal</button>
-        <button type="submit" class="btn btn-neutral" wire:click="saveUser">
+        <button type="submit" class="btn btn-neutral" wire:click="saveUser" wire:target="saveUser"
+            wire:loading.class="opacity-50 disabled">
             <iconify-icon icon="ic:round-save" class="text-xl"></iconify-icon>
             <span>{{ $form->userId ? 'Perbarui' : 'Simpan' }}</span>
         </button>

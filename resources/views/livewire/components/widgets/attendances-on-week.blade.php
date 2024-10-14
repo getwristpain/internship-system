@@ -7,7 +7,7 @@ new class extends Component {
     public array $attendances = []; // Array to store attendance data
     public Carbon $today;
     public int $loadDays = 12; // Number of days displayed before today
-    public int $daysAfter = 4; // Number of days displayed after today
+    public int $daysAfter = 6; // Number of days displayed after today
     public Carbon $minDateLimit; // Minimum date limit (January 1, 2024)
 
     public function mount()

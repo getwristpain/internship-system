@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace App\Helpers;
 
 use App\Models\AccessKey;
 use Illuminate\Support\Str;

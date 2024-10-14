@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 
 use App\Models\User;
-use App\Models\UserStatus;
+use App\Models\Status;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
@@ -23,14 +23,14 @@ class UserSeeder extends Seeder
                 'email' => 'student@example.com',
                 'password' => 'password',
                 'role' => 'student',
-                'status' => 'pending',
+                'status_slug' => 'user-status-pending',
             ],
             [
                 'name' => 'Teacher Test',
                 'email' => 'teacher@example.com',
                 'password' => 'password',
                 'role' => 'teacher',
-                'status' => 'pending',
+                'status_slug' => 'user-status-pending',
             ],
         ];
 
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 ['name' => $userData['role']]
             );
 
-            $status = UserStatus::where(['name' => $userData['status']])->first();
+            $status = Status::where(['slug' => $userData['status_slug']])->first();
 
             // Create or update the user
             $user = User::updateOrCreate(

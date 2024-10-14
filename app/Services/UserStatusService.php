@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\UserStatus;
+use App\Models\Status;
 use Illuminate\Support\Str;
 use App\Helpers\StatusBadgeMapper;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -12,7 +12,7 @@ class UserStatusService
     public static function getStatuses(): array
     {
         try {
-            $statuses = UserStatus::all();
+            $statuses = Status::where('type', 'user-status')->get();
 
             if ($statuses->isEmpty()) {
                 throw new ModelNotFoundException('No statuses found.');
@@ -21,7 +21,7 @@ class UserStatusService
             return $statuses
                 ->map(
                     fn($status) => [
-                        'value' => $status->name,
+                        'value' => $status->slug,
                         'text' => Str::title($status->name),
                         'description' => $status->description ?? 'Deskripsi tidak tersedia',
                         'badgeClass' => StatusBadgeMapper::getStatusBadgeClass($status->name),
@@ -61,8 +61,7 @@ class UserStatusService
             'blocked' => 'badge badge-error',
             'suspended' => 'badge badge-warning',
             'deactivated' => 'badge badge-ghost',
-            'guest' => 'badge badge-outline badge-neutral',
-            default => 'badge',
+            default => 'badge badge-outline badge-neutral',
         };
     }
 }

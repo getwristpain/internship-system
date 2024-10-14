@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utils;
+namespace App\Helpers;
 
 use Illuminate\Support\Facades\Route;
 
-class Alert
+class UserAlert
 {
     protected $user;
     protected string $userRole;
@@ -63,12 +63,25 @@ class Alert
     }
 
     /**
-     * Get the alerts.
+     * Remove duplicate alerts.
+     *
+     * @param array $alerts
+     * @return array
+     */
+    public static function removeDuplicateAlerts(array $alerts): array
+    {
+        // Use array_unique with SORT_REGULAR to remove duplicate alerts
+        return array_values(array_unique($alerts, SORT_REGULAR));
+    }
+
+    /**
+     * Get the alerts and remove duplicates.
      *
      * @return array
      */
     public function getAlerts(): array
     {
-        return $this->alerts;
+        // Return unique alerts only
+        return self::removeDuplicateAlerts($this->alerts);
     }
 }
