@@ -16,7 +16,10 @@ return new class extends Migration
             $table->foreignUuid('user_uuid')->constrained('users')->onDelete('cascade');
             $table->foreignId('attendance_id')->constrained('attendances')->onDelete('cascade');
             $table->date('date');
+            $table->time('time_start');
+            $table->time('time_finish');
             $table->text('activity');
+            $table->text('feedback');
             $table->timestamps();
         });
     }

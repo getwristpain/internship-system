@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->date('date');
             $table->enum('status', ['present', 'absent', 'sick', 'excused'])->default('present');
-            $table->text('remarks')->nullable();
+            $table->string('attachment')->nullable();
             $table->timestamps();
         });
     }
