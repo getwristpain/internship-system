@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('journals', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('user_uuid')->constrained('users')->onDelete('cascade');
-            $table->foreignId('attendance_id')->constrained('attendances')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->time('time_start');
             $table->time('time_finish');
             $table->text('activity');
-            $table->text('feedback');
+            $table->string('attendance');
+            $table->string('attachment')->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
         });
     }

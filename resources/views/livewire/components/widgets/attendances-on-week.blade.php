@@ -4,14 +4,16 @@ use Livewire\Volt\Component;
 use Carbon\Carbon;
 
 new class extends Component {
+    public array $journalsData = [];
     public array $attendances = []; // Array to store attendance data
     public Carbon $today;
     public int $loadDays = 12; // Number of days displayed before today
     public int $daysAfter = 4; // Number of days displayed after today
     public Carbon $minDateLimit; // Minimum date limit (January 1, 2024)
 
-    public function mount()
+    public function mount(array $journals)
     {
+        $this->journalsData = $journals;
         $this->minDateLimit = Carbon::create(2024, 1, 1); // Set minimum date to January 1, 2024
         $this->getDates();
     }
@@ -48,7 +50,9 @@ new class extends Component {
     // Create attendance data based on the date
     protected function createAttendanceData(Carbon $date): array
     {
-        $status = $this->setStatus($date);
+        $journal = $this->findJournalByDate($date); // Find journal by date
+        $status = $journal ? $journal['attendance'] : ''; // Get attendance status or empty if not found
+
         return [
             'date' => $date,
             'status' => $status,
@@ -56,6 +60,17 @@ new class extends Component {
             'cardClass' => $this->setCardClass($date, $status),
             'statusClass' => $this->setStatusClass($status),
         ];
+    }
+
+    // Find journal by date from $journalsData
+    protected function findJournalByDate(Carbon $date): ?array
+    {
+        foreach ($this->journalsData as $journal) {
+            if (Carbon::parse($journal['date'])->isSameDay($date)) {
+                return $journal; // Return journal if date matches
+            }
+        }
+        return null; // Return null if no journal found for the date
     }
 
     // Load more previous days' attendance data
@@ -72,28 +87,22 @@ new class extends Component {
         }
     }
 
-    // Determine attendance status
-    protected function setStatus(Carbon $date): string
-    {
-        return $date->isPast() ? 'hadir' : 'tidak hadir';
-    }
-
     // Get icon based on status
     protected function setIcon(string $status): string
     {
-        return $status === 'hadir' ? 'icon-park-outline:check-one' : 'tabler:clock';
+        return $status === 'present' ? 'icon-park-outline:check-one' : 'tabler:clock';
     }
 
     // Set card class based on date and status
     protected function setCardClass(Carbon $date, string $status): string
     {
-        return $date->isToday() ? 'bg-yellow-50 bg-opacity-70 border border-yellow-500' : ($status === 'hadir' ? 'bg-opacity-50 border border-green-300' : 'bg-opacity-50 border border-gray-300');
+        return $date->isToday() ? 'bg-yellow-50 bg-opacity-70 border border-yellow-500' : ($status === 'present' ? 'bg-opacity-50 border border-green-300' : 'bg-opacity-50 border border-gray-300');
     }
 
     // Set status class based on status
     protected function setStatusClass(string $status): string
     {
-        return $status === 'hadir' ? 'text-green-500' : 'text-gray-500';
+        return $status === 'present' ? 'text-green-500' : 'text-gray-500';
     }
 };
 ?>
@@ -140,8 +149,12 @@ new class extends Component {
     <div class="min-w-40 max-w-80">
         <x-card class="flex flex-col items-center justify-center h-full font-medium text-center">
             <p>
-                <span id="local-time" class="text-2xl text-yellow-500"></span>
-                <span id="local-timezone" class="text-xs text-gray-400"></span>
+                <span class="text-2xl text-yellow-500">
+                    {{ Carbon::now()->format('H:i') }}
+                </span>
+                <span class="text-xs text-gray-400">
+                    {{ Carbon::now()->format('T') }}
+                </span>
             </p>
             <p class="text-xs text-gray-500">
                 <span>{{ Carbon::now()->translatedFormat('d M Y') }}</span>
@@ -152,27 +165,6 @@ new class extends Component {
 
 @script
     <script>
-        const date = new Date();
-
-        // Mendapatkan jam dan menit
-        const hours = String(date.getHours()).padStart(2, '0'); // Menggunakan padStart untuk 2 digit
-        const minutes = String(date.getMinutes()).padStart(2, '0'); // Menggunakan padStart untuk 2 digit
-
-        // Menggabungkan jam dan menit dengan pemisah titik dua
-        const localTime = `${hours}:${minutes}`;
-
-        // Mendapatkan hanya nama zona waktu (WIB, WITA, WIT)
-        const timeZoneOptions = {
-            timeZoneName: 'short'
-        };
-
-        // Menampilkan zona waktu
-        const localTimeZone = date.toLocaleTimeString('id-ID', timeZoneOptions).split(' ').pop();
-
-        // Menempatkan waktu dan zona waktu di elemen HTML
-        document.getElementById('local-time').innerText = localTime;
-        document.getElementById('local-timezone').innerText = localTimeZone;
-
         let isLoading = false; // Track loading state
         const loadMore = () => {
             if (!isLoading) {

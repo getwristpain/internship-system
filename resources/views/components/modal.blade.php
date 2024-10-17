@@ -20,8 +20,8 @@
         class="fixed inset-0 z-10 overflow-y-auto" :class="{ 'hidden': !show }">
 
         <div class="flex items-center justify-center w-screen min-h-screen p-4 bg-black bg-opacity-10">
-            <div class="relative flex flex-col max-w-full mx-auto space-y-2 overflow-visible transition-all transform shadow-xl bg-base-100 rounded-xl md:max-w-xl lg:max-w-2xl"
-                :class="{ 'w-fit': {{ $fit }}, 'w-full': !{{ $fit }} }">
+            <div
+                class="relative flex flex-col max-w-full mx-auto space-y-2 overflow-visible transition-all transform shadow-xl bg-base-100 rounded-xl md:max-w-xl lg:max-w-2xl {{ $fit ? 'w-fit' : 'w-full' }}">
 
                 <!-- Header -->
                 <div
@@ -42,7 +42,7 @@
                 @endif
                 <!-- Content -->
                 <div class="w-full p-4">
-                    {{ $content ? $content : $slot }}
+                    {{ isset($content) ? $content : $slot }}
                 </div>
 
                 <!-- Footer -->
