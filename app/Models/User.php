@@ -88,8 +88,8 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class);
     }
 
-    public function journals(): HasMany
+    public function attendances(): HasMany
     {
-        return $this->hasMany(Journal::class);
+        return $this->hasMany(Attendance::class);
     }
 }

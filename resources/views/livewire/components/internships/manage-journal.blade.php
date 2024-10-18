@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\JournalService;
+use App\Services\AttendanceService;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -16,12 +16,7 @@ new class extends Component {
 
     protected function getJournals()
     {
-        return JournalService::getPaginatedJournals(Auth::id(), $this->perPage, $this->search);
-    }
-
-    public function openAddOrEditJournalModal(string $attendanceId = '')
-    {
-        $this->dispatch('open-add-or-edit-journal-modal', show: true, attendanceId: $attendanceId);
+        return AttendanceService::getPaginatedAttendances(Auth::id(), $this->search, $this->perPage);
     }
 };
 ?>
@@ -36,7 +31,7 @@ new class extends Component {
                     custom="search"></x-input-text>
             </div>
             <div>
-                <button class="btn btn-neutral" wire:click="openAddOrEditJournalModal">+ Tambah Baru</button>
+                <button class="btn btn-neutral" @click="$dispatch('open-add-or-edit-journal-modal')">+ Tambah Baru</button>
             </div>
         </div>
         <div class="overflow-x-auto">

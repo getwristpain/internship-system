@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Journal extends Model
+class Attendance extends Model
 {
     use HasFactory;
 
@@ -17,11 +17,11 @@ class Journal extends Model
      */
     protected $fillable = [
         'user_id',
+        'status_id',
         'date',
         'time_start',
         'time_finish',
         'activity',
-        'attendance',
         'attachment',
         'remarks',
     ];
@@ -32,5 +32,10 @@ class Journal extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class);
     }
 }

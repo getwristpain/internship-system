@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\AttendanceService;
 use Livewire\Volt\Component;
 use Carbon\Carbon;
 
@@ -11,9 +12,9 @@ new class extends Component {
     public int $daysAfter = 4; // Number of days displayed after today
     public Carbon $minDateLimit; // Minimum date limit (January 1, 2024)
 
-    public function mount(array $journals)
+    public function mount()
     {
-        $this->journalsData = $journals;
+        $this->journalsData = AttendanceService::getAllAttendances(Auth::id())->toArray();
         $this->minDateLimit = Carbon::create(2024, 1, 1); // Set minimum date to January 1, 2024
         $this->getDates();
     }
@@ -90,13 +91,27 @@ new class extends Component {
     // Get icon based on status
     protected function setIcon(string $status): string
     {
-        return $status === 'present' ? 'icon-park-outline:check-one' : 'tabler:clock';
+        return match ($status) {
+            'present' => 'mdi:clock-check-outline',
+            'absent' => 'tabler:clock-x',
+            default => 'tabler:clock',
+        };
     }
 
     // Set card class based on date and status
     protected function setCardClass(Carbon $date, string $status): string
     {
-        return $date->isToday() ? 'bg-yellow-50 bg-opacity-70 border border-yellow-500' : ($status === 'present' ? 'bg-opacity-50 border border-green-300' : 'bg-opacity-50 border border-gray-300');
+        if ($date->isToday()) {
+            return 'bg-yellow-50 bg-opacity-70 border border-yellow-500';
+        }
+
+        return match ($status) {
+            'present', 'excused' => 'bg-opacity-50 border border-green-300 bg-green-50',
+            'late', 'sick' => 'bg-opacity-50 border border-yellow-300 bg-yellow-50',
+            'absent', 'leave' => 'bg-opacity-50 border border-red-300 bg-red-50',
+            'holiday', 'vacation' => 'bg-opacity-50 border border-blue-300 bg-blue-50',
+            default => 'bg-opacity-50 border',
+        };
     }
 
     // Set status class based on status

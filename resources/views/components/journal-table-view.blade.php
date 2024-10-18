@@ -27,7 +27,7 @@
             <tr>
                 <td colspan="8">
                     <div class="flex items-center justify-center text-center text-gray-700">
-                        <p>Tidak ada kegiatan yang ditemukan.</p>
+                        <p>Tidak ada kegiatan ditemukan.</p>
                     </div>
                 </td>
             </tr>

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             SchoolSeeder::class,
             DepartmentSeeder::class,
+            AttendanceStatusSeeder::class,
         ]);
     }
 }
