@@ -54,9 +54,9 @@ new class extends Component {
     </x-slot>
     <x-slot name="content">
         <div class="flex flex-col gap-4">
-            <x-input-text type="email" name="email" model="form.email" label="Email (Opsional)"
+            <x-input-form type="email" name="email" model="form.email" label="Email (Opsional)"
                 placeholder="Masukan email..." />
-            <x-input-text name="expiryDays" model="form.expiryDays" type="number" label="Masa Kadaluarsa"
+            <x-input-form type="number" name="expiryDays" model="form.expiryDays" label="Masa Kadaluarsa"
                 placeholder="Kadaluarsa" unit="Hari" required />
         </div>
     </x-slot>

@@ -51,7 +51,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form wire:submit.prevent="sendPasswordResetLink" class="flex flex-col gap-8">
         <div class="flex flex-col gap-4">
-            <x-input-text type="email" name="email" model="email" placeholder="Email" required autofocus />
+            <x-input-form type="email" name="email" model="email" placeholder="Email" required autofocus />
             <x-input-session-status></x-input-session-status>
         </div>
         <div class="flex items-center justify-end space-x-4">

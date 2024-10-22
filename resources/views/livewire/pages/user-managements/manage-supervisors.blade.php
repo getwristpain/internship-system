@@ -126,7 +126,7 @@ new #[Layout('layouts.app')] class extends Component {
                 <div class="flex items-center justify-between gap-4">
                     <div class="grow">
                         <!-- Search Input -->
-                        <x-input-text name="search" type="text" model="search"
+                        <x-input-form name="search" type="text" model="search"
                             placeholder="Cari berdasarkan nama atau email..." />
                     </div>
                     <div>

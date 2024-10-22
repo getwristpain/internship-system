@@ -37,8 +37,8 @@ new #[Layout('layouts.guest')] class extends Component {
     <form class="w-full space-y-8" wire:submit.prevent="login">
         <div class="space-y-2">
             <x-input-session-status></x-input-session-status>
-            <x-input-text required type="email" model="form.email" placeholder="Email" autofocus />
-            <x-input-text required type="password" model="form.password" placeholder="Password" />
+            <x-input-form required autofocus type="email" model="form.email" placeholder="Email" />
+            <x-input-form required type="password" model="form.password" placeholder="Password" />
             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
         </div>
 

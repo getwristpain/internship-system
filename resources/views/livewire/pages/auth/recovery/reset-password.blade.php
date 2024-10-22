@@ -80,9 +80,9 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form wire:submit="resetPassword" class="flex flex-col w-full gap-4">
         <div class="flex flex-col w-full space-y-4">
-            <x-input-text disabled type="email" name="email" model="email" placeholder="Email" required autofocus />
-            <x-input-text type="password" name="password" model="password" placeholder="Password" required />
-            <x-input-text type="password" name="password_confirmation" model="password_confirmation"
+            <x-input-form disabled type="email" name="email" model="email" placeholder="Email" required autofocus />
+            <x-input-form type="password" name="password" model="password" placeholder="Password" required />
+            <x-input-form type="password" name="password_confirmation" model="password_confirmation"
                 Placeholder="Konfirmasi Password" required />
             <x-input-session-status></x-input-session-status>
         </div>

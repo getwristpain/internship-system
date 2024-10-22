@@ -110,7 +110,7 @@ new class extends Component {
                         <td class="py-2 pr-4 font-medium">Logo Sekolah</td>
                         <td class="flex gap-8 py-2">
                             <div class="h-24">
-                                <x-upload-image :image="$schoolData['logo']" identifier="logo" circle />
+                                {{-- <x-upload-image :image="$schoolData['logo']" identifier="logo" circle /> --}}
                             </div>
                             <div
                                 class="flex flex-col items-center justify-center max-w-sm gap-2 p-4 bg-yellow-100 border border-yellow-500 grow rounded-xl">
@@ -123,7 +123,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Nama Sekolah</td>
                         <td class="py-2">
-                            <x-input-text required type="text" custom="idcard" name="schoolName"
+                            <x-input-form required type="text" custom="idcard" name="schoolName"
                                 placeholder="Nama Sekolah" model="schoolData.name" />
                         </td>
                     </tr>
@@ -132,7 +132,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Alamat Sekolah</td>
                         <td class="py-2">
-                            <x-input-text required type="text" custom="address" name="schoolAddress"
+                            <x-input-form required type="text" custom="address" name="schoolAddress"
                                 placeholder="Alamat Sekolah" model="schoolData.address" />
                         </td>
                     </tr>
@@ -141,7 +141,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Kode Pos Sekolah</td>
                         <td class="py-2">
-                            <x-input-text required type="number" name="schoolPostCode" placeholder="Kode Pos Sekolah"
+                            <x-input-form required type="number" name="schoolPostCode" placeholder="Kode Pos Sekolah"
                                 model="schoolData.post_code" />
                         </td>
                     </tr>
@@ -150,7 +150,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Email Sekolah</td>
                         <td class="py-2">
-                            <x-input-text required type="email" name="schoolEmail" placeholder="Email Sekolah"
+                            <x-input-form required type="email" name="schoolEmail" placeholder="Email Sekolah"
                                 model="schoolData.email" />
                         </td>
                     </tr>
@@ -161,12 +161,12 @@ new class extends Component {
                         <td class="flex flex-wrap gap-4 py-2">
                             <div class="grow">
                                 <span class="font-medium">Telp.</span>
-                                <x-input-text required type="text" custom="phone" name="schoolTelp"
+                                <x-input-form required type="text" custom="phone" name="schoolTelp"
                                     placeholder="Telepon Sekolah" model="schoolData.telp" />
                             </div>
                             <div class="grow">
                                 <span class="font-medium">/Fax.</span>
-                                <x-input-text required type="text" custom="phone" name="schoolFax"
+                                <x-input-form required type="text" custom="phone" name="schoolFax"
                                     placeholder="Fax Sekolah" model="schoolData.fax" />
                             </div>
                         </td>
@@ -176,7 +176,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Kontak Person</td>
                         <td class="py-2">
-                            <x-input-text required type="text" custom="mobile" name="schoolCP"
+                            <x-input-form required type="text" custom="mobile" name="schoolCP"
                                 placeholder="Kontak Person Sekolah" model="schoolData.contact_person" />
                         </td>
                     </tr>
@@ -185,7 +185,7 @@ new class extends Component {
                     <tr class="w-full">
                         <td class="py-2 pr-4 font-medium">Kepala Sekolah</td>
                         <td class="py-2">
-                            <x-input-text required type="text" custom="person" name="schoolPrincipalName"
+                            <x-input-form required type="text" custom="person" name="schoolPrincipalName"
                                 placeholder="Kepala Sekolah" model="schoolData.principal_name" />
                         </td>
                     </tr>

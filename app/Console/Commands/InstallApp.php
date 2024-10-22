@@ -5,7 +5,9 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Models\Status;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use function Laravel\Prompts\{text, password};
 
@@ -35,7 +37,8 @@ class InstallApp extends Command
         $this->clearCache();
         $this->runMigrations();
         $this->seedDatabase();
-        $this->call('storage:link');
+        $this->cleanStorage();
+        $this->linkStorage();
 
         if ($this->createOwner()) {
             $this->info('Application installed successfully!');
@@ -71,6 +74,28 @@ class InstallApp extends Command
     {
         $this->info('Seeding the database...');
         $this->call('db:seed', ['--force' => true]);
+    }
+
+    /**
+     * Delete temporary files and all files in storage/app/public/uploads
+     */
+    protected function cleanStorage()
+    {
+        File::cleanDirectory(storage_path('logs'));
+        Storage::deleteDirectory('livewire-tmp');
+        Storage::disk('public')->deleteDirectory('uploads');
+
+        $this->info('Temporary files have been deleted.');
+    }
+
+    protected function linkStorage()
+    {
+        if (!File::exists(public_path('storage'))) {
+            $this->call('storage:link');
+            $this->info('Storage linked successfully.');
+        } else {
+            $this->info('Public storage directory already exists.');
+        }
     }
 
     /**

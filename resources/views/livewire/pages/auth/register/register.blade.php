@@ -21,10 +21,10 @@ new #[Layout('layouts.guest')] class extends Component {
     </div>
     <form wire:submit.prevent="register('student')" class="flex flex-col w-full space-y-12">
         <div class="space-y-4">
-            <x-input-text type="text" name="name" model="form.name" placeholder="Nama" />
-            <x-input-text type="email" name="email" model="form.email" placeholder="Email" />
-            <x-input-text type="password" name="password" model="form.password" placeholder="Password" />
-            <x-input-text type="password" name="password_confirmation" model="form.password_confirmation"
+            <x-input-form type="text" name="name" model="form.name" placeholder="Nama" />
+            <x-input-form type="email" name="email" model="form.email" placeholder="Email" />
+            <x-input-form type="password" name="password" model="form.password" placeholder="Password" />
+            <x-input-form type="password" name="password_confirmation" model="form.password_confirmation"
                 placeholder="Konfirmasi Password" />
         </div>
         <div class="flex items-center px-4 space-x-4">

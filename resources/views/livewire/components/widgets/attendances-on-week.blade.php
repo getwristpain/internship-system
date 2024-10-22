@@ -1,6 +1,6 @@
 <?php
 
-use App\Services\AttendanceService;
+use App\Services\JournalService;
 use Livewire\Volt\Component;
 use Carbon\Carbon;
 
@@ -14,7 +14,7 @@ new class extends Component {
 
     public function mount()
     {
-        $this->journalsData = AttendanceService::getAllAttendances(Auth::id())->toArray();
+        $this->journalsData = JournalService::getAllJournals(Auth::id())->toArray();
         $this->minDateLimit = Carbon::create(2024, 1, 1); // Set minimum date to January 1, 2024
         $this->getDates();
     }
@@ -136,18 +136,17 @@ new class extends Component {
             <div class="inline-flex justify-between gap-4">
                 @foreach ($attendances as $attendance)
                     <x-card class="flex items-center justify-between divide-x-2 min-w-16 {{ $attendance['cardClass'] }}">
-                        <div class="flex flex-col items-center w-full">
-                            <!-- Display date -->
-                            <div class="flex items-center gap-1 text-xs">
-                                <span class="text-gray-700">{{ $attendance['date']->translatedFormat('D') }}</span>
-                                <!-- Display icon based on status -->
-                                <iconify-icon class="{{ $attendance['statusClass'] }}"
-                                    icon="{{ $attendance['icon'] }}"></iconify-icon>
+                        <div class="flex flex-col items-center w-full" <!-- Display date -->
+                            <div class="flex gap-1">
+                                <span
+                                    class="text-xl font-bold text-gray-600">{{ $attendance['date']->format('d') }}</span>
                             </div>
-                            <div class="flex gap-1 text-xs text-gray-400">
-                                <span>{{ $attendance['date']->format('d') }}</span>
-                                <span>{{ $attendance['date']->translatedFormat('M') }}</span>
-                                {{-- <span>{{ $attendance['date']->translatedFormat('Y') }}</span> --}}
+                            <div class="flex items-center gap-1 text-xs">
+                                <span
+                                    class="text-gray-700 font-medium">{{ $attendance['date']->translatedFormat('D') }}</span>
+                                <!-- Display icon based on status -->
+                                <iconify-icon class="scale-125 {{ $attendance['statusClass'] }}"
+                                    icon="{{ $attendance['icon'] }}"></iconify-icon>
                             </div>
                         </div>
                     </x-card>
@@ -172,7 +171,7 @@ new class extends Component {
                 </span>
             </p>
             <p class="text-xs text-gray-500">
-                <span>{{ Carbon::now()->translatedFormat('d M Y') }}</span>
+                <span>{{ Carbon::now()->translatedFormat('d F Y') }}</span>
             </p>
         </x-card>
     </div>

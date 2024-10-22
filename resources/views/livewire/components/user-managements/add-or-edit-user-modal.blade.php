@@ -64,7 +64,7 @@ new class extends Component {
                 <tr>
                     <th>Nama</th>
                     <td>
-                        <x-input-text name="name" type="text" model="form.user.name" placeholder="Masukkan nama..."
+                        <x-input-form name="name" type="text" model="form.user.name" placeholder="Masukkan nama..."
                             required />
                     </td>
                 </tr>
@@ -72,7 +72,7 @@ new class extends Component {
                 <tr>
                     <th>Email</th>
                     <td>
-                        <x-input-text name="email" type="email" model="form.user.email"
+                        <x-input-form name="email" type="email" model="form.user.email"
                             placeholder="Masukkan email..." required />
                     </td>
                 </tr>
@@ -80,7 +80,7 @@ new class extends Component {
                 <tr>
                     <th>Password</th>
                     <td>
-                        <x-input-text name="password" type="password" model="form.user.password"
+                        <x-input-form name="password" type="password" model="form.user.password"
                             placeholder="{{ $form->userId ? 'Kosongkan jika tidak diubah...' : 'Masukkan password...' }}"
                             required="{{ $form->userId ? false : true }}" />
                     </td>
@@ -89,7 +89,7 @@ new class extends Component {
                 <tr>
                     <th>Konfirmasi Password</th>
                     <td>
-                        <x-input-text name="password_confirmation" type="password"
+                        <x-input-form name="password_confirmation" type="password"
                             model="form.user.password_confirmation"
                             placeholder="{{ $form->userId ? 'Kosongkan jika tidak diubah...' : 'Konfirmasi password...' }}"
                             required="{{ $form->userId ? false : true }}" />

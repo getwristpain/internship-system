@@ -5,7 +5,7 @@
 <tr>
     <th>Nomor Identitas (NIS/NIP)</th>
     <td>
-        <x-input-text name="identifier_number" type="text" model="form.userProfile.identifier_number"
+        <x-input-form name="identifier_number" type="text" model="form.userProfile.identifier_number"
             placeholder="Masukkan ID..." custom="idcard" />
     </td>
 </tr>
@@ -13,7 +13,7 @@
 <tr>
     <th>Jabatan</th>
     <td>
-        <x-input-text name="position" type="text" model="form.userProfile.position" placeholder="Masukkan jabatan..."
+        <x-input-form name="position" type="text" model="form.userProfile.position" placeholder="Masukkan jabatan..."
             custom="person" />
     </td>
 </tr>
@@ -21,7 +21,7 @@
 <tr>
     <th>Alamat</th>
     <td>
-        <x-input-text name="address" type="text" model="form.userProfile.address" placeholder="Masukkan alamat..."
+        <x-input-form name="address" type="text" model="form.userProfile.address" placeholder="Masukkan alamat..."
             custom="address" />
     </td>
 </tr>
@@ -29,7 +29,7 @@
 <tr>
     <th>Telepon (HP/WA)</th>
     <td>
-        <x-input-text name="phone" type="tel" model="form.userProfile.phone" placeholder="Contoh: 08xxxxxxxxxx"
+        <x-input-form name="phone" type="tel" model="form.userProfile.phone" placeholder="Contoh: 08xxxxxxxxxx"
             custom="phone" />
     </td>
 </tr>

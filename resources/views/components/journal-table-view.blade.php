@@ -8,7 +8,7 @@
             <th>Kegiatan</th>
             <th>Kehadiran</th>
             <th>Durasi</th>
-            <th>Umpan Balik</th>
+            <th>Komentar</th>
             <th></th>
         </tr>
     </thead>
@@ -18,9 +18,12 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $journal['date'] ?? '' }}</td>
                 <td>{{ $journal['activity'] ?? '' }}</td>
-                <td>{{ $journal['status'] ?? '' }}</td>
+                <td>
+                    <span
+                        class="{{ \App\Helpers\StatusBadgeMapper::getStatusBadgeClass($journal['attendance']) }}">{{ Str::title(__('attendance.' . $journal['attendance'])) ?? '' }}</span>
+                </td>
                 <td>{{ $journal['duration'] ?? '' }}</td>
-                <td>{{ $journal['notes'] ?? '' }}</td>
+                <td>{{ $journal['remarks'] ?? '' }}</td>
                 <td>{{ $journal['attachment'] ?? '' }}</td>
             </tr>
         @empty
@@ -40,7 +43,7 @@
             <th>Kegiatan</th>
             <th>Kehadiran</th>
             <th>Durasi</th>
-            <th>Umpan Balik</th>
+            <th>Komentar</th>
             <th></th>
         </tr>
     </tfoot>

@@ -4,7 +4,7 @@
     <!-- Search Input -->
     <div class="flex items-center justify-between gap-4">
         <div class="grow">
-            <x-input-text name="search" type="text" model="search" placeholder="Cari berdasarkan nama atau email..." />
+            <x-input-form name="search" type="search" model="search" placeholder="Cari berdasarkan nama atau email..." />
         </div>
         <div>
             <button class="btn btn-neutral" @click="$dispatch('open-add-or-edit-user-modal')">

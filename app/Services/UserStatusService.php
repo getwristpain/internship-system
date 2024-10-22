@@ -52,16 +52,4 @@ class UserStatusService
             ];
         }
     }
-
-    protected static function getBadgeClass(string $statusName): string
-    {
-        return match ($statusName) {
-            'active' => 'badge badge-success',
-            'pending' => 'badge badge-warning',
-            'blocked' => 'badge badge-error',
-            'suspended' => 'badge badge-warning',
-            'deactivated' => 'badge badge-ghost',
-            default => 'badge badge-outline badge-neutral',
-        };
-    }
 }

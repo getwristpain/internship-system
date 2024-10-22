@@ -5,7 +5,7 @@ return [
     'leave' => 'Izin',
     'sick' => 'Sakit',
     'late' => 'Terlambat',
-    'excused' => 'Dimaafkan',
+    'excused' => 'Dibebaskan',
     'holiday' => 'Libur',
     'vacation' => 'Cuti',
 ];

@@ -251,12 +251,12 @@ new class extends Component {
                     <!-- Department Code -->
                     <div class="flex items-center gap-2">
                         <span class="w-1/5 font-medium">Kode</span>
-                        <x-input-text disabled name="departmentCode" model="department.code" required />
+                        <x-input-form disabled name="departmentCode" model="department.code" required />
                     </div>
                     <div class="flex items-center gap-2">
                         <!-- Department Name -->
                         <span class="w-1/5 font-medium">Nama</span>
-                        <x-input-text name="departmentName" model="department.name" required />
+                        <x-input-form name="departmentName" model="department.name" required />
                     </div>
                     <div class="flex flex-col pt-4 space-y-4">
                         <span class="w-1/5 font-bold">Daftar Kelas</span>
@@ -345,7 +345,7 @@ new class extends Component {
             <form class="flex flex-col" wire:submit.prevent="deleteDepartment">
                 <div class="flex flex-col gap-2">
                     <p>Harap konfirmasi dengan memasukkan kembali nama jurusan yang ingin dihapus.</p>
-                    <x-input-text name="department_name_confirmation" model="department_name_confirmation" required />
+                    <x-input-form name="department_name_confirmation" model="department_name_confirmation" required />
                 </div>
             </form>
         </div>

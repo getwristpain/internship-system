@@ -16,7 +16,7 @@ class AttendanceStatusSeeder extends Seeder
         $data = $this->setAttendanceStatusData();
 
         foreach ($data as $status) {
-            Status::create($status);
+            Status::updateOrCreate($status);
         }
     }
 

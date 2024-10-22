@@ -19,9 +19,15 @@
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-10 overflow-y-auto" :class="{ 'hidden': !show }">
 
+        <!-- Modal Background -->
         <div class="flex items-center justify-center w-screen min-h-screen p-4 bg-black bg-opacity-10">
-            <div
-                class="relative flex flex-col max-w-full mx-auto space-y-2 overflow-visible transition-all transform shadow-xl bg-base-100 rounded-xl md:max-w-xl lg:max-w-2xl {{ $fit ? 'w-fit' : 'w-full' }}">
+
+            <!-- Modal Box -->
+            <div x-show="show" x-transition:enter="transition ease-out duration-300 transform"
+                x-transition:enter-start="opacity-0 translate-y-full" x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="relative flex flex-col mx-auto space-y-2 overflow-visible transition-all transform shadow-xl bg-base-100 rounded-xl max-w-full md:max-w-xl lg:max-w-4xl {{ $fit ? 'w-fit' : 'w-full' }}">
 
                 <!-- Header -->
                 <div
