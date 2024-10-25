@@ -97,7 +97,7 @@
                 @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
                 class="input input-bordered grow py-3 pl-10 pr-3 min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
                 aria-describedby="{{ $name }}-error" :key="$name" x-show="true"></textarea>
-        @elseif ($custom === 'search' || $type === 'date')
+        @elseif ($type === 'date')
             <input id="{{ $name }}" type="{{ $type }}" wire:model.live="{{ $model }}"
                 placeholder="{{ $placeholder }}" autocomplete="{{ $name }}"
                 {{ $disabled ? 'disabled' : '' }} {{ $autofocus ? 'autofocus' : '' }}

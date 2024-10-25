@@ -2,6 +2,7 @@
 
 use App\Services\JournalService;
 use Livewire\Volt\Component;
+use Livewire\Attributes\On;
 use Carbon\Carbon;
 
 new class extends Component {
@@ -14,9 +15,21 @@ new class extends Component {
 
     public function mount()
     {
-        $this->journalsData = JournalService::getAllJournals(Auth::id())->toArray();
         $this->minDateLimit = Carbon::create(2024, 1, 1); // Set minimum date to January 1, 2024
+        $this->getAllJournals();
         $this->getDates();
+    }
+
+    #[On('journal-updated')]
+    public function handleJournalUpdated()
+    {
+        $this->getAllJournals();
+        $this->getDates();
+    }
+
+    public function getAllJournals()
+    {
+        $this->journalsData = JournalService::getAllJournals(Auth::id())->toArray() ?? [];
     }
 
     // Function to get past and future days' attendance data

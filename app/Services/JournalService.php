@@ -8,18 +8,11 @@ use App\Models\Status;
 use Illuminate\Support\Str;
 use App\Helpers\StatusBadgeMapper;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class JournalService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
     /**
      * Get all journals for a user, optionally searchable.
      *
@@ -29,82 +22,95 @@ class JournalService
      */
     public static function getAllJournals(string $userId = '', ?string $search = null): Collection
     {
-        // Temukan pengguna dan pastikan pengguna ada
-        $user = User::find($userId);
-        if (!$user) {
-            return collect(); // Mengembalikan koleksi kosong jika pengguna tidak ditemukan
+        if (empty($userId)) {
+            return collect(); // Return empty collection if userId is empty
         }
 
-        // Membangun query untuk mengambil jurnal pengguna
+        $user = User::find($userId);
+        if (!$user) {
+            return collect(); // Return empty collection if user not found
+        }
+
+        // Build journal query with optional search filter
         $query = $user->journals();
 
-        // Terapkan filter pencarian jika ada
         if ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('activity', 'like', "%{$search}%")
-                    ->orWhere('attendance', 'like', "%{$search}%")
                     ->orWhere('remarks', 'like', "%{$search}%");
             });
         }
 
-        // Urutkan jurnal berdasarkan tanggal
+        // Order journals by date and transform results
         $query->orderBy('date');
 
-        // Ambil semua jurnal dan transformasi
-        return $query->get()->transform(function ($journal) {
-            $journal->attendance = self::getAttendanceStatus($journal->attendance);
-            $journal->duration = self::calculateDuration($journal->time_start, $journal->time_finish);
-            return $journal;
+        $allJournals = $query->get()->transform(function ($journal) {
+            return self::transformJournal($journal, 'all');
         });
+
+        return $allJournals->isEmpty() ? collect() : $allJournals;
     }
 
     /**
-     * Get user journals with pagination and optional search.
+     * Get paginated journals for a user with optional search.
      *
      * @param string $userId
      * @param string|null $search
      * @param int $perPage
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
-    public static function getPaginatedJournals(string $userId = '', ?string $search = null, int $perPage = 20)
+    public static function getPaginatedJournals(string $userId = '', ?string $search = null, int $perPage = 20): LengthAwarePaginator
     {
-        // Temukan pengguna dan pastikan pengguna ada
-        $user = User::find($userId);
-        if (!$user) {
-            return collect(); // Mengembalikan koleksi kosong jika pengguna tidak ditemukan
+        if (empty($userId)) {
+            return new LengthAwarePaginator(collect(), 0, $perPage);
         }
 
-        // Membangun query untuk mengambil jurnal pengguna
+        $user = User::find($userId);
+        if (!$user) {
+            return new LengthAwarePaginator(collect(), 0, $perPage);
+        }
+
+        // Build journal query with optional search filter
         $query = $user->journals();
 
-        // Terapkan filter pencarian jika ada
         if ($search) {
             $query->where(function ($query) use ($search) {
                 $query->where('activity', 'like', "%{$search}%")
-                    ->orWhere('attendance', 'like', "%{$search}%")
                     ->orWhere('remarks', 'like', "%{$search}%");
             });
         }
 
-        // Urutkan jurnal berdasarkan tanggal
-        $query->orderBy('date');
+        // Order and paginate journals, then transform results
+        $paginatedJournals = $query->orderBy('date')->paginate($perPage);
 
-        // Paginasikan jurnal
-        $paginatedJournals = $query->paginate($perPage);
-
-        // Transformasi koleksi jurnal yang dipaginasikan
         $paginatedJournals->getCollection()->transform(function ($journal) {
-            $journal->attendance = self::getAttendanceStatus($journal->attendance);
-            $journal->date = Carbon::parse($journal->date)->translatedFormat('d F Y');
-            $journal->duration = self::calculateDuration($journal->time_start, $journal->time_finish);
-            return $journal;
+            return self::transformJournal($journal, 'paginated');
         });
 
         return $paginatedJournals;
     }
 
     /**
-     * Get the attendance status by slug.
+     * Transform individual journal based on context (all or paginated).
+     *
+     * @param $journal
+     * @param string $context
+     * @return mixed
+     */
+    private static function transformJournal($journal, string $context)
+    {
+        // Set the date format based on the context
+        $dateFormat = $context === 'paginated' ? 'F d, Y' : 'd-m-Y';
+
+        $journal->date = Carbon::parse($journal->date)->translatedFormat($dateFormat);
+        $journal->attendance = self::getAttendanceStatus($journal->attendance);
+        $journal->duration = self::calculateDuration($journal->time_start, $journal->time_finish);
+
+        return $journal;
+    }
+
+    /**
+     * Get attendance status name by slug.
      *
      * @param string|null $status
      * @return string|null
@@ -115,11 +121,11 @@ class JournalService
             $status = Status::where('slug', $status)->first();
             return $status ? $status->name : null;
         }
-        return null; // Kembalikan null jika status tidak ada
+        return null;
     }
 
     /**
-     * Calculate the duration between two times.
+     * Calculate duration between start and finish times.
      *
      * @param string|null $startTime
      * @param string|null $finishTime
@@ -128,13 +134,11 @@ class JournalService
     private static function calculateDuration(?string $startTime, ?string $finishTime): string
     {
         if (!$startTime || !$finishTime) {
-            return 'N/A'; // Menangani kasus di mana waktu tidak tersedia
+            return 'N/A';
         }
 
         $start = Carbon::parse($startTime);
         $finish = Carbon::parse($finishTime);
-
-        // Hitung selisih dalam jam dan menit
         $hours = $start->diffInHours($finish);
         $minutes = $start->diffInMinutes($finish) % 60;
 
@@ -142,20 +146,17 @@ class JournalService
     }
 
     /**
-     * Get attendance statuses, excluding certain statuses.
+     * Get attendance statuses excluding specific statuses.
      *
      * @return array
      */
     public static function getStatuses(): array
     {
         try {
-            $excludesStatus = [
-                'attendance-status-excused',
-                'attendance-status-vacation',
-            ];
+            $excludedStatuses = ['attendance-status-excused', 'attendance-status-vacation'];
 
             $statuses = Status::where('type', 'attendance-status')
-                ->whereNotIn('slug', $excludesStatus)
+                ->whereNotIn('slug', $excludedStatuses)
                 ->get();
 
             if ($statuses->isEmpty()) {
@@ -171,16 +172,16 @@ class JournalService
                 ];
             })->toArray();
         } catch (ModelNotFoundException $e) {
-            report($e); // Log the error
-            return self::defaultStatus(); // Mengembalikan status default
+            report($e);
+            return self::defaultStatus();
         } catch (\Exception $e) {
-            report($e); // Log error lain
-            return self::defaultErrorStatus(); // Mengembalikan status error
+            report($e);
+            return self::defaultErrorStatus();
         }
     }
 
     /**
-     * Default statuses to return when no statuses are found.
+     * Default status to return when no statuses found.
      *
      * @return array
      */

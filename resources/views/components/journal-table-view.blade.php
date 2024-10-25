@@ -28,8 +28,8 @@
             </tr>
         @empty
             <tr>
-                <td colspan="8">
-                    <div class="flex items-center justify-center text-center text-gray-700">
+                <td colspan="7">
+                    <div class="flex items-center justify-center text-center text-gray-700 font-medium">
                         <p>Tidak ada kegiatan ditemukan.</p>
                     </div>
                 </td>

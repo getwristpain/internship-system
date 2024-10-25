@@ -8,5 +8,7 @@
         </div>
     @endif
 
-    {{ $content ?? $slot }}
+    <div>
+        {{ $content ?? $slot }}
+    </div>
 </div>
