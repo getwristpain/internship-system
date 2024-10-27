@@ -87,8 +87,8 @@
             }
         }">
             <div @click="if (!{{ $disabled ? 'true' : 'false' }}) { open = !open }"
-                class="flex w-full items-center justify-between cursor-pointer border-b px-4 py-2 text-sm {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
-                <span class="{{ $badgeClass }}"
+                class="flex w-full items-center justify-between cursor-pointer border-b px-4 py-2 {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
+                <span class="{{ $badgeClass }}" style="font-size: inherit;"
                     x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-2" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -99,7 +99,7 @@
             <div x-show="open" @click.away="open = false" class="absolute bg-white border mt-1 rounded-md w-full z-50">
                 <!-- Search Input -->
                 <template x-if="showSearch">
-                    <input type="text" x-model="search" placeholder="{{ $placeholder }}"
+                    <input type="text" x-model="search" placeholder="{{ $placeholder }}" style="font-size: inherit;"
                         class="w-full border p-2 rounded-t-md" {{ $disabled ? 'disabled' : '' }}
                         {{ $required ? 'required' : '' }} {{ $autofocus ? 'autofocus' : '' }}>
                 </template>

@@ -34,7 +34,13 @@ new class extends Component {
 
     public function getAllJournals()
     {
-        $this->journalsData = JournalService::getAllJournals(Auth::id())->toArray() ?? [];
+        $getJournalsData = JournalService::getAllJournals(Auth::id());
+
+        if ($getJournalsData->isNotEmpty()) {
+            return $this->journalsData = $getJournalsData->toArray();
+        }
+
+        return $this->journalsData = [];
     }
 
     // Function to get past and future days' attendance data

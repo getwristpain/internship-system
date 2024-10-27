@@ -1,7 +1,7 @@
 <?php
 
 use Livewire\Volt\Component;
-use Livewire\Attributes\Layout;
+use Livewire\Attributes\{Layout, On};
 
 new #[Layout('layouts.app')] class extends Component {
     //

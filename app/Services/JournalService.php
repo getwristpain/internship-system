@@ -30,7 +30,7 @@ class JournalService
      * @param string|null $search
      * @return Collection
      */
-    public static function getAllJournals(string $userId = '', ?string $search = null): Collection
+    public static function getAllJournals(string $userId = '', ?string $search = null)
     {
         if (empty($userId)) {
             return collect(); // Return empty collection if userId is empty
