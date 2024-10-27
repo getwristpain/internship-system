@@ -24,12 +24,31 @@
                 </td>
                 <td>{{ $journal['duration'] ?? '' }}</td>
                 <td>{{ $journal['remarks'] ?? '' }}</td>
-                <td>{{ $journal['attachment'] ?? '' }}</td>
+                <td>
+                    <div class="flex items-center justify-end gap-2">
+                        @if ($journal['attachment'])
+                            <a href="{{ url($journal['attachment'] ?? '#') }}" target="__blank"
+                                class="btn btn-sm btn-outline">
+                                <iconify-icon icon="quill:attachment" class="scale-125"></iconify-icon>
+                            </a>
+                        @endif
+
+                        <button class="btn btn-sm btn-outline" title="Edit"
+                            @click="$dispatch('openAddOrEditJournalModal', {journalId: {{ $journal['id'] }}})">
+                            <iconify-icon icon="tabler:edit" class="scale-125"></iconify-icon>
+                        </button>
+
+                        <button class="btn btn-sm btn-outline btn-error" title="Hapus"
+                            @click="$dispatch('openDeleteJournalModal', {journalId: {{ $journal['id'] }}})">
+                            <iconify-icon icon="mage:trash-fill" class="scale-125"></iconify-icon>
+                        </button>
+                    </div>
+                </td>
             </tr>
         @empty
             <tr>
                 <td colspan="7">
-                    <div class="flex items-center justify-center text-center text-gray-700 font-medium">
+                    <div class="flex items-center justify-center font-medium text-center text-gray-700">
                         <p>Tidak ada kegiatan ditemukan.</p>
                     </div>
                 </td>

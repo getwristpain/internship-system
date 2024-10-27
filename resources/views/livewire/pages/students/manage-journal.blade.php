@@ -15,7 +15,7 @@ new #[Layout('layouts.app')] class extends Component {
         </div>
 
         <div class="flex-1">
-            @livewire('components.journals.journal-card')
+            @livewire('components.journals.manage-journal-card')
         </div>
     </div>
 

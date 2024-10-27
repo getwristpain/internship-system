@@ -11,16 +11,16 @@ new class extends Component {
     use WithFileUploads;
 
     public JournalForm $form;
-    public bool $showModal = false;
     public ?int $journalId = null;
+    public bool $showModal = false;
     public array $attendanceStatuses = [];
 
-    public function mount()
+    public function updated()
     {
-        $this->initJournalData();
+        $this->saveOnSession();
     }
 
-    public function updated()
+    private function saveOnSession()
     {
         session()->put('journal_time_start', $this->form->time_start);
         session()->put('journal_time_finish', $this->form->time_finish);
@@ -29,21 +29,15 @@ new class extends Component {
     private function initJournalData()
     {
         $this->attendanceStatuses = JournalService::getStatuses();
-        $this->form->date = Carbon::now()->format('Y-m-d');
-
-        if (session()->has(['journal_time_start', 'journal_time_finish'])) {
-            $this->form->time_start = session('journal_time_start');
-            $this->form->time_finish = session('journal_time_finish');
-        } else {
-            $this->form->time_start = '07:30';
-            $this->form->time_finish = '16:00';
-        }
+        $this->form->initJournalData();
     }
 
     #[On('openAddOrEditJournalModal')]
     public function handleOpenModal(?int $journalId = null)
     {
-        $this->journalId = $journalId;
+        $this->form->resetForm();
+        $this->form->journalId = $journalId;
+        $this->initJournalData();
         $this->showModal = true;
     }
 
@@ -51,12 +45,10 @@ new class extends Component {
     public function handleCloseModal()
     {
         $this->resetValidation();
+        $this->form->resetForm();
         $this->showModal = false;
     }
 
-    /**
-     * Simpan jurnal
-     */
     public function saveJournal()
     {
         $this->form->saveJournal();
@@ -72,7 +64,7 @@ new class extends Component {
 <!-- Blade template for the modal -->
 <x-modal show="showModal" :form="true" action="saveJournal">
     <x-slot name="header">
-        {{ $journalId ? 'Edit Jurnal' : 'Tambah Jurnal' }}
+        {{ $form->journalId ? 'Edit Jurnal' : 'Tambah Jurnal' }}
     </x-slot>
     <x-slot name="content">
         <div>
@@ -86,7 +78,7 @@ new class extends Component {
                 <tr>
                     <th>Waktu</th>
                     <td>
-                        <div class="flex gap-4 items-center">
+                        <div class="flex items-center gap-4">
                             <x-input-form type="time" name="time_start" model="form.time_start"
                                 required></x-input-form>
                             <span class="before:content-[''] w-8 border-t-2 border-gray-600"></span>

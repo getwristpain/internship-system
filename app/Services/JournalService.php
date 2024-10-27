@@ -5,6 +5,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Status;
+use App\Models\Journal;
 use Illuminate\Support\Str;
 use App\Helpers\StatusBadgeMapper;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,6 +14,15 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class JournalService
 {
+    public static function findJournal(?int $journalId = null)
+    {
+        if ($journalId) {
+            return Journal::find($journalId) ?? null;
+        }
+
+        return null;
+    }
+
     /**
      * Get all journals for a user, optionally searchable.
      *
@@ -42,7 +52,7 @@ class JournalService
         }
 
         // Order journals by date and transform results
-        $query->orderBy('date');
+        $query->orderBy('date', 'desc');
 
         $allJournals = $query->get()->transform(function ($journal) {
             return self::transformJournal($journal, 'all');
@@ -81,7 +91,7 @@ class JournalService
         }
 
         // Order and paginate journals, then transform results
-        $paginatedJournals = $query->orderBy('date')->paginate($perPage);
+        $paginatedJournals = $query->orderBy('date', 'desc')->paginate($perPage);
 
         $paginatedJournals->getCollection()->transform(function ($journal) {
             return self::transformJournal($journal, 'paginated');

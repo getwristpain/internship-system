@@ -9,7 +9,7 @@ new class extends Component {
     use WithPagination;
 
     public string $search = '';
-    public int $perPage = 20;
+    public int $perPage = 10;
 
     public function with()
     {
@@ -36,16 +36,23 @@ new class extends Component {
 }; ?>
 
 <x-card class="h-full">
-    <div class="flex gap-4 justify-end items-center">
-        <x-input-form type="search" name="search" model="search"
-            placeholder="Cari berdasarkan kegiatan..."></x-input-form>
+    <x-slot name="heading">Jurnal Kegiatan</x-slot>
 
-        <button class="btn btn-neutral" wire:click="handleOpenOrEditJournalModal">
-            + Tambah Baru
-        </button>
-    </div>
+    <x-slot name="content">
+        <div class="flex gap-4 justify-end items-center">
+            <x-input-form type="search" name="search" model="search"
+                placeholder="Cari berdasarkan kegiatan..."></x-input-form>
 
-    <div>
-        <x-journal-table-view :journals="$journals"></x-journal-table-view>
-    </div>
+            <button class="btn btn-neutral" wire:click="handleOpenOrEditJournalModal">
+                + Tambah Baru
+            </button>
+        </div>
+
+        <div class="space-y-4">
+            <x-journal-table-view :journals="$journals"></x-journal-table-view>
+            @if ($journals->isNotEmpty())
+                <div>{{ $journals->links() }}</div>
+            @endif
+        </div>
+    </x-slot>
 </x-card>

@@ -15,14 +15,19 @@ new class extends Component {
 
     public function mount()
     {
-        $this->minDateLimit = Carbon::create(2024, 1, 1); // Set minimum date to January 1, 2024
-        $this->getAllJournals();
-        $this->getDates();
+        $this->loadAttendancesData();
     }
 
     #[On('journal-updated')]
     public function handleJournalUpdated()
     {
+        $this->reset(['journalsData', 'attendances']);
+        $this->loadAttendancesData();
+    }
+
+    public function loadAttendancesData()
+    {
+        $this->minDateLimit = Carbon::create(2024, 1, 1);
         $this->getAllJournals();
         $this->getDates();
     }
@@ -130,7 +135,13 @@ new class extends Component {
     // Set status class based on status
     protected function setStatusClass(string $status): string
     {
-        return $status === 'present' ? 'text-green-500' : 'text-gray-500';
+        return match ($status) {
+            'present', 'excused' => 'text-green-500',
+            'late', 'sick' => 'text-yellow-500',
+            'absent', 'leave' => 'text-red-500',
+            'holiday', 'vacation' => 'text-blue-500',
+            default => 'text-gray-500',
+        };
     }
 };
 ?>
@@ -156,7 +167,7 @@ new class extends Component {
                             </div>
                             <div class="flex items-center gap-1 text-xs">
                                 <span
-                                    class="text-gray-700 font-medium">{{ $attendance['date']->translatedFormat('D') }}</span>
+                                    class="font-medium text-gray-700">{{ $attendance['date']->translatedFormat('D') }}</span>
                                 <!-- Display icon based on status -->
                                 <iconify-icon class="scale-125 {{ $attendance['statusClass'] }}"
                                     icon="{{ $attendance['icon'] }}"></iconify-icon>
