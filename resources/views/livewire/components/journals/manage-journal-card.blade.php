@@ -17,8 +17,6 @@ new class extends Component {
     public $selectedJournals = [];
     public int $countSelectedJournals = 0;
 
-    public string $bulkAction = '';
-
     public function with()
     {
         return [

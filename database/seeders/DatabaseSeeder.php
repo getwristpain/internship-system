@@ -19,5 +19,11 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             AttendanceStatusSeeder::class,
         ]);
+
+        if (env('APP_ENV') !== 'production') {
+            $this->call([
+                DBTestSeeder::class,
+            ]);
+        }
     }
 }

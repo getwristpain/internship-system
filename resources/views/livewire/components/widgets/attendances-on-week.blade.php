@@ -163,7 +163,7 @@ new class extends Component {
         <div id="scroll-container" class="overflow-x-auto whitespace-nowrap" style="scroll-behavior: smooth;"
             wire:target="loadMorePreviousDays" wire:loading.class="opacity-50">
 
-            <div class="inline-flex justify-between gap-4">
+            <div class="inline-flex justify-end items-center gap-4">
                 @foreach ($attendances as $attendance)
                     <x-card class="flex items-center justify-between divide-x-2 min-w-16 {{ $attendance['cardClass'] }}">
                         <div class="flex flex-col items-center w-full" <!-- Display date -->

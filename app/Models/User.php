@@ -92,4 +92,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Journal::class);
     }
+
+    public function mentorships(): HasMany
+    {
+        return $this->hasMany(Mentorship::class);
+    }
+
+    public function internshipReports(): HasMany
+    {
+        return $this->hasMany(InternshipReport::class);
+    }
 }

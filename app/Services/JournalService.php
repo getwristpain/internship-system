@@ -37,6 +37,7 @@ class JournalService
         }
 
         $user = User::find($userId);
+
         if (!$user) {
             return collect(); // Return empty collection if user not found
         }
@@ -97,7 +98,7 @@ class JournalService
             return self::transformJournal($journal, 'paginated');
         });
 
-        return $paginatedJournals;
+        return $paginatedJournals->isEmpty() ? collect() : $paginatedJournals;
     }
 
     /**
@@ -110,7 +111,7 @@ class JournalService
     private static function transformJournal($journal, string $context)
     {
         // Set the date format based on the context
-        $dateFormat = $context === 'paginated' ? 'F d, Y' : 'd-m-Y';
+        $dateFormat = $context === 'paginated' ? 'l, d F Y' : 'd-m-Y';
 
         $journal->date = Carbon::parse($journal->date)->translatedFormat($dateFormat);
         $journal->attendance = self::getAttendanceStatus($journal->attendance);
@@ -176,7 +177,7 @@ class JournalService
             return $statuses->map(function ($status) {
                 return [
                     'value' => $status->slug,
-                    'text' => Str::title(__('attendance.' . $status->name)),
+                    'text' => Str::title(__('status.attendance.' . $status->name)),
                     'description' => $status->description ?? 'Deskripsi tidak tersedia',
                     'badgeClass' => StatusBadgeMapper::getStatusBadgeClass($status->name),
                 ];

@@ -29,17 +29,9 @@ class Status extends Model
         // Event saving to generate slug before saving the model
         static::saving(function (Status $status) {
             if (empty($status->slug)) {
-                $status->slug = Str::slug($status->type . '-' . $status->name);
+                $formattedSlug = strtolower(str_replace(' ', '-', $status->type . '-' . $status->name));
+                $status->slug = Str::slug($formattedSlug);
             }
         });
-    }
-
-    /**
-     * User status with one-to-many relationship
-     * @return HasMany
-     */
-    public function users(): HasMany
-    {
-        return $this->hasMany(User::class);
     }
 }

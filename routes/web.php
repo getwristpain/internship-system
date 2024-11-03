@@ -32,6 +32,10 @@ Route::middleware(['auth', 'role:admin|staff'])->group(function () {
 Route::middleware(['auth', 'role:student'])->group(function () {
     Volt::route('/journals', 'pages.students.manage-journal')
         ->name('student-journal');
+    Volt::route('/mentorships', 'pages.students.manage-mentorship')
+        ->name('student-mentorship');
+    Volt::route('/assignments', 'pages.students.manage-assignment')
+        ->name('student-assignment');
 });
 
 Route::middleware(['auth', 'role:teacher'])->group(function () {

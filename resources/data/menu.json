@@ -22,9 +22,9 @@
                 "roles": ["student"]
             },
             {
-                "slug": "student-mentoring",
+                "slug": "student-mentorship",
                 "label": "Pembimbingan",
-                "route": "student-mentoring",
+                "route": "student-mentorship",
                 "icon": "material-symbols:group-outline",
                 "roles": ["student"]
             },
