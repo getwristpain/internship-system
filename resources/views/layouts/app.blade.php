@@ -17,17 +17,19 @@
 
     <body class="flex w-full min-h-screen bg-gray-50">
         <!-- Page Sidebar -->
-        <livewire:components.sidebar />
+        @livewire('components.sidebar')
 
         <div class="flex flex-col w-full min-h-screen overflow-y-auto">
             <!-- Page Navbar -->
-            <livewire:components.navbar />
+            @livewire('components.navbar')
 
             <!-- Page Content -->
             <main class="p-4 grow">
                 {{ $slot }}
             </main>
         </div>
+
+        @livewire('components.notification')
 
         @livewireScripts
         @livewireChartsScripts

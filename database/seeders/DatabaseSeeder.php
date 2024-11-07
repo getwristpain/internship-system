@@ -13,11 +13,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserStatusSeeder::class,
+            NotifyStatusSeeder::class,
+            AttendanceStatusSeeder::class,
+            AcceptanceStatusSeeder::class,
             RoleSeeder::class,
             MenuSeeder::class,
             SchoolSeeder::class,
             DepartmentSeeder::class,
-            AttendanceStatusSeeder::class,
         ]);
 
         if (env('APP_ENV') !== 'production') {

@@ -38,6 +38,26 @@ class FileHelper
         return $filePath;
     }
 
+    public static function storeDoc($file): string
+    {
+        $fileName = self::generateFileName($file->getClientOriginalExtension());
+        $filePath = 'uploads/documents/' . $fileName;
+
+        Storage::disk('public')->putFileAs('uploads/documents', $file, $fileName);
+
+        return $filePath;
+    }
+
+    public static function deleteFile($filePath): string
+    {
+        if (Storage::exists($filePath)) {
+            Storage::delete($filePath);
+            return 'File deleted successfully.';
+        } else {
+            return 'File not found.';
+        }
+    }
+
     /**
      * Generate a unique filename with the given extension
      *
@@ -50,5 +70,13 @@ class FileHelper
         $randomString = Str::random(16);
 
         return $today->format('Y-m-d') . '-' . $randomString . '.' . $extension;
+    }
+
+    public static function formatFileSize(int $size = 0)
+    {
+        $fileSize = number_format($size / (1024 * 1024), 2);
+        $formattedSize = $fileSize . 'MB';
+
+        return $formattedSize ?? '0 MB';
     }
 }

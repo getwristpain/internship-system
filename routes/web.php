@@ -7,7 +7,6 @@ use App\Http\Controllers\AvatarController;
 // Volt::route('/reset', 'pages.auth.reset');
 
 Route::redirect('/', '/dashboard', 301);
-Route::get('assets/uploads/avatars/{userId}/{filename}', [AvatarController::class, 'show'])->middleware('auth')->name('assets.avatar');
 
 Route::middleware(['auth'])->group(function () {
     Volt::route('/dashboard', 'pages.dashboard')->name('dashboard');

@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\User;
-use App\Models\Profile;
-use Laravolt\Avatar\Facade as Avatar;
+use App\Services\NotifyService;
+use App\Services\ProfileService;
 
 class UserObserver
 {
@@ -13,10 +13,8 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        Profile::create([
-            'user_id' => $user->id,
-            'avatar' => Avatar::create($user->name)->toBase64(),
-        ]);
+        ProfileService::setDefaultProfile($user);
+        NotifyService::sendWelcomeNotification($user);
     }
 
     /**

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('status_id')->constrained()->onDelete('cascade');
+            $table->string('file_name');
             $table->string('file_path');
             $table->text('remarks')->nullable();
             $table->timestamp('submitted_at')->useCurrent();

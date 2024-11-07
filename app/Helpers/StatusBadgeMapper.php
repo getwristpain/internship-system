@@ -8,11 +8,11 @@ class StatusBadgeMapper
     {
         return match ($statusName) {
             'verified' => 'badge badge-info',
-            'active', 'present', 'excused' => 'badge badge-success text-white',
+            'active', 'present', 'excused', 'accepted' => 'badge badge-success text-white',
             'pending', 'suspended', 'late', 'sick' => 'badge badge-warning',
-            'blocked', 'absent' => 'badge badge-error text-white',
+            'blocked', 'absent', 'rejected' => 'badge badge-error text-white',
             'leave', 'holiday', 'vacation' => 'badge badge-info',
-            'deactivated', => 'badge badge-ghost',
+            'deactivated' => 'badge badge-ghost',
             default => 'badge badge-outline badge-neutral',
         };
     }
