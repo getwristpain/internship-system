@@ -1,14 +1,14 @@
-<div {{ $attributes->merge(['class' => 'w-full h-fit p-4 rounded-xl border bg-white']) }}>
+<div {{ $attributes->merge(['class' => 'p-4 rounded-xl border bg-white flex flex-col gap-4']) }}>
     {{-- Header --}}
     @if (isset($heading))
-        <div class="mb-8">
-            <h2 {{ $attributes->merge(['class' => 'font-heading font-medium text-lg text-left text-gray-600 mb-4']) }}>
+        <div>
+            <h2 class="text-lg font-medium text-left text-gray-600 font-heading">
                 {{ $heading }}
             </h2>
         </div>
     @endif
 
-    <div>
+    <div class="flex-1">
         {{ $content ?? $slot }}
     </div>
 </div>

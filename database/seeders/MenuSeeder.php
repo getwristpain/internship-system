@@ -13,12 +13,13 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
+        Menu::truncate();
+
         $menus = $this->getMenus();
 
         foreach ($menus as $menu) {
             // Use updateOrCreate to handle both creation and updating of records
-            $createdMenu = Menu::updateOrCreate(
-                ['slug' => $menu['slug']], // Unique identifier
+            $createdMenu = Menu::create(
                 $this->prepareMenuData($menu) // Data to update or insert
             );
 

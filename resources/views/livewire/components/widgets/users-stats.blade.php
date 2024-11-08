@@ -73,13 +73,16 @@ new class extends Component {
 
 <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
     @foreach ($usersStats as $role => $data)
-        <x-card class="flex items-center h-full gap-4">
-            <div class="w-12 h-12 aspect-square rounded-full {{ $data['bgColor'] }} flex justify-center items-center">
-                <iconify-icon class="text-xl scale-125" icon="{{ $data['icon'] }}"></iconify-icon>
-            </div>
-            <div class="flex flex-col text-sm">
-                <span class="text-xl">{{ $data['count'] ?? 0 }}</span>
-                <span class="break-words text-wrap">{{ $data['label'] }}</span>
+        <x-card>
+            <div class="flex items-center h-full gap-4 flex-nowrap">
+                <div
+                    class="w-12 h-12 aspect-square rounded-full {{ $data['bgColor'] }} flex justify-center items-center">
+                    <iconify-icon class="text-xl scale-125" icon="{{ $data['icon'] }}"></iconify-icon>
+                </div>
+                <div class="flex flex-col text-sm">
+                    <span class="text-xl">{{ $data['count'] ?? 0 }}</span>
+                    <span class="break-words text-wrap">{{ $data['label'] }}</span>
+                </div>
             </div>
         </x-card>
     @endforeach

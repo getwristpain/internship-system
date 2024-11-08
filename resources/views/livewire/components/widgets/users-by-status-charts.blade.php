@@ -87,34 +87,36 @@ new class extends Component {
 <div class="flex flex-col w-full h-full gap-4">
     <div class="flex flex-row gap-4 md:flex-col">
         {{-- Jumlah pengguna aktif --}}
-        <x-card class="flex h-full gap-4">
-            <div
-                class="w-12 h-12 aspect-square rounded-full {{ $activeUsersData['bgColor'] }} flex justify-center items-center">
-                <iconify-icon class="text-xl scale-125" icon="{{ $activeUsersData['icon'] }}"></iconify-icon>
-            </div>
-            <div class="flex flex-col text-sm">
-                <span class="text-xl">{{ $activeUsersData['count'] ?? 0 }}</span>
-                <span class="break-words text-wrap">{{ $activeUsersData['label'] }}</span>
+        <x-card>
+            <div class="flex items-center h-full gap-4 flex-nowrap">
+                <div
+                    class="w-12 h-12 aspect-square rounded-full {{ $activeUsersData['bgColor'] }} flex justify-center items-center">
+                    <iconify-icon class="text-xl scale-125" icon="{{ $activeUsersData['icon'] }}"></iconify-icon>
+                </div>
+                <div class="flex flex-col text-sm">
+                    <span class="text-xl">{{ $activeUsersData['count'] ?? 0 }}</span>
+                    <span class="break-words text-wrap">{{ $activeUsersData['label'] }}</span>
+                </div>
             </div>
         </x-card>
 
         {{-- Jumlah pengguna tamu --}}
-        <x-card class="flex h-full gap-4">
-            <div
-                class="w-12 h-12 aspect-square rounded-full {{ $guestUsersData['bgColor'] }} flex justify-center items-center">
-                <iconify-icon class="text-xl scale-125" icon="{{ $guestUsersData['icon'] }}"></iconify-icon>
-            </div>
-            <div class="flex flex-col text-sm">
-                <span class="text-xl">{{ $guestUsersData['count'] ?? 0 }}</span>
-                <span class="break-words text-wrap">{{ $guestUsersData['label'] }}</span>
+        <x-card>
+            <div class="flex items-center h-full gap-4 flex-nowrap">
+                <div
+                    class="w-12 h-12 aspect-square rounded-full {{ $guestUsersData['bgColor'] }} flex justify-center items-center">
+                    <iconify-icon class="text-xl scale-125" icon="{{ $guestUsersData['icon'] }}"></iconify-icon>
+                </div>
+                <div class="flex flex-col text-sm">
+                    <span class="text-xl">{{ $guestUsersData['count'] ?? 0 }}</span>
+                    <span class="break-words text-wrap">{{ $guestUsersData['label'] }}</span>
+                </div>
             </div>
         </x-card>
     </div>
 
     {{-- Pie chart untuk pengguna berdasarkan status --}}
-    <div class="flex-1 grow">
-        <x-card class="w-full h-full">
-            @livewire('livewire-pie-chart', ['pieChartModel' => $usersByStatusPieChartModel])
-        </x-card>
-    </div>
+    <x-card class="flex-1 w-full h-full">
+        @livewire('livewire-pie-chart', ['pieChartModel' => $usersByStatusPieChartModel])
+    </x-card>
 </div>

@@ -21,6 +21,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin|staff'])->group(function () {
+    Volt::route('/programs', 'pages.internships.manage-program')->name('internship-program');
     Volt::route('/users-overview', 'pages.user-managements.users-overview')->name('users-overview');
     Volt::route('/user-manager', 'pages.user-managements.manage-users')->name('user-manager');
     Volt::route('/supervisor-manager', 'pages.user-managements.manage-supervisors')->name('supervisor-manager');

@@ -10,10 +10,12 @@ new class extends Component {
     public array $filteredMenuItems = [];
     public array $openSubmenus = [];
     public bool $isSidebarOpen = true;
+    public string $activeMenu = '';
 
     public function mount(): void
     {
         $this->loadMenu();
+        $this->activeMenu = Route::currentRouteName();
     }
 
     #[On('toggleSidebar')]
@@ -70,6 +72,7 @@ new class extends Component {
         if (!empty($item['submenus'])) {
             $this->toggleSubmenu($item['slug']);
         } elseif (isset($item['route']) && Route::has($item['route'])) {
+            $this->activeMenu = $item['route'] ?? '';
             $this->redirect(route($item['route']), navigate: true);
         } else {
             flash()->error('Route not found for menu item: ' . $item['label']);
@@ -87,7 +90,7 @@ new class extends Component {
 
     public function isActive(string $routeName): bool
     {
-        return Route::currentRouteName() === $routeName;
+        return $this->activeMenu === $routeName;
     }
 };
 

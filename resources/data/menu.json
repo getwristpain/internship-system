@@ -38,6 +38,22 @@
         ]
     },
     {
+        "slug": "internship-management",
+        "label": "Program PKL",
+        "route": null,
+        "icon": "fluent-emoji-high-contrast:office-building",
+        "roles": ["admin", "staff"],
+        "submenu": [
+            {
+                "slug": "internship-program",
+                "label": "Manajemen",
+                "route": "internship-program",
+                "icon": "uis:schedule",
+                "roles": ["admin", "staff"]
+            }
+        ]
+    },
+    {
         "slug": "user-management",
         "label": "Pengguna",
         "route": null,

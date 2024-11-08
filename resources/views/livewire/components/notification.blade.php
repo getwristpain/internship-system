@@ -64,37 +64,38 @@ new class extends Component {
      */
     public function mount()
     {
+        $this->reset(['show']);
         $this->loadNotifications();
     }
 };
 ?>
 
-<div x-data="{ show: @entangle('show').live }" x-show="show" x-transition:enter="transform transition ease-out duration-500"
+<div x-data="{ show: @entangle('show').live }" x-cloak x-show="show" x-transition:enter="transform transition ease-out duration-500"
     x-transition:enter-start="translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
     x-transition:leave="transform transition ease-in duration-500" x-transition:leave-start="translate-x-0 opacity-100"
     x-transition:leave-end="translate-x-full opacity-0"
-    class="fixed right-0 z-10 vh-full sm:max-w-sm w-full bg-white p-4 shadow-lg overflow-hidden space-y-4">
+    class="fixed right-0 z-10 w-full p-4 space-y-4 overflow-hidden bg-white shadow-lg vh-full sm:max-w-sm">
 
-    <div class="flex gap-4 justify-between text-nowrap p-4 bg-gray-100 rounded-lg items-center">
-        <div class="font-bold text-gray-700 text-lg px-4 flex gap-4 items-center">
+    <div class="flex items-center justify-between gap-4 p-4 bg-gray-100 rounded-lg text-nowrap">
+        <div class="flex items-center gap-4 px-4 text-lg font-bold text-gray-700">
             <iconify-icon class="scale-125" icon="mage:notification-bell-fill"></iconify-icon>
             <span>NOTIFIKASI</span>
         </div>
         <div>
             <button wire:click="toggleNotification"
-                class="text-xl w-8 h-8 text-gray-600 bg-gray-200 flex items-center justify-center rounded-full">
+                class="flex items-center justify-center w-8 h-8 text-xl text-gray-600 bg-gray-200 rounded-full">
                 <iconify-icon icon="icon-park-solid:right-c"></iconify-icon>
             </button>
         </div>
     </div>
 
-    <div class="flex flex-col gap-4 h-full">
+    <div class="flex flex-col h-full gap-4">
         @forelse ($notifications as $notification)
             <div>
                 <x-notification-item :$notification />
             </div>
         @empty
-            <div class="p-4 h-full flex items-center justify-center text-gray-700">
+            <div class="flex items-center justify-center h-full p-4 text-gray-700">
                 Tidak ada notifikasi.
             </div>
         @endforelse
