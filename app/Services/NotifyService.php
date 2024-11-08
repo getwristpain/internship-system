@@ -122,7 +122,7 @@ class NotifyService
         return $undeliveredNotifications > 0;
     }
 
-    private function getStatus(string $slug)
+    private static function getStatus(string $slug)
     {
         return Status::where('slug', $slug)->first();
     }
