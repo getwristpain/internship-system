@@ -18,7 +18,7 @@ class NotifyService
     public static function sendWelcomeNotification($user)
     {
         // Menentukan status default untuk notifikasi
-        $status = Status::where('slug', 'notify-status-read')->first();
+        $status = self::getStatus('notify-status-read');
 
         // Membuat notifikasi baru
         Notification::create([
@@ -49,6 +49,35 @@ class NotifyService
     }
 
     /**
+     * Send a notification to a user with either a delivered or scheduled status.
+     *
+     * @param User  $user         The user to whom the notification is sent.
+     * @param array $notification The notification data to be stored.
+     * @param bool  $isScheduled  Indicates if the notification is scheduled.
+     * @param \Carbon\Carbon|null $scheduledAt The scheduled time for the notification (required if $isScheduled is true).
+     *
+     * @return \Illuminate\Database\Eloquent\Model The created notification instance.
+     *
+     * @throws \InvalidArgumentException If $isScheduled is true but no $scheduledAt time is provided.
+     */
+    public static function sendNotification(User $user, array $notification, bool $isScheduled = false, \Carbon\Carbon $scheduledAt = null)
+    {
+        $statusKey = $isScheduled ? 'notify-status-scheduled' : 'notify-status-delivered';
+        $statusId = self::getStatus($statusKey)->id;
+
+        if ($isScheduled && is_null($scheduledAt)) {
+            throw new \InvalidArgumentException('Scheduled notifications require a $scheduledAt time.');
+        }
+
+        $notificationData = array_merge($notification, [
+            'status_id' => $statusId,
+            'scheduled_at' => $isScheduled ? $scheduledAt : null,
+        ]);
+
+        return $user->notifications()->create($notificationData);
+    }
+
+    /**
      * Sets the status of a notification to "read".
      *
      * This method updates the status of a given notification by setting its
@@ -60,7 +89,7 @@ class NotifyService
      */
     public static function setReadNotification(int $notifyId)
     {
-        $status = Status::where('slug', 'notify-status-read')->first();
+        $status = self::getStatus('notify-status-read');
 
         if (!$status) {
             return;
@@ -85,11 +114,16 @@ class NotifyService
      */
     public static function hasUnreadNotifications(string $userId)
     {
-        $deliveredStatus = Status::where('slug', 'notify-status-delivered')->first();
+        $deliveredStatus = self::getStatus('notify-status-delivered');
 
         $user = User::with(['notifications'])->find($userId);
         $undeliveredNotifications = $user->notifications()->where('status_id', $deliveredStatus ? $deliveredStatus->id : null)->count();
 
         return $undeliveredNotifications > 0;
+    }
+
+    private function getStatus(string $slug)
+    {
+        return Status::where('slug', $slug)->first();
     }
 }
