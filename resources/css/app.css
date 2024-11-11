@@ -5,11 +5,11 @@
 @tailwind utilities;
 
 body {
-    @apply font-sans antialiased screen-full text-gray-900;
+    @apply font-sans antialiased screen-full;
 }
 
 .font-heading {
-    @apply text-gray-700;
+    @apply text-gray-600;
 }
 
 .screen-full {

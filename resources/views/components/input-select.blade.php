@@ -56,12 +56,14 @@
     }
 @endphp
 
-<div class="flex flex-col gap-1 w-full font-medium {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
-    <div class="flex gap-4 w-full">
+<div class="flex flex-col gap-2 w-full font-medium pt-1 {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}"
+    :key="$name">
+    <div class="flex flex-col gap-2 w-full">
         @if (!empty($label))
-            <div class="flex justify-between w-full items-center">
-                <label class="w-24" for="{{ $name }}">{{ $label }}</label>
-                <span class="px-1">:</span>
+            <div class="text-sm text-gray-600">
+                <label for="{{ $name }}" class="text-sm font-medium text-gray-600">
+                    {{ $label }}
+                </label>
             </div>
         @endif
         <div class="relative w-full" x-data="{
@@ -87,8 +89,9 @@
             }
         }">
             <div @click="if (!{{ $disabled ? 'true' : 'false' }}) { open = !open }"
-                class="flex w-full items-center justify-between cursor-pointer border-b px-4 py-2 {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
-                <span class="{{ $badgeClass }}" style="font-size: inherit;"
+                class="flex w-full gap-2 items-center justify-between cursor-pointer input input-bordered {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
+                <iconify-icon icon="tabler:selector" class="text-gray-400 scale-125"></iconify-icon>
+                <span class="flex-1 text-gray-700 {{ $badgeClass }}" style="font-size: inherit;"
                     x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-2" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">

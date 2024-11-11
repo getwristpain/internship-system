@@ -23,11 +23,13 @@ class FileHelper
      * @param \Illuminate\Http\UploadedFile $file
      * @return string
      */
-    public static function storeAsWebp($file): string
+    public static function storeAsWebp($file, string $path = ''): string
     {
+        $path = rtrim($path, '/') . '/';
+
         // Generate a new filename with .webp extension
         $fileName = self::generateFileName('webp');
-        $filePath = 'uploads/attachments/' . $fileName;
+        $filePath = 'uploads/images/' . $path . $fileName;
 
         // Convert to webp format and compress the image
         $image = Image::make($file)->encode('webp', 60);

@@ -43,7 +43,7 @@ new class extends Component {
             return;
         }
 
-        $filepath = FileHelper::storeAsWebp($this->photo);
+        $filepath = FileHelper::storeAsWebp($this->photo, 'avatars/');
         $this->avatar = Storage::url($filepath);
 
         $profile = Profile::where('user_id', auth()->id())->first();
@@ -63,8 +63,8 @@ new class extends Component {
 };
 ?>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-    <div class="md:col-span-2 mb-4 flex flex-col md:flex-row gap-2 md:gap-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 items-start">
+    <div class="md:col-span-2 mb-4 flex flex-col md:flex-row gap-2 md:gap-10 md:items-center">
         <div class="avatar self-center">
             <div class="w-24 rounded-full">
                 @if ($photo)
@@ -76,7 +76,7 @@ new class extends Component {
         </div>
         <div class="flex flex-col gap-2">
             <div class="">
-                <x-input-file name="photo" label="Foto profile" model="photo" placeholder="Pilih file" />
+                <x-input-file name="photo" model="photo" placeholder="Ubah Foto Profil" />
             </div>
 
             @if ($photo)
@@ -109,19 +109,14 @@ new class extends Component {
     <x-input-form name="school_year" type="number" min="1900" model="form.userProfile.school_year"
         label="Tahun sekolah" custom="time" />
 
-    <div>
-        <label for="gender" class="text-sm font-medium text-gray-600">
-            Jenis Kelamin
-        </label>
-        <x-input-select name="gender" :options="[
+    <x-input-select name="gender" label="Jenis Kelamin" :options="[
             ['value' => 'male', 'text' => 'Laki-laki'],
             ['value' => 'female', 'text' => 'Perempuan'],
             ['value' => 'other', 'text' => 'Lainnya'],
         ]" model="form.userProfile.gender"
             placeholder="Pilih jenis kelamin..." />
-    </div>
 
-    @if (auth()->user()->hasRole('student'))
+    @role('student')
         <div class="divider divider-start md:col-span-2 mb-0">Data Orang Tua</div>
 
         <x-input-form name="parent_name" model="form.profile.parent_name" type="text" label="Nama orang tua"
@@ -130,9 +125,9 @@ new class extends Component {
         <x-input-form name="parent_address" type="text" model="form.userProfile.parent_address" label="Alamat"
             placeholder="Masukkan alamat..." custom="address" />
 
-        <x-input-form name="parent_phone" type="tel" model="form.userProfile.parent_phone" label="Telepon (HP/WA)"
+            <x-input-form name="parent_phone" type="tel" model="form.userProfile.parent_phone" label="Telepon (HP/WA)"
             placeholder="Contoh: 08xxxxxxxxxx" custom="phone" />
-    @endif
+    @endrole
 
     <div class="md:col-span-2 flex justify-end">
         <button type="submit" class="btn btn-neutral" wire:click="saveUser" wire:target="saveUser"
