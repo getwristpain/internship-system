@@ -1,13 +1,9 @@
 @props([
     'program' => [],
-    'color' => '',
+    'cardClass' => '',
 ])
 
-@php
-    $cardClass = $color ? 'bg-' . $color . '-100' : '';
-@endphp
-
-<x-card class="{{ $cardClass }}">
+<x-card class="h-full min-h-40 {{ $cardClass }}">
     <x-slot name="content">
         <div class="flex flex-col gap-4">
             <div class="flex-1 min-h-40 flex flex-col gap-2 justify-between">
@@ -19,7 +15,7 @@
                             <span class="badge badge-xs badge-outline">{{ $program['year'] }}</span>
                         @endif
                     </div>
-                    <span class="text-lg font-medium text-gray-700">{{ $program['tittle'] ?? 'Tidak Ada Judul' }}</span>
+                    <span class="text-lg font-medium text-gray-700">{{ $program['title'] ?? 'Tidak Ada Judul' }}</span>
                 </div>
 
                 <div class="flex flex-col text-xs text-gray-600 font-medium gap-1">

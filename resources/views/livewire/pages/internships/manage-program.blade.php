@@ -8,6 +8,5 @@ new #[Layout('layouts.app')] class extends Component {
 }; ?>
 
 <div>
-    // Program
     @livewire('components.internships.program-list')
 </div>

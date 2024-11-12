@@ -98,7 +98,7 @@ new class extends Component {
 
 <nav class="flex flex-col gap-2">
     @foreach ($filteredMenuItems as $item)
-        <div>
+        <div class="flex flex-col gap-1">
             @if (!empty($item['submenus']) || isset($item['route']))
                 <!-- Main menu items -->
                 <a type="button" title="{{ $item['label'] ?? '' }}" wire:click="navigate('{{ $item['slug'] }}')"
