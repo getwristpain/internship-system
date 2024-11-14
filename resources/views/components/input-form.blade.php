@@ -16,6 +16,7 @@
     'pattern' => null,
     'unit' => '',
     'height' => '',
+    'width' => 'full',
 ])
 
 @php
@@ -25,9 +26,11 @@
     $iconClass =
         'absolute text-lg text-gray-400 left-3 ' .
         ($type === 'textarea' ? 'top-4' : 'top-1/2 transform -translate-y-1/2');
+
+    $inputWidth = 'w-' . $width ?? 'w-full';
 @endphp
 
-<div class="{{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }} flex flex-col gap-2 w-full" :key="$name">
+<div class="flex flex-col gap-2 w-full {{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }}">
     <div>
         <!-- Label -->
         @if ($label)
@@ -37,7 +40,7 @@
         @endif
     </div>
 
-    <div class="relative flex flex-grow gap-2 w-full items-center">
+    <div class="relative flex gap-2 items-center">
         <!-- Icon Switch -->
         @switch($custom)
             @case('email')
@@ -95,7 +98,7 @@
                 {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
                 @if (isset($max)) maxlength="{{ $max }}" @endif
                 @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                class="input input-bordered grow py-3 pl-10 pr-3 min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
+                class="input input-bordered py-3 pl-10 pr-3 min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed {{ $inputWidth }}"
                 aria-describedby="{{ $name }}-error" :key="$name" x-show="true"></textarea>
         @elseif ($type === 'date')
             <input id="{{ $name }}" type="{{ $type }}" wire:model.live="{{ $model }}"
@@ -104,9 +107,9 @@
                 {{ $required ? 'required' : '' }} @if (isset($max)) max="{{ $max }}" @endif
                 @if (isset($min)) min="{{ $min }}" @endif
                 @if (isset($step)) step="{{ $step }}" @endif
-                @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                class="input input-bordered grow pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
-                aria-describedby="{{ $name }}-error" :key="$name">
+                @if (isset($pattern)) pattern="{{ $pattern }}" @endif
+                class="input input-bordered pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed {{ $inputWidth }}"
+                x-ref="input" aria-describedby="{{ $name }}-error" :key="$name">
         @else
             <input id="{{ $name }}" type="{{ $type }}"
                 wire:model.live.debounce.250ms="{{ $model }}" placeholder="{{ $placeholder }}"
@@ -116,7 +119,7 @@
                 @if (isset($min)) min="{{ $min }}" @endif
                 @if (isset($step)) step="{{ $step }}" @endif
                 @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                class="input input-bordered grow pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
+                class="input input-bordered pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed {{ $inputWidth }}"
                 aria-describedby="{{ $name }}-error" :key="$name">
         @endif
 

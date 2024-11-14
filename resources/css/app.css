@@ -8,6 +8,10 @@ body {
     @apply font-sans antialiased screen-full;
 }
 
+.required::after {
+    @apply content-['*'] relative -top-1 text-red-500 text-xs;
+}
+
 .font-heading {
     @apply text-gray-600;
 }

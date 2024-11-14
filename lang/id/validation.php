@@ -1,6 +1,35 @@
 <?php
 
+$attributes = [
+    'name' => 'nama',
+    'email' => 'email',
+    'password' => 'kata sandi',
+    'identifier_number' => 'nomor identitas',
+    'avatar' => 'foto profil',
+    'position' => 'jabatan',
+    'group' => 'kelas',
+    'school_year' => 'tahun ajaran',
+    'address' => 'alamat',
+    'phone' => 'telepon',
+    'gender' => 'jenis kelamin',
+    'parent_name' => 'nama orang tua',
+    'parent_address' => 'alamat orang tua',
+    'parent_phone' => 'telepon orang tua',
+    'internshipReportFile' => 'berkas laporan PKL',
+    'program' => [
+        'title' => 'judul program',
+        'year' => 'tahun periode',
+        'date_start' => 'tanggal mulai',
+        'date_finish' => 'tanggal selesai',
+    ],
+];
+
 return [
+
+    'attributes' => array_merge($attributes, [
+        'form' => $attributes,
+        'user' => $attributes,
+    ]),
 
     /*
     |--------------------------------------------------------------------------
@@ -159,8 +188,4 @@ return [
     'url' => 'Kolom :attribute harus berupa URL yang valid.',
     'ulid' => 'Kolom :attribute harus berupa ULID yang valid.',
     'uuid' => 'Kolom :attribute harus berupa UUID yang valid.',
-
-    'attributes' => [
-        'internshipReportFile' => 'berkas laporan PKL',
-    ],
 ];

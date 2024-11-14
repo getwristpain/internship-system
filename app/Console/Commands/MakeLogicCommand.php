@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-class MakeClassCommand extends Command
+class MakeLogicCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:make-class {name} {--path=}';
+    protected $signature = 'make:logic {name} {--path=}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new class in the specified path with automatic namespace generation';
+    protected $description = 'Create a new feature logic class in the specified path in /app directory';
 
     /**
      * Execute the console command.
