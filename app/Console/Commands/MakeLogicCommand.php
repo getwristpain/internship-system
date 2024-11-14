@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -12,14 +13,14 @@ class MakeLogicCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:logic {name} {--path=}';
+    protected $signature = 'make:logic {name : The folder/class name in format Folder/ClassName}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new feature logic class in the specified path in /app directory';
+    protected $description = 'Create a new logic class with a dynamic namespace inside app directory';
 
     /**
      * Execute the console command.
@@ -27,21 +28,25 @@ class MakeLogicCommand extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $pathOption = $this->option('path');
 
-        // Define default path if no path option is provided
-        $path = $pathOption ? base_path($pathOption) : app_path();
+        // Split the name argument into folder and class parts
+        $nameParts = explode('/', $name);
+        $className = array_pop($nameParts); // Get the last part as class name
+        $subPath = implode('/', $nameParts); // Remaining parts form the path
 
-        // Ensure the directory exists
-        if (!File::exists($path)) {
-            File::makeDirectory($path, 0755, true);
+        // Define the full path under app/
+        $fullPath = app_path($subPath);
+
+        // Create the directory if it doesn't exist
+        if (!File::exists($fullPath)) {
+            File::makeDirectory($fullPath, 0755, true);
         }
 
-        // Build the namespace based on the path (inside 'app')
-        $namespace = $this->buildNamespace($path);
+        // Generate the namespace
+        $namespace = $this->buildNamespace($subPath);
 
-        // Build the full class path
-        $filePath = $path . '/' . $name . '.php';
+        // Build the file path
+        $filePath = $fullPath . '/' . $className . '.php';
 
         // Class template
         $classTemplate = <<<CLASS
@@ -49,7 +54,7 @@ class MakeLogicCommand extends Command
 
 namespace $namespace;
 
-class $name
+class $className
 {
     //
 }
@@ -68,19 +73,15 @@ CLASS;
     }
 
     /**
-     * Build the namespace based on the path inside 'app/' folder.
+     * Build the namespace based on the sub-path inside 'app/' folder.
      *
-     * @param string \$path
+     * @param string \$subPath
      * @return string
      */
-    protected function buildNamespace($path)
+    protected function buildNamespace($subPath)
     {
-        // Remove the base app path and normalize slashes
-        $relativePath = str_replace(base_path() . '/', '', $path);
-        $relativePath = str_replace('/', '\\', $relativePath);
-
-        // Build namespace from the relative path
-        $namespace = 'App' . ($relativePath ? '\\' . trim($relativePath, '\\') : '');
+        // Normalize slashes and build the namespace
+        $namespace = 'App' . ($subPath ? '\\' . str_replace('/', '\\', trim($subPath, '/')) : '');
 
         return $namespace;
     }
