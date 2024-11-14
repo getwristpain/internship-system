@@ -31,7 +31,7 @@ class MakeLogicCommand extends Command
 
         // Split the name argument into folder and class parts
         $nameParts = explode('/', $name);
-        $className = array_pop($nameParts); // Get the last part as class name
+        $className = Str::studly(array_pop($nameParts)); // Get the last part as class name
         $subPath = implode('/', $nameParts); // Remaining parts form the path
 
         // Define the full path under app/

@@ -75,7 +75,8 @@ new class extends Component {
                 <tr>
                     <th class="required">Masa Program</th>
                     <td>
-                        <x-input-range required type="date" min="2000-01-01"></x-input-range>
+                        <x-input-range required type="date" min="2000-01-01" labelMin="Tanggal Mulai"
+                            labelMax="Tanggal Selesai"></x-input-range>
                     </td>
                 </tr>
             </table>

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\app;
+namespace App\Helpers;
 
-class Helpers/StatusMapper
+class StatusMapper
 {
     //
 }
