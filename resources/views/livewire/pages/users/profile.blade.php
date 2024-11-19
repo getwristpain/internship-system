@@ -12,8 +12,8 @@ new #[Layout('layouts.app')] class extends Component {
     }
 }; ?>
 
-<div class="w-full h-full gap-2">
-    <x-card class="h-full">
+<div class="w-full h-full gap-4">
+    <x-card class="">
         <x-slot name="heading">
             User Profile
         </x-slot>
@@ -21,6 +21,17 @@ new #[Layout('layouts.app')] class extends Component {
         <x-slot name="content">
 
             @livewire('components.profiles.update-profile-information-form', ['userId' => $userId])
+        </x-slot>
+    </x-card>
+
+    <x-card class="my-4">
+        <x-slot name="heading">
+            Password
+        </x-slot>
+
+        <x-slot name="content">
+
+            @livewire('components.profiles.update-password-form')
         </x-slot>
     </x-card>
 </div>

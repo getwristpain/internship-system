@@ -4,7 +4,7 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\User;
-use App\Utils\AccessKeyGen;
+use App\Helpers\AccessKeyGen;
 use Illuminate\Support\Facades\Auth;
 
 class LoginForm extends Form
