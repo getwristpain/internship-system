@@ -1,8 +1,8 @@
 @props(['label' => '', 'className' => ''])
 
-<div {{ $attributes->merge(['class' => 'flex gap-1 items-center text-xs']) }}>
+<div {{ $attributes->merge(['class' => 'flex gap-1 items-center text-xs font-medium']) }}>
     <iconify-icon class="animate-pulse {{ $className }}" icon="vaadin:dot-circle"></iconify-icon>
     @if ($label)
-        <span>{{ $label }}</span>
+        <span class="{{ $className }}">{{ $label }}</span>
     @endif
 </div>

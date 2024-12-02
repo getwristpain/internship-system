@@ -50,6 +50,13 @@
                 "route": "internship-program",
                 "icon": "uis:schedule",
                 "roles": ["admin", "staff"]
+            },
+            {
+                "slug": "internship-manager",
+                "label": "Magang",
+                "route": "internship-manager",
+                "icon": "uis:schedule",
+                "roles": ["admin", "staff"]
             }
         ]
     },

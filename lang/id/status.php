@@ -15,4 +15,13 @@ return [
         'holiday' => 'Libur',
         'vacation' => 'Cuti',
     ],
+
+    'event' => [
+        'pending' => 'Menunggu',
+        'not-started' => 'Belum dimulai',
+        'running' => 'Sedang berjalan',
+        'stopped' => 'Berhenti',
+        'finished' => 'Selesai',
+        'archived' => 'Diarsipkan',
+    ]
 ];

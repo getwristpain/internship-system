@@ -1,6 +1,16 @@
-@props(['disabled' => false])
+@props([
+    'label' => '',
+    'icon' => '',
+    'disabled' => false,
+    'className' => 'btn-outline',
+    'action' => '',
+])
 
-<button {{ !$disabled ?: 'disabled' }}
-    {{ $attributes->merge(['class' => 'inline-flex gap-2 px-4 py-2 font-medium bg-black text-white border border-black rounded-xl justify-center items-center transition ease-in-out duration-150 hover:ring hover:ring-black focus:ring focus:ring-black disabled:opacity-20 disabled:cursor-not-allowed disabled:hover:ring-0']) }}>
-    {{ $slot }}
+<button wire:click="{{ $action }}" class="btn justify-between {{ $className }}" {{ !$disabled ?: 'disabled' }}>
+    @if ($label)
+        <span>{{ $label }}</span>
+    @endif
+    @if ($icon)
+        <iconify-icon icon="{{ $icon }}" class="scale-125"></iconify-icon>
+    @endif
 </button>

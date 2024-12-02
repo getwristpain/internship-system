@@ -1,26 +1,24 @@
 @props([
     'type' => 'number',
     'name' => 'input_range',
-    'modelMin' => '',
-    'modelMax' => '',
-    'labelMin' => '',
-    'labelMax' => '',
+    'minModel' => '',
+    'maxModel' => '',
+    'minLabel' => '',
+    'maxLabel' => '',
     'custom' => '',
     'required' => false,
     'min' => '',
     'max' => '',
-    'width' => 'full',
+    'width' => 'w-full',
 ])
 
-<div class="flex flex-col sm:flex-row gap-1 sm:gap-4 sm:items-center">
-    <div class="{{ $labelMax && !$labelMin ? 'mt-5' : '' }} w-full">
-        <x-input-form model="{{ $modelMin }}" name="{{ $name . '_min' }}" label="{{ $labelMin }}" :$required :$type
+<div class="flex flex-col gap-1 sm:flex-row sm:gap-4">
+    <div class="{{ $maxLabel && !$minLabel ? 'mt-5' : '' }} w-full">
+        <x-input-form model="{{ $minModel }}" name="{{ $name . '_min' }}" label="{{ $minLabel }}" :$required :$type
             :$width :$min :$max></x-input-form>
     </div>
-    <span
-        class="hidden sm:inline-block before:content-[''] w-4 border-b-2 border-gray-600 {{ $labelMin ?? $labelMax ? 'mt-5' : '' }}"></span>
-    <div class="{{ $labelMin && !$labelMax ? 'mt-5' : '' }} w-full">
-        <x-input-form model="{{ $modelMax }}" name="{{ $name . '_max' }}" label="{{ $labelMax }}" :$required :$type
+    <div class="{{ $minLabel && !$maxLabel ? 'mt-5' : '' }} w-full">
+        <x-input-form model="{{ $maxModel }}" name="{{ $name . '_max' }}" label="{{ $maxLabel }}" :$required :$type
             :$width :$min :$max></x-input-form>
     </div>
 </div>

@@ -1,21 +1,57 @@
 <?php
 
+use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
+use App\Helpers\StatusMapper;
+use App\Services\ProgramService;
 
 new class extends Component {
-    public array $programsData = [['title' => 'Program PKL 2024', 'year' => '2024'], ['title' => 'Program PKL 2024', 'year' => '2023']];
-
-    public function openProgram(?int $programId = null)
-    {
-        if (!$programId) {
-            flash()->info('Program tidak ditemukan');
-            return;
-        }
-    }
+    public array $programs = [];
 
     public function mount()
     {
+        $this->loadProgramsData();
         $this->randomizeCardStyle();
+    }
+
+    #[On('program-updated')]
+    public function refreshPrograms()
+    {
+        $this->programs = [];
+
+        $this->loadProgramsData();
+        $this->randomizeCardStyle();
+    }
+
+    private function loadProgramsData()
+    {
+        $programs = ProgramService::getPrograms();
+
+        if ($programs->isEmpty()) {
+            $this->programs = [];
+            return;
+        }
+
+        // Transformasi data program
+        $this->programs = $programs
+            ->map(function ($program) {
+                return [
+                    'id' => $program['id'],
+                    'key' => 'program-' . $program['id'] . '-' . now()->timestamp,
+                    'title' => $program['title'],
+                    'year' => $program['year'],
+                    'date_start' => Carbon::parse($program['date_start'])->translatedFormat('l, d M Y'),
+                    'date_finish' => Carbon::parse($program['date_finish'])->translatedFormat('l, d M Y'),
+                    // TODO: Buat event scheduling untuk mengubah status program secara realtime.
+                    'status' => __('status.event.' . Str::slug($program['status']['name'])),
+                    'statusClass' => StatusMapper::getStatusClass($program['status']['name']),
+                    // TODO: Tambahkan total siswa terdaftar secara realtime.
+                    'total_students' => 0,
+                ];
+            })
+            ->toArray();
     }
 
     private function randomizeCardStyle()
@@ -24,7 +60,7 @@ new class extends Component {
 
         $lastColor = null; // Warna kartu terakhir yang dipakai
 
-        foreach ($this->programsData as &$program) {
+        foreach ($this->programs as &$program) {
             // Filter warna yang bukan warna terakhir
             $availableColors = array_filter($rainbowBGColors, fn($color) => $color !== $lastColor);
 
@@ -35,26 +71,19 @@ new class extends Component {
             $lastColor = $program['cardClass'];
         }
     }
-
-    public function with()
-    {
-        return [
-            'programs' => $this->programsData,
-        ];
-    }
 }; ?>
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
     {{-- Tambah program baru --}}
-    <x-card class="h-full min-h-40 bg-white">
-        <button @click="$dispatch('open-add-internship-program-modal')"
-            class="rounded-xl h-full w-full p-4 flex flex-col gap-2 items-center justify-center text-gray-400 bg-gray-50 transition duration-150 ease-in-out hover:bg-gray-200">
+    <x-card class="h-full bg-white min-h-40">
+        <button @click="$dispatch('open-program-form-modal')"
+            class="flex flex-col items-center justify-center w-full h-full gap-2 p-4 text-gray-400 transition duration-150 ease-in-out rounded-xl bg-gray-50 hover:bg-gray-200">
             <iconify-icon class="text-4xl" icon="icons8:plus"></iconify-icon>
             <span>Tambah Program</span>
         </button>
     </x-card>
 
     @foreach ($programs as $program)
-        <x-program-item :$program></x-program-item>
+        @livewire('components.internships.program-item', ['program' => $program], key($program['key']))
     @endforeach
 </div>

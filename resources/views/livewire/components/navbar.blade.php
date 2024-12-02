@@ -4,15 +4,34 @@ use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use App\Services\NotifyService;
 use App\Livewire\Actions\Logout;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 new class extends Component {
-    public bool $open = true;
+    public bool $openSidebar = true;
     public bool $hasUnread = false;
 
-    public function toggleSidebar()
+    public function mount()
     {
-        $this->open = !$this->open;
-        $this->dispatch('toggleSidebar', $this->open);
+        $this->loadSessionData();
+    }
+
+    private function loadSessionData(): void
+    {
+        // Ambil data session dengan nilai default $this->openSidebar
+        $this->openSidebar = Session::get('toggle-sidebar', $this->openSidebar);
+    }
+
+    public function toggleSidebar(): void
+    {
+        // Toggle sidebar
+        $this->openSidebar = !$this->openSidebar;
+
+        // Emit event untuk front-end (jika diperlukan)
+        $this->dispatch('toggleSidebar', $this->openSidebar);
+
+        // Simpan perubahan ke session
+        Session::put('toggle-sidebar', $this->openSidebar);
     }
 
     public function logout(Logout $logout): void
@@ -28,7 +47,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="w-full flex gap-4 justify-between items-center bg-white p-4">
+<div class="flex items-center justify-between w-full gap-4 p-4 bg-white">
     {{-- Hamburger --}}
     <div>
         <button class="text-gray-800 cursor-pointer" wire:click="toggleSidebar" wire:navigate>
@@ -40,7 +59,7 @@ new class extends Component {
     </div>
 
     {{-- Right Side --}}
-    <div class="flex gap-2 items-center">
+    <div class="flex items-center gap-2">
         {{-- Notifications --}}
         <x-notification-bell :$hasUnread />
 

@@ -21,7 +21,14 @@ new class extends Component {
 
     public function mount()
     {
+        $this->loadSessionData();
         $this->loadSchool();
+    }
+
+    private function loadSessionData(): void
+    {
+        // Ambil data session dengan nilai default $this->open
+        $this->open = Session::get('toggle-sidebar', $this->open);
     }
 
     #[On('toggleSidebar')]
@@ -38,7 +45,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="sticky top-0 left-0 h-screen bg-white border-r z-10">
+<div class="sticky top-0 left-0 z-10 h-screen bg-white border-r">
     <div class="flex flex-col justify-between gap-4 h-full px-2 py-4 max-w-sm {{ $open ? 'w-full' : 'w-fit' }}">
         <div class="space-y-12">
             <div class="flex items-center justify-center w-full h-8 px-2 space-x-2">

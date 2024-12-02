@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             NotifyStatusSeeder::class,
             AttendanceStatusSeeder::class,
             AcceptanceStatusSeeder::class,
+            EventStatusSeeder::class,
             RoleSeeder::class,
             MenuSeeder::class,
             SchoolSeeder::class,

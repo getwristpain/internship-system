@@ -15,7 +15,14 @@ new class extends Component {
     public function mount(): void
     {
         $this->loadMenu();
+        $this->loadSessionData();
         $this->activeMenu = Route::currentRouteName();
+    }
+
+    private function loadSessionData(): void
+    {
+        // Ambil data session dengan nilai default $this->isSidebarOpen
+        $this->isSidebarOpen = Session::get('toggle-sidebar', $this->isSidebarOpen);
     }
 
     #[On('toggleSidebar')]

@@ -16,7 +16,7 @@
     'pattern' => null,
     'unit' => '',
     'height' => '',
-    'width' => 'full',
+    'width' => 'w-full',
 ])
 
 @php
@@ -26,8 +26,6 @@
     $iconClass =
         'absolute text-lg text-gray-400 left-3 ' .
         ($type === 'textarea' ? 'top-4' : 'top-1/2 transform -translate-y-1/2');
-
-    $inputWidth = 'w-' . (string) $width;
 @endphp
 
 <div class="flex flex-col gap-2 {{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }}">
@@ -40,8 +38,8 @@
         @endif
     </div>
 
-    <div class="flex gap-2 items-center">
-        <div class="relative {{ $inputWidth }}">
+    <div class="flex items-center gap-2">
+        <div class="relative {{ $width }}">
             <!-- Icon Switch -->
             @switch($custom)
                 @case('email')
@@ -94,15 +92,17 @@
 
             <!-- Input Field -->
             @if ($type === 'textarea')
-                <textarea id="{{ $name }}" wire:model.live.debounce.250ms="{{ $model }}"
+                <textarea id="{{ $name }}"
+                    @if ($model) wire:model.live.debounce.250ms="{{ $model }}" @endif
                     placeholder="{{ $placeholder }}" autocomplete="{{ $name }}" {{ $disabled ? 'disabled' : '' }}
                     {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
                     @if (isset($max)) maxlength="{{ $max }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                    class="input input-bordered py-3 pl-10 pr-3 min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed w-full"
+                    class="w-full py-3 pl-10 pr-3 input input-bordered min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
                     aria-describedby="{{ $name }}-error" :key="$name" x-show="true"></textarea>
             @elseif ($type === 'date')
-                <input id="{{ $name }}" type="{{ $type }}" wire:model.live="{{ $model }}"
+                <input id="{{ $name }}" type="{{ $type }}"
+                    @if ($model) wire:model.live="{{ $model }}" @endif
                     placeholder="{{ $placeholder }}" autocomplete="{{ $name }}"
                     {{ $disabled ? 'disabled' : '' }} {{ $autofocus ? 'autofocus' : '' }}
                     {{ $required ? 'required' : '' }}
@@ -110,24 +110,25 @@
                     @if (isset($min)) min="{{ $min }}" @endif
                     @if (isset($step)) step="{{ $step }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif
-                    class="input input-bordered pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed w-full"
+                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
                     x-ref="input" aria-describedby="{{ $name }}-error" :key="$name">
             @else
-                <input id="{{ $name }}" type="{{ $type }}"
-                    wire:model.live.debounce.250ms="{{ $model }}" placeholder="{{ $placeholder }}"
-                    autocomplete="{{ $name }}" {{ $disabled ? 'disabled' : '' }}
-                    {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
+                <input id="{{ $name }}"
+                    @if ($model) wire:model.live.debounce.250ms="{{ $model }}" @endif
+                    type="{{ $type }}" placeholder="{{ $placeholder }}" autocomplete="{{ $name }}"
+                    {{ $disabled ? 'disabled' : '' }} {{ $autofocus ? 'autofocus' : '' }}
+                    {{ $required ? 'required' : '' }}
                     @if (isset($max)) max="{{ $max }}" @endif
                     @if (isset($min)) min="{{ $min }}" @endif
                     @if (isset($step)) step="{{ $step }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                    class="input input-bordered pl-10 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed w-full"
+                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
                     aria-describedby="{{ $name }}-error" :key="$name">
             @endif
         </div>
 
         @if ($unit)
-            <span class="font-medium text-sm text-gray-500">{{ $unit }}</span>
+            <span class="text-sm font-medium text-gray-500">{{ $unit }}</span>
         @endif
     </div>
 

@@ -13,12 +13,19 @@ new class extends Component {
     {
         $this->item = $item;
         $this->isActive($this->item);
+        $this->loadSessionData();
     }
 
     private function isActive(array $item)
     {
         $routeName = request()->route()->getName();
         $this->active = $routeName === $item['route'];
+    }
+
+    private function loadSessionData(): void
+    {
+        // Ambil data session dengan nilai default $this->open
+        $this->open = Session::get('toggle-sidebar', $this->open);
     }
 
     #[On('toggleSidebar')]
