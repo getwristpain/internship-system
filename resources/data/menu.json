@@ -45,16 +45,16 @@
         "roles": ["admin", "staff"],
         "submenu": [
             {
-                "slug": "internship-program",
-                "label": "Manajemen",
-                "route": "internship-program",
-                "icon": "uis:schedule",
+                "slug": "internship-overview",
+                "label": "Overview",
+                "route": "internship-overview",
+                "icon": "fluent:people-toolbox-20-filled",
                 "roles": ["admin", "staff"]
             },
             {
-                "slug": "internship-manager",
-                "label": "Magang",
-                "route": "internship-manager",
+                "slug": "internship-program",
+                "label": "Arsip",
+                "route": "internship-program",
                 "icon": "uis:schedule",
                 "roles": ["admin", "staff"]
             }

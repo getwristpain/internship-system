@@ -49,6 +49,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin|staff'])->group(function () {
     // Internship Management
     Route::prefix('/internships')->group(function () {
+        Volt::route('/overview', 'pages.internships.internship-overview')->name('internship-overview');
         Volt::route('/programs', 'pages.internships.manage-program')->name('internship-program');
     });
 

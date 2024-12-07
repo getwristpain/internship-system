@@ -27,7 +27,7 @@ new class extends Component {
 
     private function loadProgramsData()
     {
-        $programs = ProgramService::getPrograms();
+        $programs = ProgramService::getAllPrograms();
 
         if ($programs->isEmpty()) {
             $this->programs = [];

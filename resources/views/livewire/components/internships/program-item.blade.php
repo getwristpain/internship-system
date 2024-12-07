@@ -32,14 +32,14 @@ new class extends Component {
             // Simpan id program ke last viewed program melalui Session.
             Session::put('last-viewed-program', $programId);
 
-            // Cek apakah aplikasi memiliki rute 'internship-manager'
-            if (!Route::has('internship-manager')) {
+            // Cek apakah aplikasi memiliki rute 'internship-overview'
+            if (!Route::has('internship-overview')) {
                 flash()->info('Halaman tidak tersedia.');
                 return;
             }
 
             // Tautkan ke halaman kelola magang.
-            $this->redirect(route('internship-manager', ['programId' => $programId]), navigate: true);
+            $this->redirect(route('internship-overview'), navigate: true);
             return;
         }
 
