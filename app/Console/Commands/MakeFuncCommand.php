@@ -6,21 +6,21 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-class MakeLogicCommand extends Command
+class MakeFuncCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:logic {name : The folder/class name in format Folder/ClassName}';
+    protected $signature = 'make:func {name : The folder/class name in format Folder/ClassName}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new logic class with a dynamic namespace inside app directory';
+    protected $description = 'Create a new utility class with a dynamic namespace inside app directory';
 
     /**
      * Execute the console command.

@@ -6,7 +6,7 @@ export default {
         "./resources/views/**/*.blade.php",
     ],
     daisyui: {
-        themes: ["light"],
+        themes: ["bumblebee"],
     },
     theme: {
         extend: {
@@ -19,7 +19,7 @@ export default {
                 "dashed-10": "10px dashed",
             },
             fontFamily: {
-                sans: ["Inter", ...defaultTheme.fontFamily.sans],
+                sans: ["Wix Madefor Text", ...defaultTheme.fontFamily.sans],
                 heading: ["Paytone One", ...defaultTheme.fontFamily.sans],
             },
             keyframes: {

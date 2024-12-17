@@ -23,9 +23,9 @@ class ProgramService
     public static function getLatestProgram(?int $programId = null)
     {
         if (!$programId) {
-            return Program::where('year', Carbon::now()->format('Y'))->orderBy('updated_at', 'desc')->first() ?? null;
+            return Program::with(['status'])->where('year', Carbon::now()->format('Y'))->orderBy('updated_at', 'desc')->first() ?? null;
         }
 
-        return Program::find($programId) ?? null;
+        return Program::with(['status'])->find($programId) ?? null;
     }
 }

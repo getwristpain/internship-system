@@ -49,17 +49,17 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin|staff'])->group(function () {
     // Internship Management
     Route::prefix('/internships')->group(function () {
-        Volt::route('/overview', 'pages.internships.internship-overview')->name('internship-overview');
-        Volt::route('/programs', 'pages.internships.manage-program')->name('internship-program');
+        Volt::route('/overview', 'pages.internships.overview')->name('internship-overview');
+        Volt::route('/programs', 'pages.internships.programs')->name('internship-programs');
     });
 
     // User Management
     Route::prefix('/users')->group(function () {
-        Volt::route('/overview', 'pages.user-managements.users-overview')->name('users-overview');
-        Volt::route('/all', 'pages.user-managements.manage-users')->name('user-manager');
-        Volt::route('/supervisors', 'pages.user-managements.manage-supervisors')->name('supervisor-manager');
-        Volt::route('/students', 'pages.user-managements.manage-students')->name('student-manager');
-        Volt::route('/teachers', 'pages.user-managements.manage-teachers')->name('teacher-manager');
+        Volt::route('/overview', 'pages.user-managements.overview')->name('users-overview');
+        Volt::route('/all', 'pages.user-managements.users')->name('user-manager');
+        Volt::route('/supervisors', 'pages.user-managements.supervisors')->name('supervisor-manager');
+        Volt::route('/students', 'pages.user-managements.students')->name('student-manager');
+        Volt::route('/teachers', 'pages.user-managements.teachers')->name('teacher-manager');
     });
 });
 

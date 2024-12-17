@@ -117,7 +117,7 @@ new class extends Component {
                     <!-- Label that appears on hover -->
                     <span
                         class="items-center gap-2 {{ $isSidebarOpen ? 'flex' : 'hidden group-hover:flex absolute left-full pl-2 pr-4 py-2 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $this->isActive($item['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
-                        {{ $item['label'] ?? '' }}
+                        <span class="text-nowrap">{{ $item['label'] ?? '' }}</span>
 
                         <!-- Dropdown icon -->
                         @if (!empty($item['submenus']))
@@ -144,7 +144,7 @@ new class extends Component {
                                     <!-- Label that appears on hover -->
                                     <span
                                         class="{{ $isSidebarOpen ? 'block' : 'hidden group-hover:block absolute left-full p-2 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $this->isActive($submenu['route'] ?? '') ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
-                                        {{ $submenu['label'] ?? '' }}
+                                        <span class="text-nowrap">{{ $submenu['label'] ?? '' }}</span>
                                     </span>
                                 </a>
                             </div>

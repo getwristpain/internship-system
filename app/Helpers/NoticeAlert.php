@@ -2,23 +2,27 @@
 
 namespace App\Helpers;
 
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Route;
 
-class UserAlert
+class NoticeAlert
 {
-    protected $user;
-    protected string $userRole;
-    protected array $userProfile;
+    protected ?User $user = null;
+    protected string $userRole = '';
+    protected string $userStatus = '';
+    protected array $userProfile = [];
     protected array $alerts = [];
 
     /**
      * Constructor to initialize user role, profile, and user instance.
      */
-    public function __construct($user, string $userRole, array $userProfile)
+    public function __construct(?User $user = null)
     {
         $this->user = $user;
-        $this->userRole = $userRole;
-        $this->userProfile = $userProfile;
+        $this->userProfile = $user->profile ? $user->profile->toArray() : [];
+        $this->userRole = $user->roles->first()->name ?? 'guest';
+        $this->userStatus = $user->status->slug ?? 'user-status-pending';
 
         // Check for alerts upon initialization
         $this->checkForAlerts();
@@ -42,7 +46,7 @@ class UserAlert
         if (in_array($this->userRole, ['student', 'teacher'])) {
             foreach ($baseRequiredFields as $field) {
                 if (empty($this->userProfile[$field] ?? null)) {
-                    $this->addAlert('info', 'Profil Anda belum lengkap. Silakan perbarui informasi profil Anda.', 'profil', 'Periksa Profil');
+                    $this->addAlert('info', 'Profil Anda belum lengkap. Silakan perbarui informasi profil Anda.', 'Periksa Profil', 'profile');
                     return;
                 }
             }
@@ -52,13 +56,14 @@ class UserAlert
     /**
      * Helper method to add an alert message.
      */
-    protected function addAlert(string $type, string $message, string $route = '', string $label = ''): void
+    protected function addAlert(string $type = 'info', string $message = '', string $label = '', string $action = ''): void
     {
+
         $this->alerts[] = [
             'type' => $type,
             'message' => $message,
-            'route' => Route::has($route) ? $route : '',
             'label' => $label,
+            'action' => Route::has($action) ? route($action) : '',
         ];
     }
 

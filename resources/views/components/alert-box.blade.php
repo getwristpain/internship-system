@@ -1,4 +1,4 @@
-@props(['type' => 'info', 'message' => '', 'route' => '', 'label' => ''])
+@props(['type' => 'info', 'message' => '', 'action' => '', 'label' => ''])
 
 @php
     // Define alert classes based on type
@@ -36,8 +36,9 @@
         @endif
         <div class="flex flex-wrap items-center w-full gap-2">
             <p>{{ $message }}</p>
-            @if ($route && $label)
-                <a href="{{ route($route) }}" class="btn btn-sm btn-ghost btn-outline">{{ $label ?? '' }}</a>
+            @if ($action && $label)
+                <a href="{{ $action }}"
+                    class="btn btn-sm {{ 'btn-' . $type }} btn-outline">{{ $label ?? '' }}</a>
             @endif
         </div>
         <div>

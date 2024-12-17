@@ -89,10 +89,9 @@ new class extends Component {
                 </div>
             </div>
             <div class="flex w-full gap-4">
-                <x-button-primary action="openProgramFormModal({{ $program['id'] ?? null }})"
-                    icon="tabler:edit"></x-button-primary>
-                <x-button-primary action="openProgram({{ $program['id'] ?? null }})" label="Lihat"
-                    icon="icon-park-solid:right-c" className="btn-outline flex-1"></x-button-primary>
+                <x-button action="openProgramFormModal({{ $program['id'] ?? null }})" icon="tabler:edit"></x-button>
+                <x-button action="openProgram({{ $program['id'] ?? null }})" label="Lihat"
+                    icon="icon-park-solid:right-c" className="btn-outline flex-1"></x-button>
             </div>
         </div>
     </x-slot>

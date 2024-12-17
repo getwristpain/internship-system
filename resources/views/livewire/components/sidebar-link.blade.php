@@ -52,6 +52,6 @@ new class extends Component {
     <!-- Label that appears on hover -->
     <span
         class="{{ $open ? 'block' : 'hidden group-hover:block absolute left-full p-2 whitespace-nowrap rounded-r-lg transition-transform transform -translate-x-2' }} {{ $active ? 'bg-black text-white' : 'group-hover:bg-gray-200 transition ease-in-out duration-150' }}">
-        {{ $item['label'] ?? '' }}
+        <span class="text-nowrap">{{ $item['label'] ?? '' }}</span>
     </span>
 </a>

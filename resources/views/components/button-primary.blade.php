@@ -1,16 +1,12 @@
 @props([
+    'type' => 'button',
     'label' => '',
     'icon' => '',
-    'disabled' => false,
-    'className' => 'btn-outline',
     'action' => '',
+    'hint' => '',
+    'disabled' => '',
+    'className' =>
+        'bg-yellow-400 text-neutral-900 hover:bg-yellow-500 hover:shadow-lg hover:scale-105 disabled:bg-yellow-500 disabled:text-neutral-900',
 ])
 
-<button wire:click="{{ $action }}" class="btn justify-between {{ $className }}" {{ !$disabled ?: 'disabled' }}>
-    @if ($label)
-        <span>{{ $label }}</span>
-    @endif
-    @if ($icon)
-        <iconify-icon icon="{{ $icon }}" class="scale-125"></iconify-icon>
-    @endif
-</button>
+<x-button :$type :$label :$icon :$action :$hint :$disabled :$className></x-button>

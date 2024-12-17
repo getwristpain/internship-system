@@ -46,12 +46,14 @@ new class extends Component {
 }; ?>
 
 <div class="sticky top-0 left-0 z-10 h-screen bg-white border-r">
-    <div class="flex flex-col justify-between gap-4 h-full px-2 py-4 max-w-sm {{ $open ? 'w-full' : 'w-fit' }}">
-        <div class="space-y-12">
-            <div class="flex items-center justify-center w-full h-8 px-2 space-x-2">
+    <div class="flex flex-col justify-between gap-4 h-full px-2 py-4 max-w-56 {{ $open ? 'w-full' : 'w-fit' }}">
+        <div class="flex-1 space-y-12">
+            <div class="flex items-center w-full h-8 px-2 space-x-2 overflow-x-hidden">
                 <x-application-logo :logo="$logo" class="max-h-6" />
-                <a wire:navigate href="{{ url('/') }}"
-                    class="font-bold text-heading text-nowrap {{ $open ? 'block' : 'hidden' }}">{{ $brand }}</a>
+                <a wire:navigate href="{{ url('/') }}" title="{{ $brand }}"
+                    class="w-full font-bold text-heading text-nowrap line-clamp-1 {{ $open ? 'block' : 'hidden' }}">
+                    {{ $brand }}
+                </a>
             </div>
 
             <div>

@@ -8,8 +8,12 @@ new #[Layout('layouts.app')] class extends Component {
 };
 ?>
 
-<div class="grid grid-cols-4 gap-4">
-    @livewire('components.widgets.user-alerts')
+<div class="w-full h-full flex flex-col gap-4">
+    @livewire('components.widgets.notice-alerts')
 
-    // Dashboard
+    <div class="flex-1">
+        @role('admin|staff')
+            @livewire('dashboards.admin-dashboard')
+        @endrole
+    </div>
 </div>

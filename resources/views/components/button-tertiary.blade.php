@@ -1,5 +1,12 @@
-<a type="button"
-    {{ $attributes->merge(['class' => 'inline-flex gap-2 justify-center items-center px-4 py-2 rounded-xl font-medium transition ease-in-out duration-150 cursor-pointer hover:underline']) }}
-    wire:navigate>
-    {{ $slot }}
-</a>
+@props([
+    'type' => 'button',
+    'label' => '',
+    'icon' => '',
+    'action' => '',
+    'hint' => '',
+    'disabled' => false,
+    'className' =>
+        'bg-inherit text-inherit shadow-none border-0 rounded-0 hover:underline hover:opacity-80 hover:bg-inherit hover:text-inherit disabled:bg-inherit disabled:text-inherit',
+])
+
+<x-button :$type :$label :icon :$action :$hint :$disabled :$className></x-button>

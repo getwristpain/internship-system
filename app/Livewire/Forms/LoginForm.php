@@ -4,8 +4,12 @@ namespace App\Livewire\Forms;
 
 use Livewire\Form;
 use App\Models\User;
-use App\Utils\AccessKeyGen;
+use App\Helpers\AccessKeyGen;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\ValidationException;
 
 class LoginForm extends Form
 {
@@ -14,57 +18,81 @@ class LoginForm extends Form
     public bool $remember = false;
     public string $accessKey = '';
 
+    /**
+     * Attempt to log the user in with email and password.
+     *
+     * @return \Illuminate\Http\RedirectResponse|null
+     */
     public function attemptLogin()
     {
-        $this->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'remember' => 'boolean',
-        ]);
+        // Throttle login attempts
+        $this->ensureNotRateLimited();
 
-        if (!$this->isUserValid()) {
-            return;
+        try {
+            $this->validate([
+                'email' => 'required|string|email',
+                'password' => 'required|string',
+                'remember' => 'boolean',
+            ]);
+
+            if (!$this->isUserValid()) {
+                return;
+            }
+
+            if (!$this->authenticateUser()) {
+                return;
+            }
+
+            // Successful login, reset the rate limiter
+            RateLimiter::clear($this->throttleKey());
+
+            return redirect()->intended()->route('dashboard');
+        } catch (\Exception $e) {
+            $this->handleException($e, 'Failed to attempt login.');
         }
-
-        if (!$this->authenticateUser()) {
-            return;
-        }
-
-        return redirect()->intended()->route('dashboard');
     }
 
+    /**
+     * Attempt to log the user in with an access key.
+     *
+     * @param string $accessKey
+     * @return \Illuminate\Http\RedirectResponse|null
+     */
     public function attemptLoginWithKey(string $accessKey = '')
     {
-        // Mengatur accessKey jika tidak ada input dari parameter
-        $this->accessKey = $accessKey ?: $this->accessKey;
+        try {
+            $this->accessKey = $accessKey ?: $this->accessKey;
 
-        $this->validate([
-            'accessKey' => 'required|string',
-        ]);
+            $this->validate([
+                'accessKey' => 'required|string',
+            ]);
 
-        $accessKeyRecord = AccessKeyGen::verifyKey($this->accessKey);
+            $accessKeyRecord = AccessKeyGen::verifyKey($this->accessKey);
 
-        if (!$accessKeyRecord) {
-            $this->addError('accessKey', __('Kunci akses tidak valid atau sudah kadaluarsa.'));
-            return;
+            if (!$accessKeyRecord) {
+                $this->addError('accessKey', __('Kunci akses tidak valid atau sudah kadaluarsa.'));
+                return;
+            }
+
+            $user = $accessKeyRecord->user;
+
+            if (!$user || !$user->hasRole('supervisor')) {
+                $this->addError('accessKey', __('Pengguna ini bukan supervisor.'));
+                return;
+            }
+
+            Auth::login($user, $this->remember);
+
+            return redirect()->route('dashboard');
+        } catch (\Exception $e) {
+            $this->handleException($e, 'Failed to login with access key.');
         }
-
-        $user = $accessKeyRecord->user;
-
-        if (!$user || !$user->hasRole('supervisor')) {
-            $this->addError('accessKey', __('Pengguna ini bukan supervisor.'));
-            return;
-        }
-
-        // Melakukan login user supervisor
-        Auth::login($user, $this->remember);
-
-        // Redirect ke halaman dashboard
-        return redirect()->route('dashboard');
     }
 
     /**
      * Checks if the user exists and adds an error if not.
+     *
+     * @return bool
      */
     protected function isUserValid(): bool
     {
@@ -78,6 +106,8 @@ class LoginForm extends Form
 
     /**
      * Verifies if the user exists in the database.
+     *
+     * @return bool
      */
     protected function userExists(): bool
     {
@@ -86,6 +116,8 @@ class LoginForm extends Form
 
     /**
      * Attempts to authenticate the user and adds an error if authentication fails.
+     *
+     * @return bool
      */
     protected function authenticateUser(): bool
     {
@@ -93,10 +125,51 @@ class LoginForm extends Form
             'email' => $this->email,
             'password' => $this->password
         ], $this->remember)) {
-            $this->addError('email', __('auth.failed'));
+            $this->addError('password', __('auth.password_incorrect'));
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Handle exception, log the error and save flash message.
+     *
+     * @param \Exception $exception
+     * @param string $context
+     * @return void
+     */
+    protected function handleException(\Exception $exception, string $context): void
+    {
+        Session::flash('error', __('auth.login_failed'));
+        Log::error($context, ['error' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
+    }
+
+    /**
+     * Throttles login attempts to prevent brute-force attacks.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @return void
+     */
+    protected function ensureNotRateLimited(): void
+    {
+        if (RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            Session::flash('warning', __('auth.throttle'));
+            throw ValidationException::withMessages([
+                'email' => __('auth.throttle'),
+            ]);
+        }
+
+        RateLimiter::hit($this->throttleKey(), 60);
+    }
+
+    /**
+     * Get the throttle key for the current login attempt.
+     *
+     * @return string
+     */
+    protected function throttleKey(): string
+    {
+        return 'login:' . request()->ip();
     }
 }

@@ -11,7 +11,7 @@ class StatusMapper
             'running' => 'text-blue-500',
             'stopped' => 'text-red-500',
             'finished' => 'text-green-500',
-            'not started', 'archived' => 'text-gray-500',
+            'not started', 'archived' => 'opacity-70',
         };
     }
 }

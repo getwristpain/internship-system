@@ -98,7 +98,8 @@
                     {{ $autofocus ? 'autofocus' : '' }} {{ $required ? 'required' : '' }}
                     @if (isset($max)) maxlength="{{ $max }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                    class="w-full py-3 pl-10 pr-3 input input-bordered min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="w-full py-3 pl-10 pr-3 input input-bordered min-h-40 focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed
+                    {{ empty($errorMessages) ?: 'border-red-500 focus:ring-red-500' }}"
                     aria-describedby="{{ $name }}-error" :key="$name" x-show="true"></textarea>
             @elseif ($type === 'date')
                 <input id="{{ $name }}" type="{{ $type }}"
@@ -110,7 +111,7 @@
                     @if (isset($min)) min="{{ $min }}" @endif
                     @if (isset($step)) step="{{ $step }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif
-                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed {{ empty($errorMessages) ?: 'border-red-500 focus:ring-red-500' }}"
                     x-ref="input" aria-describedby="{{ $name }}-error" :key="$name">
             @else
                 <input id="{{ $name }}"
@@ -122,7 +123,7 @@
                     @if (isset($min)) min="{{ $min }}" @endif
                     @if (isset($step)) step="{{ $step }}" @endif
                     @if (isset($pattern)) pattern="{{ $pattern }}" @endif x-ref="input"
-                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    class="w-full pl-10 input input-bordered focus:outline-none focus:ring-2 focus:ring-neutral disabled:bg-gray-100 disabled:cursor-not-allowed {{ empty($errorMessages) ?: 'border-red-500 focus:ring-red-500' }}"
                     aria-describedby="{{ $name }}-error" :key="$name">
             @endif
         </div>

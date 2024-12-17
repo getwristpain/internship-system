@@ -7,6 +7,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Validate;
 use Illuminate\Support\Facades\Log;
 use App\Services\EventStatusService;
+use Illuminate\Support\Facades\Session;
 
 new class extends Component {
     public bool $show = false;
@@ -24,6 +25,7 @@ new class extends Component {
         if (!$programId) {
             // Kembalikan nilai default
             $this->program = [
+                'id' => null,
                 'title' => '',
                 'year' => '',
                 'date_start' => '',
@@ -85,7 +87,8 @@ new class extends Component {
 
         try {
             // Update atau buat program baru
-            Program::updateOrCreate(['id' => $this->program['id']], $this->prepProgramData());
+            $program = Program::updateOrCreate(['id' => $this->program['id']], $this->prepProgramData());
+            Session::put('last-viewed-program', $program->id);
 
             // Dispatch event dan pesan sukses
             $this->dispatch('program-updated');
@@ -137,7 +140,7 @@ new class extends Component {
 }; ?>
 
 <x-modal show="show" :form="true" action="saveProgram">
-    <x-slot name="header">Tambah Program</x-slot>
+    <x-slot name="header">{{ $program['id'] ?? null ? 'Edit Program' : 'Tambah Program' }}</x-slot>
     <x-slot name="content">
         <div class="flex flex-col w-full gap-4">
             <table class="table table-list">

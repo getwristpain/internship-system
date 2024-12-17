@@ -6,13 +6,13 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 
 
 Route::middleware('guest')->group(function () {
-    // Register
-    Volt::route('register', 'pages.auth.register.register')
-        ->name('register');
-
     // Login
     Volt::route('login', 'pages.auth.login.login')
         ->name('login');
+
+    // Register
+    Volt::route('register', 'pages.auth.register.register')
+        ->name('register');
 
     // Company Login
     Volt::route('c/login', 'pages.auth.login.c-login')

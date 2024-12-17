@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => 'flex flex-col gap-4 p-4 rounded-xl border']) }}>
+<div {{ $attributes->merge(['class' => 'flex flex-col gap-4 p-8 rounded-xl border']) }}>
     {{-- Header --}}
     @if (isset($heading))
         <div>

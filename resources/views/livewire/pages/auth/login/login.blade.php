@@ -4,24 +4,52 @@ use App\Livewire\Forms\LoginForm;
 use Livewire\Attributes\{Layout, On};
 use Livewire\Volt\Component;
 
+/**
+ * Login Component for Guest Layout.
+ */
 new #[Layout('layouts.guest')] class extends Component {
+    /**
+     * Instance of LoginForm.
+     *
+     * @var LoginForm
+     */
     public LoginForm $form;
 
-    public function login()
+    /**
+     * Handle user login.
+     *
+     * @return void
+     */
+    public function login(): void
     {
         $this->form->attemptLogin();
     }
 
-    public function clogin()
+    /**
+     * Redirect to company login page.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function redirectToCompanyLogin()
     {
         return $this->redirect(route('company.login'), navigate: true);
     }
 
+    /**
+     * Redirect to user registration page.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function register()
     {
         return $this->redirect(route('register'), navigate: true);
     }
 
+    /**
+     * Redirect to password reset page.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function resetPassword()
     {
         return $this->redirect(route('password.request'), navigate: true);
@@ -34,18 +62,18 @@ new #[Layout('layouts.guest')] class extends Component {
         <p>Selamat datang di Sistem Informasi Manajemen PKL</p>
     </div>
 
-    <form class="w-full space-y-8" wire:submit.prevent="login">
+    <form class="w-full space-y-8" wire:submit="login">
         <div class="space-y-2">
-            <x-input-session-status></x-input-session-status>
+            <x-session-flash-status></x-session-flash-status>
             <x-input-form required autofocus type="email" model="form.email" placeholder="Email" />
             <x-input-form required type="password" model="form.password" placeholder="Password" />
             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
         </div>
 
         <div class="flex items-center justify-end space-x-4">
-            <button type="button" wire:click="resetPassword">Lupa password?</button>
-            <button type="button" wire:click="register" class="btn btn-outline btn-neutral">Register</button>
-            <button type="submit" class="btn bgn-outline btn-neutral">Login</button>
+            <x-button-tertiary label="Lupa password?" action="resetPassword"></x-button-tertiary>
+            <x-button-secondary label="Register" action="register"></x-button-secondary>
+            <x-button-submit label="Login"></x-button-submit>
         </div>
 
         <div class="flex items-center justify-center w-full space-x-4 text-sm text-gray-500">
@@ -55,7 +83,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
 
         <div class="flex flex-col items-center justify-center w-full space-y-8 text-center">
-            <button wire:click.prevent="clogin" class="btn btn-neutral btn-outline">Login untuk Perusahaan</button>
+            <x-button label="Login untuk Perusahaan" action="redirectToCompanyLogin"></x-button>
         </div>
     </form>
 </div>

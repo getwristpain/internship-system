@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Paytone+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&family=Paytone+One&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -41,8 +41,11 @@ body {
     pointer-events: none;
 }
 
-.disabled {
-    @apply opacity-30 cursor-not-allowed;
+.disabled,
+.disabled:disabled,
+button:disabled,
+input:disabled {
+    @apply opacity-40 cursor-not-allowed;
 }
 
 iconify-icon {
