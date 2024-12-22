@@ -36,7 +36,7 @@ new #[Layout('layouts.guest')] class extends Component {
         session()->flash('status', __($status));
     }
 
-    public function back()
+    public function redirectToLogin()
     {
         return $this->redirect(route('login'), navigate: true);
     }
@@ -51,12 +51,12 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form wire:submit.prevent="sendPasswordResetLink" class="flex flex-col gap-8">
         <div class="flex flex-col gap-4">
+            <x-session-flash-status></x-session-flash-status>
             <x-input-form type="email" name="email" model="email" placeholder="Email" required autofocus />
-            <x-input-session-status></x-input-session-status>
         </div>
         <div class="flex items-center justify-end space-x-4">
-            <button type="button" class="btn btn-outline btn-neutral" wire:click="back">Kembali</button>
-            <button type="submit" class="btn btn-neutral">Kirim</button>
+            <x-button label="Kembali" action="redirectToLogin"></x-button>
+            <x-button-submit label="Kirim"></x-button-submit>
         </div>
     </form>
 </div>

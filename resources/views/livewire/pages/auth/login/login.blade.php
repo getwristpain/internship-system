@@ -1,28 +1,50 @@
 <?php
 
-use App\Livewire\Forms\LoginForm;
-use Livewire\Attributes\{Layout, On};
 use Livewire\Volt\Component;
+use App\Services\AuthService;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Validate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Login Component for Guest Layout.
  */
 new #[Layout('layouts.guest')] class extends Component {
-    /**
-     * Instance of LoginForm.
-     *
-     * @var LoginForm
-     */
-    public LoginForm $form;
+    public string $email = '';
+    public string $password = '';
+    public bool $remember = false;
+
+    #[Validate]
+    protected function rules()
+    {
+        return [
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'remember' => 'boolean',
+        ];
+    }
 
     /**
      * Handle user login.
      *
      * @return void
      */
-    public function login(): void
+    public function login()
     {
-        $this->form->attemptLogin();
+        $this->validate();
+
+        $authService = new AuthService([
+            'email' => $this->email,
+            'password' => $this->password,
+            'remember' => $this->remember,
+        ]);
+
+        $authService->login();
+
+        if (Auth::check()) {
+            return $this->redirect(route('dashboard'), navigate: true);
+        }
     }
 
     /**
@@ -40,7 +62,7 @@ new #[Layout('layouts.guest')] class extends Component {
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function register()
+    public function redirectToRegister()
     {
         return $this->redirect(route('register'), navigate: true);
     }
@@ -50,11 +72,30 @@ new #[Layout('layouts.guest')] class extends Component {
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function resetPassword()
+    public function redirectToResetPassword()
     {
         return $this->redirect(route('password.request'), navigate: true);
     }
-}; ?>
+
+    /**
+     * Handle login errors.
+     *
+     * @param \Throwable $th
+     * @return void
+     */
+    protected function handleLoginError(\Throwable $th): void
+    {
+        Log::error('Failed to login.', [
+            'message' => $th->getMessage(),
+            'file' => $th->getFile(),
+            'line' => $th->getLine(),
+            'stack' => $th->getTraceAsString(),
+        ]);
+
+        flash()->error('Gagal untuk masuk!');
+    }
+};
+?>
 
 <div class="flex flex-col items-center justify-center max-w-md mx-auto space-y-8">
     <div class="w-full px-16 space-y-2 text-center">
@@ -64,15 +105,17 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form class="w-full space-y-8" wire:submit="login">
         <div class="space-y-2">
-            <x-session-flash-status></x-session-flash-status>
-            <x-input-form required autofocus type="email" model="form.email" placeholder="Email" />
-            <x-input-form required type="password" model="form.password" placeholder="Password" />
-            <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />
+            <div class="flex justify-center py-2">
+                <x-session-flash-status></x-session-flash-status>
+            </div>
+            <x-input-form required name="email" type="email" model="email" placeholder="Email" autofocus />
+            <x-input-form required name="password" type="password" model="password" placeholder="Password" />
+            <x-input-checkbox name="remember" model="remember" label="Ingat saya" />
         </div>
 
         <div class="flex items-center justify-end space-x-4">
-            <x-button-tertiary label="Lupa password?" action="resetPassword"></x-button-tertiary>
-            <x-button-secondary label="Register" action="register"></x-button-secondary>
+            <x-button-tertiary label="Lupa password?" action="redirectToResetPassword"></x-button-tertiary>
+            <x-button-secondary label="Register" action="redirectToRegister"></x-button-secondary>
             <x-button-submit label="Login"></x-button-submit>
         </div>
 

@@ -4,6 +4,7 @@ $attributes = [
     'name' => 'nama',
     'email' => 'email',
     'password' => 'kata sandi',
+    'password_confirmation' => 'konfirmasi kata sandi',
     'identifier_number' => 'nomor identitas',
     'avatar' => 'foto profil',
     'position' => 'jabatan',

@@ -6,14 +6,14 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
-class MakeFuncCommand extends Command
+class MakeLogicCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'make:func {name : The folder/class name in format Folder/ClassName}';
+    protected $signature = 'make:logic {name : The folder/class name in format Folder/ClassName}';
 
     /**
      * The console command description.
