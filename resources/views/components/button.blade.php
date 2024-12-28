@@ -5,11 +5,11 @@
         'action' => '',
         'hint' => '',
         'disabled' => false,
-        'className' => 'btn-outline text-inherit hover:text-neutral-100 hover:bg-neutral-900',
+        'class' => 'btn-outline text-inherit hover:text-neutral-100 hover:bg-neutral-900',
     ])
 
     <button x-cloak type="{{ $type }}" wire:click.prevent="{{ $action }}"
-        class="relative btn flex-nowrap transition ease-in-out duration-150 {{ $label && $icon ? 'justify-between' : '' }} {{ $disabled ? 'disabled ' . $className : $className }}"
+        class="relative btn flex-nowrap transition ease-in-out duration-150 {{ $label && $icon ? 'justify-between' : '' }} {{ $disabled ? 'disabled ' . $class : $class }}"
         {{ !$disabled ?: 'disabled' }} x-data="{
             showHint: false,
             timer: null,

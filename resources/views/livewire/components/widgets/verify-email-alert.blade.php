@@ -75,9 +75,9 @@ new class extends Component {
 };
 ?>
 
-<div>
+<div class="flex w-full">
     @if ($showAlert && !Auth::user()->hasVerifiedEmail())
-        <div class="rounded-md alert alert-warning bg-yellow-100 text-yellow-800 border border-yellow-300">
+        <div class="text-yellow-800 bg-yellow-100 border border-yellow-300 rounded-md alert alert-warning">
             <div>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     class="w-6 h-6 stroke-current shrink-0">
@@ -92,7 +92,7 @@ new class extends Component {
                 </div>
 
                 <div>
-                    <button class="btn btn-warning bg-yellow-200 text-yellow-800 border-yellow-900 btn-sm"
+                    <button class="text-yellow-800 bg-yellow-200 border-yellow-900 btn btn-warning btn-sm"
                         wire:click="sendVerification" wire:loading.attr="disabled" wire:target="sendVerification"
                         @disabled($countdown > 0)>
                         <span>

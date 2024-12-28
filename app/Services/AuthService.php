@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Status;
 use App\Helpers\Exception;
 use App\Helpers\RateLimiter;
+use App\Helpers\AccessKeyGen;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,7 @@ class AuthService
     private string $password = '';
     private bool $remember = false;
     private string $accountType = 'student';
+    private string $accessKey = '';
 
     /**
      * AuthService constructor.
@@ -35,6 +37,7 @@ class AuthService
         $this->password = $userDetails['password'] ?? $this->password;
         $this->remember = $userDetails['remember'] ?? $this->remember;
         $this->accountType = $userDetails['accountType'] ?? $this->accountType;
+        $this->accessKey = $userDetails['accessKey'] ?? $this->accessKey;
     }
 
     /**
@@ -70,6 +73,38 @@ class AuthService
             }
         } catch (\Throwable $th) {
             Exception::handle('Failed to log in the user.', $th);
+            Session::flash('message.error', __('auth.login_error'));
+        }
+    }
+
+    /**
+     * Attempt to log the user in with an access key.
+     *
+     * @param string $accessKey
+     * @return \Illuminate\Http\RedirectResponse|null
+     */
+    public function loginWithKey()
+    {
+        try {
+            RateLimiter::ensureNotRateLimited('clogin:', 5, 'login');
+            $accessKeyRecord = AccessKeyGen::verifyKey($this->accessKey);
+
+            if (!$accessKeyRecord) {
+                Session::flash('message.error', 'Kunci akses tidak valid atau sudah kadaluarsa.');
+                return false;
+            }
+
+            $user = $accessKeyRecord->user;
+
+            if (!$user || !$user->hasRole('supervisor')) {
+                Session::flash('message.error', 'Pengguna ini bukan supervisor.');
+                return false;
+            }
+
+            Auth::login($user, $this->remember);
+            return true;
+        } catch (\Throwable $th) {
+            Exception::handle('Failed to login with access key.', $th);
             Session::flash('message.error', __('auth.login_error'));
         }
     }

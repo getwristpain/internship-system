@@ -1,11 +1,13 @@
 <?php
 
+use App\Services\AppService;
 use Livewire\Volt\Component;
 use App\Services\AuthService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Login Component for Guest Layout.
@@ -23,6 +25,13 @@ new #[Layout('layouts.guest')] class extends Component {
             'password' => 'required|string',
             'remember' => 'boolean',
         ];
+    }
+
+    public function mount()
+    {
+        if (AppService::isNotInstalled() && Route::has('install')) {
+            return $this->redirect(route('install'), navigate: true);
+        }
     }
 
     /**
@@ -43,8 +52,12 @@ new #[Layout('layouts.guest')] class extends Component {
         $authService->login();
 
         if (Auth::check()) {
-            return $this->redirect(route('dashboard'), navigate: true);
+            $this->redirect(route('dashboard'), navigate: true);
+            return true;
         }
+
+        flash()->error(__('auth.login_error'));
+        return false;
     }
 
     /**

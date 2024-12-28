@@ -3,13 +3,13 @@
     'icon' => 'icon-park-outline:right-c',
     'hint' => '',
     'disabled' => false,
-    'className' =>
+    'class' =>
         'bg-yellow-400 text-neutral-900 hover:bg-yellow-500 hover:shadow-lg hover:scale-105 disabled:bg-yellow-500 disabled:text-neutral-900',
 ])
 
 <!-- Button with dynamic classes -->
 <button x-cloak type="submit"
-    class="relative btn flex-nowrap transition ease-in-out duration-150 {{ $label && $icon ? 'justify-between' : '' }} {{ $disabled ? 'disabled ' . $className : $className }}"
+    class="relative btn flex-nowrap transition ease-in-out duration-150 {{ $label && $icon ? 'justify-between' : '' }} {{ $disabled ? 'disabled ' . $class : $class }}"
     {{ !$disabled ?: 'disabled' }} x-data="{
         showHint: false,
         timer: null,

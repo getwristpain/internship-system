@@ -37,7 +37,7 @@ new class extends Component {
                 @endif
             </div>
             <div class="flex-1 space-y-4">
-                <div class="space-y-1">
+                <div class="space-y-2">
                     {{-- Display School Name --}}
                     <h3 class="font-bold text-gray-700 text-lg">{{ $school->name ?: 'No School Name' }}</h3>
 
@@ -59,7 +59,7 @@ new class extends Component {
 
                 {{-- Action Buttons --}}
                 <div>
-                    <x-button label="Lihat Profil Sekolah" className="btn-sm btn-neutral btn-outline"></x-button>
+                    <x-button label="Atur Profil Sekolah" class="btn-sm btn-neutral btn-outline"></x-button>
                 </div>
             </div>
         </div>

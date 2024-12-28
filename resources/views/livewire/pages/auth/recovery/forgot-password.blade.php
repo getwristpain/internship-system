@@ -11,36 +11,40 @@ new #[Layout('layouts.guest')] class extends Component {
     /**
      * Send a password reset link to the provided email address.
      */
-    public function sendPasswordResetLink(): void
+    public function sendPasswordResetLink(): bool
     {
         $this->validate([
             'email' => ['required', 'string', 'email'],
         ]);
 
-        // Check if the user is a supervisor
         $user = User::where('email', $this->email)->first();
 
-        if ($user && $user->hasRole('supervisor')) {
+        if ($user?->hasRole('supervisor')) {
             $this->addError('email', __('Supervisor tidak diizinkan untuk mereset password.'));
-            return;
+            return false;
         }
 
-        $status = Password::sendResetLink($this->only('email'));
+        $status = Password::sendResetLink(['email' => $this->email]);
 
         if ($status !== Password::RESET_LINK_SENT) {
             $this->addError('email', __($status));
-            return;
+            return false;
         }
 
         $this->reset('email');
         session()->flash('status', __($status));
+        return true;
     }
 
-    public function redirectToLogin()
+    /**
+     * Redirect the user to the login page.
+     */
+    public function redirectToLogin(): void
     {
-        return $this->redirect(route('login'), navigate: true);
+        $this->redirect(route('login'), navigate: true);
     }
 };
+
 ?>
 
 <div class="flex flex-col max-w-md gap-8 mx-auto">
