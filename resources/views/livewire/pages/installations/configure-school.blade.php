@@ -12,6 +12,29 @@ new #[Layout('layouts.guest')] class extends Component {
     public array $school = [];
     public ?UploadedFile $logo = null;
 
+    public function mount()
+    {
+        $this->initSchoolData();
+    }
+
+    private function initSchoolData()
+    {
+        $school = SchoolService::getSchoolData();
+
+        $this->school = [
+            'name' => $school->name ?: '',
+            'logo' => $school->logo ?: '',
+            'email' => $school->email ?: '',
+            'address' => $school->address ?: '',
+            'postcode' => $school->postcode ?: '',
+            'telp' => $school->telp ?: '',
+            'fax' => $school->fax ?: '',
+            'principal_name' => $school->principal_name ?: '',
+        ];
+
+        return $this->school;
+    }
+
     public function next()
     {
         try {
@@ -28,13 +51,12 @@ new #[Layout('layouts.guest')] class extends Component {
             ]);
 
             // 2. Simpan data sekolah
-            $isSchoolSaved = SchoolService::save($schoolData, $logo)
+            $isSchoolSaved = SchoolService::save($schoolData, $logo);
 
             // 3. Jika berhasil, redirect ke route 'install.step2'
             if ($isSchoolSaved) {
                 return $this->redirect(route('install.step2'), navigate: true);
             }
-
         } catch (\Throwable $th) {
             // 4. Jika gagal, tampilkan pesan kesalahan
             session()->flash('message.error', __('proccessing.store_failed', ['context' => __('school')]));
