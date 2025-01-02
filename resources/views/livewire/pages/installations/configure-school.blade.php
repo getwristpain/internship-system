@@ -59,10 +59,12 @@ new #[Layout('layouts.guest')] class extends Component {
             }
         } catch (\Throwable $th) {
             // 4. Jika gagal, tampilkan pesan kesalahan
-            session()->flash('message.error', __('proccessing.store_failed', ['context' => __('school')]));
+            session()->flash('message.error', __('system.store_failed', ['context' => __('school')]));
 
-            // 5. Simpan kesalahan ke Exception
-            Exception::handle(__('proccessing.store_failed', ['context' => __('school')]), $th);
+            // 5. Simpan pesan kesalahan ke Exception
+            Exception::handle(__('system.store_failed', ['context' => __('school')]), $th);
+
+            return;
         }
     }
 
@@ -84,7 +86,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
         <form submit.prevent="next" class="flex flex-col gap-8 s-full">
             <div class="mx-auto space-y-4 s-full">
-                <!-- Sistem Message --->
+                <!-- Flash Message --->
                 <x-flash-message />
 
                 <!-- School Logo --->
@@ -92,7 +94,11 @@ new #[Layout('layouts.guest')] class extends Component {
                     <div class="flex flex-col items-center justify-center gap-4">
                         @if ($logo)
                             <div class="w-24 avatar">
-                                <img src="{{ $logo->temporaryUrl() ?? asset($logo) }}" alt="Logo">
+                                <img src="{{ $logo->temporaryUrl() }}" alt="Logo">
+                            </div>
+                        @elseif ($school['logo'])
+                            <div class="w-24 avatar">
+                                <img src="{{ asset($school['logo']) }}" alt="Logo">
                             </div>
                         @endif
                         <div>

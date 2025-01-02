@@ -1,5 +1,5 @@
 <?php
 
 return [
-    // Add your translations here
+    'school' => 'sekolah',
 ];
