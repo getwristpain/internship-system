@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Setting extends Model
+class System extends Model
 {
     public $fillable = [
+        'app_name',
+        'app_logo',
         'is_installed'
     ];
 }

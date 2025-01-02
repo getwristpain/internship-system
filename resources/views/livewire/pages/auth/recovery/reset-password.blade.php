@@ -84,7 +84,6 @@ new #[Layout('layouts.guest')] class extends Component {
             <x-input-form type="password" name="password" model="password" placeholder="Password" required />
             <x-input-form type="password" name="password_confirmation" model="password_confirmation"
                 Placeholder="Konfirmasi Password" required />
-            <x-input-session-status></x-input-session-status>
         </div>
 
         <div class="flex items-center justify-end w-full space-x-4">

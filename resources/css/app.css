@@ -20,6 +20,11 @@ body {
     @apply h-screen w-screen overflow-x-hidden overflow-y-auto;
 }
 
+.s-full,
+.size-full {
+    @apply w-full h-full;
+}
+
 .vh-full {
     height: 100vh;
 }

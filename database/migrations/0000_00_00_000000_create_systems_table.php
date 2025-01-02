@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('settings', function (Blueprint $table) {
+        Schema::create('systems', function (Blueprint $table) {
             $table->id();
+            $table->string('app_name');
+            $table->string('app_logo')->nullable();
             $table->boolean('is_installed')->default('false');
             $table->timestamps();
         });
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('settings');
+        Schema::dropIfExists('systems');
     }
 };

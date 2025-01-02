@@ -16,13 +16,12 @@ class School extends Model
      */
     protected $fillable = [
         'name',
-        'email',
         'logo',
-        'principal_name',
+        'email',
         'address',
-        'post_code',
+        'postcode',
         'telp',
         'fax',
-        'contact_person',
+        'principal_name',
     ];
 }

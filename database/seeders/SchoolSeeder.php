@@ -15,18 +15,17 @@ class SchoolSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            'name' => 'Sekolah Nusa Bangsa',
-            'email' => 'nusa.bangsa@example.com',
-            'principal_name' => 'Dr. Nusantara',
-            'address' => 'Jl. Pendidikan No. 5, Klaten, Jawa Tengah',
-            'post_code' => '57400',
-            'telp' => '+62 812 xxxx xxxx',
-            'fax' => '+62 827 xxxx xxxx',
-            'contact_person' => '',
+            'name' =>
+            config('app.name', 'Sistem Informasi Manajemen PKL'),
+            'email' => '',
+            'address' => '',
+            'postcode' => '',
+            'telp' => '',
+            'fax' => '',
+            'principal_name' => '',
         ];
 
-
-        Setting::updateOrCreate(['is_installed' => false]);
-        School::updateOrCreate(['email' => $data['email']], $data);
+        School::truncate();
+        School::create($data);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,7 +24,7 @@ class FileHelper
      * @param \Illuminate\Http\UploadedFile $file
      * @return string
      */
-    public static function storeAsWebp($file, string $path = ''): string
+    public static function storeAsWebp(UploadedFile $file, string $path = ''): string
     {
         $path = rtrim($path, '/') . '/';
 

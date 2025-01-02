@@ -27,13 +27,6 @@ new #[Layout('layouts.guest')] class extends Component {
         ];
     }
 
-    public function mount()
-    {
-        if (AppService::isNotInstalled() && Route::has('install')) {
-            return $this->redirect(route('install'), navigate: true);
-        }
-    }
-
     /**
      * Handle user login.
      *

@@ -110,5 +110,21 @@
                 "roles": ["admin"]
             }
         ]
+    },
+    {
+        "slug": "setting",
+        "label": "Pengaturan",
+        "route": null,
+        "icon": "mdi:gear",
+        "roles": [],
+        "submenu": [
+            {
+                "slug": "user-profile",
+                "label": "Profil",
+                "route": "profile",
+                "icon": "gg:profile",
+                "roles": []
+            }
+        ]
     }
 ]

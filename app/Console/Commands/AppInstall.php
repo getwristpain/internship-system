@@ -90,12 +90,13 @@ class AppInstall extends Command
         $this->cleanStorage();
         $this->linkStorage();
         $this->createOwner();
+        $this->runAppBuild();
     }
 
     /**
      * Clear application caches.
      */
-    protected function clearCache(): void
+    private function clearCache(): void
     {
         $this->info('Clearing all caches...');
         $this->call('optimize:clear');
@@ -104,16 +105,17 @@ class AppInstall extends Command
     /**
      * Run database migrations.
      */
-    protected function runMigrations(): void
+    private function runMigrations(): void
     {
         $this->info('Running migrations...');
+        $this->call('migrate');
         $this->call('migrate:fresh', ['--force' => true]);
     }
 
     /**
      * Seed the database.
      */
-    protected function seedDatabase(): void
+    private function seedDatabase(): void
     {
         $this->info('Seeding the database...');
         $this->call('db:seed', ['--force' => true]);
@@ -122,7 +124,7 @@ class AppInstall extends Command
     /**
      * Delete temporary files and all files in storage/app/public/uploads
      */
-    protected function cleanStorage(): void
+    private function cleanStorage(): void
     {
         $this->deleteTemporaryFiles();
         $this->info('Temporary files have been deleted.');
@@ -131,7 +133,7 @@ class AppInstall extends Command
     /**
      * Delete temporary files and specific folders.
      */
-    protected function deleteTemporaryFiles(): void
+    private function deleteTemporaryFiles(): void
     {
         File::cleanDirectory(storage_path('logs'));
         Storage::deleteDirectory('livewire-tmp');
@@ -141,7 +143,7 @@ class AppInstall extends Command
     /**
      * Link storage to the public directory.
      */
-    protected function linkStorage(): void
+    private function linkStorage(): void
     {
         if ($this->isStorageLinked()) {
             $this->info('Public storage directory already exists.');
@@ -157,7 +159,7 @@ class AppInstall extends Command
      *
      * @return bool
      */
-    protected function isStorageLinked(): bool
+    private function isStorageLinked(): bool
     {
         return File::exists(public_path('storage'));
     }
@@ -167,7 +169,7 @@ class AppInstall extends Command
      *
      * @return bool
      */
-    protected function createOwner(): bool
+    private function createOwner(): bool
     {
         $this->info('Creating owner user...');
 
@@ -185,7 +187,7 @@ class AppInstall extends Command
      *
      * @return array
      */
-    protected function getOwnerData(): array
+    private function getOwnerData(): array
     {
         return [
             'name' => text("What is the owner's name?"),
@@ -201,7 +203,7 @@ class AppInstall extends Command
      * @param array $ownerData
      * @return bool
      */
-    protected function validateOwnerData(array $ownerData): bool
+    private function validateOwnerData(array $ownerData): bool
     {
         $previousLocale = app()->getLocale();
         app()->setLocale('en');
@@ -229,7 +231,7 @@ class AppInstall extends Command
      * @param array $ownerData
      * @return bool
      */
-    protected function createUser(array $ownerData): bool
+    private function createUser(array $ownerData): bool
     {
         $status = Status::firstOrCreate(['slug' => 'user-status-verified']);
 
@@ -253,5 +255,32 @@ class AppInstall extends Command
 
         $this->errors[] = 'Error creating user.';
         return false;
+    }
+
+    /**
+     * Run the app build process.
+     */
+    private function runAppBuild(): void
+    {
+        $this->info('Running npm build...');
+
+        try {
+            // Execute npm run build command
+            $output = [];
+            $resultCode = null;
+
+            exec('npm run build', $output, $resultCode);
+
+            if ($resultCode !== 0) {
+                $this->errors[] = 'Failed to build the app. Please check the output for errors.';
+                $this->error('npm run build failed!');
+                $this->error(implode("\n", $output));
+            } else {
+                $this->info('App build completed successfully!');
+            }
+        } catch (\Throwable $exception) {
+            $this->errors[] = 'Error occurred during the build process: ' . $exception->getMessage();
+            $this->error('An error occurred during the build process!');
+        }
     }
 }

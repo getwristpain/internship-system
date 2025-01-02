@@ -2,9 +2,6 @@
 
 use Livewire\Volt\Volt;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AvatarController;
-
-// Volt::route('/reset', 'pages.auth.reset');
 
 /**
  * ================================================
@@ -13,7 +10,18 @@ use App\Http\Controllers\AvatarController;
  * - Berisi rute yang berlaku untuk semua pengguna
  *   (tanpa atau sebelum proses autentikasi).
  */
-Route::redirect('/', '/dashboard', 301);
+
+// Volt::route('/reset', 'pages.auth.reset');
+
+Route::middleware(['is_installed'])->get('/', function () {
+    return redirect(route('dashboard'));
+});
+
+Route::middleware(['is_installed'])->prefix('/install/' . config('app.version'))->group(function () {
+    Volt::route('/', 'pages.installations.install-start')->name('install');
+    Volt::route('/next/configure_school', 'pages.installations.configure-school')->name('install.step1');
+    Volt::route('/finish', 'pages.installations.install-finish')->name('install.finish');
+});
 
 /**
  * ================================================

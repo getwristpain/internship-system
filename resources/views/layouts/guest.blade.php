@@ -28,7 +28,7 @@
             </div>
         </header>
 
-        <main class="flex items-center justify-center grow">
+        <main class="flex justify-center grow">
             <div class="container p-8 mx-auto">
                 {{ $slot }}
             </div>

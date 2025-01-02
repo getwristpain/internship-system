@@ -13,7 +13,8 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Sistem Informasi Manajemen PKL'),
+    'version' => env('APP_VERSION', 'v0.1-beta'),
 
     /*
     |--------------------------------------------------------------------------

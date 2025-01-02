@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\School;
+use App\Models\System;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -15,9 +15,9 @@ new class extends Component {
 
     protected function loadBrand()
     {
-        $school = School::first();
-        $this->logo = $school->logo ?? (asset('img/logo.png') ?? '');
-        $this->brand = $school->name ?? '';
+        $system = System::first();
+        $this->brand = $system->app_name ?? '';
+        $this->logo = $system->app_logo ?? (asset('img/logo.png') ?? '');
     }
 }; ?>
 
