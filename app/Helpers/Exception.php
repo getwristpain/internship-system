@@ -14,13 +14,10 @@ class Exception
      *
      * @param string $message The error message to log.
      * @param \Throwable|null $th Optional throwable instance for detailed error logging.
-     * @return void
+     * @return string
      */
-    public static function handle(string $message, \Throwable $th = null): void
+    public static function handle(string $message, \Throwable $th = null): string
     {
-        $previousLocale = app()->getLocale();
-        app()->setLocale('en');
-
         if ($th !== null) {
             Log::error(__($message), [
                 'message' => $th->getMessage(),
@@ -28,10 +25,10 @@ class Exception
                 'line' => $th->getLine(),
                 'stack' => $th->getTraceAsString()
             ]);
-            return;
+        } else {
+            Log::error(__($message));
         }
 
-        Log::error(__($message));
-        app()->setLocale($previousLocale);
+        return __($message);
     }
 }

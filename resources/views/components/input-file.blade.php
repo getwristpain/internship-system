@@ -14,20 +14,22 @@
     :key="$name">
     <div class="flex items-center gap-4">
         @if ($rtl && !$hideLabel)
-            <div>
-                <!-- Tampilkan error jika ada -->
+            <!-- Container untuk label dan error -->
+            <div x-show="filename || '{{ $label }}'">
+                <!-- Menampilkan error jika ada -->
                 <x-input-error :messages="$errors->get($model)" class="mt-2 text-red-500" />
 
-                <!-- Tampilkan nama file jika ada yang dipilih, jika tidak tampilkan label -->
-                @if ($errors->get($model) === [])
+                <!-- Menampilkan nama file atau label -->
+                @if (empty($errors->get($model)))
                     <label for="{{ $name }}" class="font-medium text-gray-600"
-                        x-text="fileName || '{{ $label }}'"></label>
+                        x-text="fileName || '{{ $label }}'">
+                    </label>
                 @endif
             </div>
         @endif
 
+        <!-- Custom File Input with DaisyUI -->
         <div>
-            <!-- Custom File Input with DaisyUI -->
             <label class="text-gray-700 border-gray-400 btn btn-neutral btn-outline {{ $class }}">
                 <span>{{ $placeholder }}</span>
                 <input id="{{ $name }}" type="file" wire:model.live="{{ $model }}" class="hidden"
@@ -38,7 +40,8 @@
         </div>
 
         @if (!$rtl && !$hideLabel)
-            <div>
+            <!-- Container untuk label dan error -->
+            <div x-show="filename || '{{ $label }}'">
                 <!-- Tampilkan error jika ada -->
                 <x-input-error :messages="$errors->get($model)" class="mt-2 text-red-500" />
 

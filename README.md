@@ -67,7 +67,8 @@ A Laravel-based web application for managing internship information systems (PKL
 
 ## Credits
 
-This project was developed by [reasnovynt](https://github.com/reasnovynt). Special thanks to the contributors and the open-source community for their support and contributions.
+This project was developed by [getwristpain](https://github.com/getwristpain). Special thanks to the contributors and the open-source community for their support and contributions.
+Public Mirror Repo: [getwristpain/internship-system](https://github.com/getwristpain/internship-system)
 
 ## License
 

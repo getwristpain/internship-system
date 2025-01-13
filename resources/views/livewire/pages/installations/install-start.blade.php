@@ -4,11 +4,19 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.guest')] class extends Component {
-    public function next()
+    /**
+     * Arahkan ke langkah berikutnya.
+     *
+     * @return void
+     */
+    public function next(): void
     {
-        return $this->redirect(route('install.step1'), navigate: true);
+        // Arahkan ke langkah pertama instalasi
+        $this->redirect(route('install.step1'), navigate: true);
     }
-}; ?>
+};
+
+?>
 
 <div class="size-full space-y-12">
     <div class="flex flex-col md:flex-row gap-20">

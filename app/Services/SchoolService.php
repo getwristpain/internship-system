@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\School;
 use App\Helpers\Exception;
+use App\Helpers\FileHelper;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Session;
 
 class SchoolService
@@ -17,22 +19,37 @@ class SchoolService
     {
 
         try {
-            // 1. Ambil data pertama dari sekolah
-            $school = School::first();
-
-            // 2. Jika berhasil, kembalikan data sekolah yang diambil
-            if ($school) {
-                return $school;
-            }
+            // 1. Ambil data sekolah.
+            return School::first();
         } catch (\Throwable $th) {
-            // 3. Jika gagal, tampilkan pesan kesalahan
-            Session::flash('error', __('system.data_not_found', ['context' => __('school')]));
-
-            // 4. Simpan pesan kesalahan ke Exception
+            // 2. Jika gagal, tangani pesan kesalahan.
             Exception::handle(__('system.data_not_found', ['context' => __('school')]), $th);
 
-            // 5. Kembalikan nilai null
+            // 3. Kembalikan nilai null
             return null;
+        }
+    }
+
+    public static function store(array $schoolData, ?UploadedFile $logo): bool
+    {
+        try {
+            // 1. Penyiapan data sekolah dari atribut
+            $school = self::getSchoolData();
+
+            // 2. Jika terdapat file logo, simpan logo ke storage
+            if ($logo) {
+                $schoolData['logo'] = FileHelper::storeAsWebp($logo, 'logo');
+            }
+
+            // 3. Perbarui data sekolah, kembalikan nilai true
+            $school->update($schoolData);
+            return true;
+        } catch (\Throwable $th) {
+            // 5. Jika gagal, tangani pesan kesalahan.
+            Exception::handle(__('system.store_failed', ['context' => __('school')]), $th);
+
+            // 6. Kembalikan nilai false
+            return false;
         }
     }
 }

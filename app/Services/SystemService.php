@@ -7,7 +7,7 @@ use App\Models\System;
 class SystemService
 {
     /**
-     * Check if the application is installed.
+     * Periksa apakah aplikasi sudah terinstal.
      *
      * @return bool
      */
@@ -15,11 +15,12 @@ class SystemService
     {
         $system = System::first();
 
+        // 1. Periksa apakah data sistem ada dan sudah terinstal
         if ($system && $system->is_installed) {
             return true;
         }
 
-        // Redirect to the installation route if not installed
+        // 2. Kembalikan false jika aplikasi belum terinstal
         return false;
     }
 }

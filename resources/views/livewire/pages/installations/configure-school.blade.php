@@ -1,78 +1,123 @@
 <?php
 
-use App\Services\SchoolService;
-use Illuminate\Http\UploadedFile;
-use Livewire\Attributes\Layout;
+use App\Helpers\Exception;
+use App\Helpers\FileHelper;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
+use App\Services\SchoolService;
+use Livewire\Attributes\Layout;
+use Illuminate\Http\UploadedFile;
 
 new #[Layout('layouts.guest')] class extends Component {
     use WithFileUploads;
 
     public array $school = [];
     public ?UploadedFile $logo = null;
+    public ?UploadedFile $logoPreview = null;
 
-    public function mount()
+    /**
+     * Inisialisasi komponen dan ambil data sekolah.
+     *
+     * @return void
+     */
+    public function mount(): void
     {
         $this->initSchoolData();
     }
 
-    private function initSchoolData()
+    public function updatedLogo()
     {
-        $school = SchoolService::getSchoolData();
+        $this->validate([
+            'logo' => 'required|file|mimes:png,jpg,webp|max:10240',
+        ]);
 
-        $this->school = [
-            'name' => $school->name ?: '',
-            'logo' => $school->logo ?: '',
-            'email' => $school->email ?: '',
-            'address' => $school->address ?: '',
-            'postcode' => $school->postcode ?: '',
-            'telp' => $school->telp ?: '',
-            'fax' => $school->fax ?: '',
-            'principal_name' => $school->principal_name ?: '',
-        ];
-
-        return $this->school;
+        $this->logoPreview = $this->logo;
     }
 
-    public function next()
+    /**
+     * Inisialisasi data sekolah dengan mengambilnya dari service.
+     *
+     * @return array|null
+     */
+    private function initSchoolData(): ?array
     {
         try {
-            // 1. Validasi data input
-            $this->validate([
-                'logo' => 'required|file|mimes:png,jpg,webp|max:10240',
-                'school.name' => 'required|string|min:5|max:255',
-                'school.email' => 'required|email|min:5|max:255',
-                'school.principal_name' => 'required|string|min:5|max:255',
-                'school.address' => 'required|string|min:10|max:255',
-                'school.postcode' => ['required', 'regex:/^\d{5,10}$/'],
-                'school.telp' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
-                'school.fax' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
-            ]);
+            // Ambil data sekolah dari service
+            $school = SchoolService::getSchoolData();
 
-            // 2. Simpan data sekolah
-            $isSchoolSaved = SchoolService::save($schoolData, $logo);
+            // Set data sekolah ke dalam komponen
+            $this->school = [
+                'name' => $school->name ?: '',
+                'logo' => $school->logo ?: '',
+                'email' => $school->email ?: '',
+                'address' => $school->address ?: '',
+                'postcode' => $school->postcode ?: '',
+                'telp' => $school->telp ?: '',
+                'fax' => $school->fax ?: '',
+                'principal_name' => $school->principal_name ?: '',
+            ];
 
-            // 3. Jika berhasil, redirect ke route 'install.step2'
-            if ($isSchoolSaved) {
-                return $this->redirect(route('install.step2'), navigate: true);
-            }
+            return $this->school;
         } catch (\Throwable $th) {
-            // 4. Jika gagal, tampilkan pesan kesalahan
-            session()->flash('message.error', __('system.store_failed', ['context' => __('school')]));
+            // Jika gagal, tangani kesalahan
+            $message = Exception::handle(__('system.error.fetch_failed', ['context' => 'data sekolah']), $th);
 
-            // 5. Simpan pesan kesalahan ke Exception
-            Exception::handle(__('system.store_failed', ['context' => __('school')]), $th);
-
-            return;
+            // Tampilkan pesan kegagalan
+            flash()->error($message);
+            return null;
         }
     }
 
-    public function back()
+    /**
+     * Validasi input, simpan data sekolah, dan lanjutkan ke langkah berikutnya.
+     *
+     * @return void
+     */
+    public function saveAndNext(): void
     {
-        return $this->redirect(route('install'), navigate: true);
+        // Validasi input
+        $this->validate([
+            'school.name' => 'required|string|min:5|max:255',
+            'school.email' => 'required|email|min:5|max:255',
+            'school.principal_name' => 'required|string|min:5|max:255',
+            'school.address' => 'required|string|min:10|max:255',
+            'school.postcode' => ['required', 'regex:/^\d{5,10}$/'],
+            'school.telp' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
+            'school.fax' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
+        ]);
+
+        try {
+            // Simpan data sekolah
+            $isSchoolSaved = SchoolService::store($this->school, $this->logo);
+
+            if ($isSchoolSaved) {
+                // Arahkan ke langkah berikutnya jika berhasil disimpan
+                $this->redirect(route('install.step2'), navigate: true);
+
+                // Tampilkan pesan berhasil
+                flash()->info(__('system.success.saved', ['context' => 'sekolah'], 'id'));
+            }
+        } catch (\Throwable $th) {
+            // Tangani kesalahan saat menyimpan
+            Exception::handle(__('system.error.store_failed', ['context' => 'sekolah']), $th);
+
+            // Tampilkan pesan kesalahan
+            flash()->error(__('system.error.store_failed', ['context' => 'sekolah']));
+        }
     }
-}; ?>
+
+    /**
+     * Arahkan kembali ke langkah sebelumnya.
+     *
+     * @return void
+     */
+    public function back(): void
+    {
+        $this->redirect(route('install'), navigate: true);
+    }
+};
+
+?>
 
 <div class="pb-8 space-y-12">
     <x-nav-step backTo="Selamat Datang" route="install" step="1" finish="3"></x-nav-step>
@@ -84,25 +129,26 @@ new #[Layout('layouts.guest')] class extends Component {
                 aplikasi sesuai dengan kebutuhan sekolah. Anda dapat memperbarui informasi ini kapan saja.</p>
         </div>
 
-        <form submit.prevent="next" class="flex flex-col gap-8 s-full">
+        <form wire:submit.prevent="saveAndNext" class="flex flex-col gap-8 s-full">
             <div class="mx-auto space-y-4 s-full">
                 <!-- Flash Message --->
                 <x-flash-message />
 
                 <!-- School Logo --->
-                <x-input-group required name="logo" label="Logo Sekolah">
+                <x-input-group name="logo" label="Logo Sekolah">
                     <div class="flex flex-col items-center justify-center gap-4">
-                        @if ($logo)
-                            <div class="w-24 avatar">
-                                <img src="{{ $logo->temporaryUrl() }}" alt="Logo">
+                        @if ($logoPreview)
+                            <div class="container-center aspect-square w-24">
+                                <img src="{{ $logoPreview->temporaryUrl() }}" alt="Logo">
                             </div>
                         @elseif ($school['logo'])
-                            <div class="w-24 avatar">
-                                <img src="{{ asset($school['logo']) }}" alt="Logo">
+                            <div class="container-center aspect-square w-24">
+                                <img src="{{ asset('storage/' . $school['logo']) }}" alt="Logo">
                             </div>
                         @endif
-                        <div>
-                            <x-input-file name="logo" model="logo" hideLabel placeholder="Ubah Logo" />
+
+                        <div class="flex justify-center">
+                            <x-input-file name="logo" model="logo" placeholder="Ubah Logo" />
                         </div>
                     </div>
                 </x-input-group>
@@ -145,7 +191,7 @@ new #[Layout('layouts.guest')] class extends Component {
                 </div>
             </div>
             <div class="flex items-center justify-end gap-4">
-                <x-button label="Kembali" />
+                <x-button label="Kembali" action="back" />
                 <x-button-submit label="Selanjutnya" action="next" />
             </div>
         </form>
