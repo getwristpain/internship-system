@@ -5,7 +5,7 @@
     'finish' => '4',
 ])
 
-<div class="w-full border-b-2 border-neutral-200 pb-8 relative">
+<div class="w-full border-b-2 border-neutral-200 pb-4 relative">
     <div class="flex justify-between items-center text-neutral-600">
         @if ($backTo && $route)
             <div class="font-medium">

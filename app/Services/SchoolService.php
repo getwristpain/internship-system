@@ -6,7 +6,6 @@ use App\Models\School;
 use App\Helpers\Exception;
 use App\Helpers\FileHelper;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Session;
 
 class SchoolService
 {
@@ -23,7 +22,7 @@ class SchoolService
             return School::first();
         } catch (\Throwable $th) {
             // 2. Jika gagal, tangani pesan kesalahan.
-            Exception::handle(__('system.data_not_found', ['context' => __('school')]), $th);
+            Exception::handle(__('system.error.not_found', ['context' => 'Data sekolah']), $th);
 
             // 3. Kembalikan nilai null
             return null;
@@ -46,7 +45,7 @@ class SchoolService
             return true;
         } catch (\Throwable $th) {
             // 5. Jika gagal, tangani pesan kesalahan.
-            Exception::handle(__('system.store_failed', ['context' => __('school')]), $th);
+            Exception::handle(__('system.store_failed', ['context' => 'Data Sekolah']), $th);
 
             // 6. Kembalikan nilai false
             return false;

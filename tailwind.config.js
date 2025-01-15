@@ -19,8 +19,7 @@ export default {
                 "dashed-10": "10px dashed",
             },
             fontFamily: {
-                sans: ["Wix Madefor Text", ...defaultTheme.fontFamily.sans],
-                heading: ["Paytone One", ...defaultTheme.fontFamily.sans],
+                sans: ["Rethink Sans", ...defaultTheme.fontFamily.sans],
             },
             keyframes: {
                 blink: {

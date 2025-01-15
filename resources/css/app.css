@@ -1,23 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Wix+Madefor+Text:ital,wght@0,400..800;1,400..800&family=Paytone+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-    @apply font-sans antialiased screen-full;
-}
-
-.required::after {
-    @apply content-['*'] relative -top-1 text-red-500 text-xs;
+    @apply font-sans antialiased screen-full text-neutral-900;
 }
 
 .font-heading {
-    @apply text-gray-600;
+    @apply font-sans font-black text-neutral-600;
 }
 
 .screen-full {
     @apply h-screen w-screen overflow-x-hidden overflow-y-auto;
+}
+
+.required::after {
+    @apply content-['*'] relative -top-1 text-red-500 text-xs;
 }
 
 .s-full,
@@ -26,7 +26,7 @@ body {
 }
 
 .container-center {
-    @apply inline-flex items-center justify-center
+    @apply inline-flex items-center justify-center;
 }
 
 .vh-full {

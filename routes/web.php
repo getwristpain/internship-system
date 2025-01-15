@@ -19,7 +19,8 @@ Route::middleware(['is_installed'])->get('/', function () {
 
 Route::middleware(['is_installed'])->prefix('/install')->group(function () {
     Volt::route('/', 'pages.installations.install-start')->name('install');
-    Volt::route('/next/configure_school', 'pages.installations.configure-school')->name('install.step1');
+    Volt::route('/next/__step_1__', 'pages.installations.configure-school')->name('install.step1');
+    Volt::route('/next/__step_2__', 'pages.installations.configure-admin')->name('install.step2');
     Volt::route('/finish', 'pages.installations.install-finish')->name('install.finish');
 });
 

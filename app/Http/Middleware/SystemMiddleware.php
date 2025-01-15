@@ -37,7 +37,7 @@ class SystemMiddleware
             return $next($request);
         } catch (\Throwable $th) {
             // 5. Tangani kesalahan yang terjadi
-            $message = Exception::handle(__('system.error.message', ['context' => 'server']), $th);
+            $message = Exception::handle(__('system.error.message', ['context' => 'Server']), $th);
 
             // 6. Kembalikan respon kesalahan server ke klien
             return response()->json([

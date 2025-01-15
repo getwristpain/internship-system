@@ -16,7 +16,7 @@
         @livewireStyles()
     </head>
 
-    <body class="flex flex-col text-neutral-900">
+    <body class="flex flex-col">
 
         {{-- Header --}}
         <header class="sticky top-0 z-10 w-full px-8 border-b bg-base-100">

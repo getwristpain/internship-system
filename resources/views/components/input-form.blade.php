@@ -33,10 +33,10 @@
 <div class="flex flex-col gap-2 {{ $disabled ? 'opacity-100 cursor-not-allowed' : '' }}">
     @if ($label)
         <label for="{{ $id }}"
-            class="flex gap-1 text-sm font-medium text-neutral-600 {{ $required ? 'required' : '' }}">
+            class="flex text-sm font-medium text-neutral-600 {{ $required ? 'required' : '' }}">
             <span>{{ $label }}</span>
             @if ($help)
-                <span class="text-neutral-500">({{ $help }})</span>
+                <span class="text-neutral-500 pl-1">({{ $help }})</span>
             @endif
         </label>
     @endif

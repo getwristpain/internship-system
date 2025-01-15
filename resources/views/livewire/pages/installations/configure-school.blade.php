@@ -60,7 +60,7 @@ new #[Layout('layouts.guest')] class extends Component {
             return $this->school;
         } catch (\Throwable $th) {
             // Jika gagal, tangani kesalahan
-            $message = Exception::handle(__('system.error.fetch_failed', ['context' => 'data sekolah']), $th);
+            $message = Exception::handle(__('system.error.fetch_failed', ['context' => 'Data sekolah']), $th);
 
             // Tampilkan pesan kegagalan
             flash()->error($message);
@@ -70,10 +70,8 @@ new #[Layout('layouts.guest')] class extends Component {
 
     /**
      * Validasi input, simpan data sekolah, dan lanjutkan ke langkah berikutnya.
-     *
-     * @return void
      */
-    public function saveAndNext(): void
+    public function next()
     {
         // Validasi input
         $this->validate([
@@ -91,109 +89,103 @@ new #[Layout('layouts.guest')] class extends Component {
             $isSchoolSaved = SchoolService::store($this->school, $this->logo);
 
             if ($isSchoolSaved) {
-                // Arahkan ke langkah berikutnya jika berhasil disimpan
-                $this->redirect(route('install.step2'), navigate: true);
-
                 // Tampilkan pesan berhasil
-                flash()->info(__('system.success.saved', ['context' => 'sekolah'], 'id'));
+                flash()->success(__('system.success.saved', ['context' => 'Data sekolah']));
+
+                // Arahkan ke langkah berikutnya jika berhasil disimpan
+                return $this->redirect(route('install.step2'), navigate: true);
             }
         } catch (\Throwable $th) {
             // Tangani kesalahan saat menyimpan
-            Exception::handle(__('system.error.store_failed', ['context' => 'sekolah']), $th);
+            Exception::handle(__('system.error.store_failed', ['context' => 'Data sekolah']), $th);
 
             // Tampilkan pesan kesalahan
-            flash()->error(__('system.error.store_failed', ['context' => 'sekolah']));
+            flash()->error(__('system.error.store_failed', ['context' => 'Data sekolah']));
         }
     }
 
     /**
      * Arahkan kembali ke langkah sebelumnya.
-     *
-     * @return void
      */
-    public function back(): void
+    public function back()
     {
-        $this->redirect(route('install'), navigate: true);
+        return $this->redirect(route('install'), navigate: true);
     }
 };
 
 ?>
 
-<div class="pb-8 space-y-12">
+<div class="s-full space-y-8">
     <x-nav-step backTo="Selamat Datang" route="install" step="1" finish="3"></x-nav-step>
 
-    <div class="flex flex-col items-center max-w-xl gap-8 mx-auto">
-        <div class="flex flex-col justify-center gap-2 text-center">
-            <h1 class="text-2xl font-bold">Data Sekolah</h1>
+    <x-form-group action="next">
+        <x-slot name="formHeader">
+            <h1 class="text-2xl font-heading">Data Sekolah</h1>
             <p>Isi formulir berikut dengan informasi dasar sekolah Anda. Data ini akan digunakan untuk menyesuaikan
                 aplikasi sesuai dengan kebutuhan sekolah. Anda dapat memperbarui informasi ini kapan saja.</p>
-        </div>
+        </x-slot>
 
-        <form wire:submit.prevent="saveAndNext" class="flex flex-col gap-8 s-full">
-            <div class="mx-auto space-y-4 s-full">
-                <!-- Flash Message --->
-                <x-flash-message />
-
-                <!-- School Logo --->
-                <x-input-group name="logo" label="Logo Sekolah">
-                    <div class="flex flex-col items-center justify-center gap-4">
-                        @if ($logoPreview)
-                            <div class="container-center aspect-square w-24">
-                                <img src="{{ $logoPreview->temporaryUrl() }}" alt="Logo">
-                            </div>
-                        @elseif ($school['logo'])
-                            <div class="container-center aspect-square w-24">
-                                <img src="{{ asset('storage/' . $school['logo']) }}" alt="Logo">
-                            </div>
-                        @endif
-
-                        <div class="flex justify-center">
-                            <x-input-file name="logo" model="logo" placeholder="Ubah Logo" />
+        <x-slot name="formInput">
+            <!-- School Logo --->
+            <x-input-group name="logo" label="Logo Sekolah">
+                <div class="flex flex-col items-center justify-center gap-4">
+                    @if ($logoPreview)
+                        <div class="container-center aspect-square w-24">
+                            <img src="{{ $logoPreview->temporaryUrl() }}" alt="Logo">
                         </div>
-                    </div>
-                </x-input-group>
+                    @elseif ($school['logo'])
+                        <div class="container-center aspect-square w-24">
+                            <img src="{{ asset('storage/' . $school['logo']) }}" alt="Logo">
+                        </div>
+                    @endif
 
-                <!-- School Name --->
-                <x-input-form required name="school_name" model="school.name" label="Nama Sekolah"
-                    placeholder="Masukkan nama resmi sekolah..." help="Singkat" />
-
-                <!-- School Email --->
-                <x-input-form required type="email" name="school_email" model="school.email" label="Email Sekolah"
-                    placeholder="Masukkan email sekolah..." />
-
-                <!-- Principal Name --->
-                <x-input-form required name="principal_name" model="school.principal_name" label="Nama Kepala Sekolah"
-                    placeholder="Masukkan nama kepala sekolah..." />
-
-                <!-- School Address --->
-                <div class="flex gap-4">
-                    <div class="w-3/4">
-                        <x-input-form required name="school_address" model="school.address" label="Alamat Sekolah"
-                            placeholder="Masukkan alamat sekolah..." custom="address" />
-                    </div>
-
-                    <div class="flex-1">
-                        <x-input-form required type="number" name="school_postcode" model="school.postcode"
-                            label="Kode Pos" placeholder="xxxxx" />
+                    <div class="flex justify-center">
+                        <x-input-file name="logo" model="logo" placeholder="Ubah Logo" />
                     </div>
                 </div>
+            </x-input-group>
 
-                <!-- School Telp/Fax --->
-                <div class="flex gap-4">
-                    <div class="w-full">
-                        <x-input-form required type="number" name="school_telp" model="school.telp"
-                            label="Telepon Sekolah" placeholder="(xxx) xxxxxxx" custom="phone" />
-                    </div>
-                    <div class="w-full">
-                        <x-input-form required type="number" name="school_fax" model="school.fax" label="Fax Sekolah"
-                            placeholder="(xxx) xxxxxxx" custom="phone" />
-                    </div>
+            <!-- School Name --->
+            <x-input-form required name="school_name" model="school.name" label="Nama Sekolah"
+                placeholder="Masukkan nama resmi sekolah..." help="Singkat" />
+
+            <!-- School Email --->
+            <x-input-form required type="email" name="school_email" model="school.email" label="Email Sekolah"
+                placeholder="Masukkan email sekolah..." />
+
+            <!-- Principal Name --->
+            <x-input-form required name="principal_name" model="school.principal_name" label="Nama Kepala Sekolah"
+                placeholder="Masukkan nama kepala sekolah..." />
+
+            <!-- School Address --->
+            <div class="flex gap-4">
+                <div class="w-3/4">
+                    <x-input-form required name="school_address" model="school.address" label="Alamat Sekolah"
+                        placeholder="Masukkan alamat sekolah..." custom="address" />
+                </div>
+
+                <div class="flex-1">
+                    <x-input-form required type="number" name="school_postcode" model="school.postcode"
+                        label="Kode Pos" placeholder="xxxxx" />
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-4">
-                <x-button label="Kembali" action="back" />
-                <x-button-submit label="Selanjutnya" action="next" />
+
+            <!-- School Telp/Fax --->
+            <div class="flex gap-4">
+                <div class="w-full">
+                    <x-input-form required type="number" name="school_telp" model="school.telp" label="Telepon Sekolah"
+                        placeholder="(xxx) xxxxxxx" custom="phone" />
+                </div>
+                <div class="w-full">
+                    <x-input-form required type="number" name="school_fax" model="school.fax" label="Fax Sekolah"
+                        placeholder="(xxx) xxxxxxx" custom="phone" />
+                </div>
             </div>
-        </form>
-    </div>
+        </x-slot>
+
+        <x-slot name="formAction">
+            <x-button label="Kembali" action="back" />
+            <x-button-submit label="Selanjutnya" />
+        </x-slot>
+    </x-form-group>
 </div>

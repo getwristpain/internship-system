@@ -6,13 +6,11 @@ use Livewire\Attributes\Layout;
 new #[Layout('layouts.guest')] class extends Component {
     /**
      * Arahkan ke langkah berikutnya.
-     *
-     * @return void
      */
-    public function next(): void
+    public function next()
     {
         // Arahkan ke langkah pertama instalasi
-        $this->redirect(route('install.step1'), navigate: true);
+        return $this->redirect(route('install.step1'), navigate: true);
     }
 };
 
