@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\Exception;
+use App\Helpers\Formatter;
 use App\Helpers\FileHelper;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -16,7 +17,7 @@ new #[Layout('layouts.guest')] class extends Component {
     public ?UploadedFile $logoPreview = null;
 
     /**
-     * Inisialisasi komponen dan ambil data sekolah.
+     * Initialize the component and fetch school data.
      *
      * @return void
      */
@@ -25,6 +26,20 @@ new #[Layout('layouts.guest')] class extends Component {
         $this->initSchoolData();
     }
 
+    /**
+     * Format phone and fax to (xxx) xxxxxxx format.
+     */
+    public function updated($propertyName)
+    {
+        if (in_array($propertyName, ['school.telp', 'school.fax'])) {
+            // Format telp and fax to (xxx) xxxxxxx
+            $this->school[str_replace('school.', '', $propertyName)] = Formatter::telp($this->school[str_replace('school.', '', $propertyName)]);
+        }
+    }
+
+    /**
+     * Handle logo file update and validation.
+     */
     public function updatedLogo()
     {
         $this->validate([
@@ -35,77 +50,75 @@ new #[Layout('layouts.guest')] class extends Component {
     }
 
     /**
-     * Inisialisasi data sekolah dengan mengambilnya dari service.
+     * Initialize school data by fetching it from the service.
      *
      * @return array|null
      */
     private function initSchoolData(): ?array
     {
         try {
-            // Ambil data sekolah dari service
+            // Fetch school data from service
             $school = SchoolService::getSchoolData();
 
-            // Set data sekolah ke dalam komponen
+            // Set school data into the component
             $this->school = [
-                'name' => $school->name ?: '',
-                'logo' => $school->logo ?: '',
-                'email' => $school->email ?: '',
-                'address' => $school->address ?: '',
-                'postcode' => $school->postcode ?: '',
-                'telp' => $school->telp ?: '',
-                'fax' => $school->fax ?: '',
-                'principal_name' => $school->principal_name ?: '',
+                'name' => $school->name ?? null,
+                'logo' => $school->logo ?? null,
+                'email' => $school->email ?? null,
+                'address' => $school->address ?? null,
+                'postcode' => $school->postcode ?? null,
+                'telp' => Formatter::telp($school->telp) ?? null,
+                'fax' => Formatter::telp($school->fax) ?? null,
+                'principal_name' => $school->principal_name ?? null,
             ];
 
             return $this->school;
         } catch (\Throwable $th) {
-            // Jika gagal, tangani kesalahan
-            $message = Exception::handle(__('system.error.fetch_failed', ['context' => 'Data sekolah']), $th);
-
-            // Tampilkan pesan kegagalan
+            $message = Exception::handle(__('system.error.fetch_failed', ['context' => 'Data sekolah']));
             flash()->error($message);
             return null;
         }
     }
 
     /**
-     * Validasi input, simpan data sekolah, dan lanjutkan ke langkah berikutnya.
+     * Validate input, store school data, and proceed to the next step.
      */
     public function next()
     {
-        // Validasi input
+        // Validate input
         $this->validate([
             'school.name' => 'required|string|min:5|max:255',
             'school.email' => 'required|email|min:5|max:255',
             'school.principal_name' => 'required|string|min:5|max:255',
             'school.address' => 'required|string|min:10|max:255',
-            'school.postcode' => ['required', 'regex:/^\d{5,10}$/'],
-            'school.telp' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
-            'school.fax' => ['required', 'regex:/^\+?[\d\s\-]{6,15}$/'],
+            'school.postcode' => 'required|regex:/^\d{5,10}$/',
+            'school.telp' => 'required|regex:/^\(\d{3}\) \d{5,}$/',
+            'school.fax' => 'required|regex:/^\(\d{3}\) \d{5,}$/',
         ]);
 
         try {
-            // Simpan data sekolah
+            // Save school data
             $isSchoolSaved = SchoolService::store($this->school, $this->logo);
 
             if ($isSchoolSaved) {
-                // Tampilkan pesan berhasil
+                // Show success message
                 flash()->success(__('system.success.saved', ['context' => 'Data sekolah']));
 
-                // Arahkan ke langkah berikutnya jika berhasil disimpan
+                // Redirect to the next step if saved successfully
                 return $this->redirect(route('install.step2'), navigate: true);
             }
         } catch (\Throwable $th) {
-            // Tangani kesalahan saat menyimpan
-            Exception::handle(__('system.error.store_failed', ['context' => 'Data sekolah']), $th);
+            // Handle error when saving
+            $message = Exception::handle(__('system.error.store_failed', ['context' => 'Data sekolah']), $th);
 
-            // Tampilkan pesan kesalahan
-            flash()->error(__('system.error.store_failed', ['context' => 'Data sekolah']));
+            // Show error message
+            flash()->error($message);
+            return;
         }
     }
 
     /**
-     * Arahkan kembali ke langkah sebelumnya.
+     * Redirect back to the previous step.
      */
     public function back()
     {
@@ -114,6 +127,7 @@ new #[Layout('layouts.guest')] class extends Component {
 };
 
 ?>
+
 
 <div class="s-full space-y-8">
     <x-nav-step backTo="Selamat Datang" route="install" step="1" finish="3"></x-nav-step>
@@ -129,14 +143,14 @@ new #[Layout('layouts.guest')] class extends Component {
             <!-- School Logo --->
             <x-input-group name="logo" label="Logo Sekolah">
                 <div class="flex flex-col items-center justify-center gap-4">
-                    @if ($logoPreview)
-                        <div class="container-center aspect-square w-24">
-                            <img src="{{ $logoPreview->temporaryUrl() }}" alt="Logo">
-                        </div>
-                    @elseif ($school['logo'])
-                        <div class="container-center aspect-square w-24">
-                            <img src="{{ asset('storage/' . $school['logo']) }}" alt="Logo">
-                        </div>
+                    @if (isset($logoPreview))
+                    <div class="container-center aspect-square w-24">
+                        <img src="{{ $logoPreview->temporaryUrl() }}" alt="Logo">
+                    </div>
+                    @elseif (isset($school['logo']))
+                    <div class="container-center aspect-square w-24">
+                        <img src="{{ asset('storage/' . $school['logo']) }}" alt="Logo">
+                    </div>
                     @endif
 
                     <div class="flex justify-center">
@@ -165,19 +179,19 @@ new #[Layout('layouts.guest')] class extends Component {
                 </div>
 
                 <div class="flex-1">
-                    <x-input-form required type="number" name="school_postcode" model="school.postcode"
-                        label="Kode Pos" placeholder="xxxxx" />
+                    <x-input-form required type="number" name="school_postcode" model="school.postcode" label="Kode Pos"
+                        placeholder="xxxxx" />
                 </div>
             </div>
 
             <!-- School Telp/Fax --->
             <div class="flex gap-4">
                 <div class="w-full">
-                    <x-input-form required type="number" name="school_telp" model="school.telp" label="Telepon Sekolah"
+                    <x-input-form required type="string" name="school_telp" model="school.telp" label="Telepon Sekolah"
                         placeholder="(xxx) xxxxxxx" custom="phone" />
                 </div>
                 <div class="w-full">
-                    <x-input-form required type="number" name="school_fax" model="school.fax" label="Fax Sekolah"
+                    <x-input-form required type="string" name="school_fax" model="school.fax" label="Fax Sekolah"
                         placeholder="(xxx) xxxxxxx" custom="phone" />
                 </div>
             </div>
@@ -189,3 +203,15 @@ new #[Layout('layouts.guest')] class extends Component {
         </x-slot>
     </x-form-group>
 </div>
+
+@script
+<script>
+    document.getElementById('school_telp').addEventListener('input', function(event) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+    document.getElementById('school_fax').addEventListener('input', function(event) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+</script>
+@endscript

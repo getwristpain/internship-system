@@ -56,7 +56,6 @@ new #[Layout('layouts.guest')] class extends Component {
     <form wire:submit.prevent="login" class="flex flex-col w-full space-y-12">
         <!-- Form Input -->
         <div class="space-y-4">
-            <x-session-flash-status></x-session-flash-status>
             <x-input-form type="text" name="accessKey" model="accessKey" placeholder="Kunci Akses" custom="password"
                 required />
             <x-input-checkbox name="remember" model="form.remember" label="Ingat saya" />

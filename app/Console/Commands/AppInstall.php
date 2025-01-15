@@ -2,15 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
-use App\Models\Status;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use function Laravel\Prompts\{text, password};
+use App\Helpers\Exception;
 
 class AppInstall extends Command
 {
@@ -43,37 +39,21 @@ class AppInstall extends Command
     public function handle(): void
     {
         $this->info('Starting application installation...');
+
         try {
             $this->performInstallationSteps();
 
             if (!empty($this->errors)) {
                 $this->error('Application installation failed!');
                 foreach ($this->errors as $error) {
-                    $error = htmlspecialchars($error, ENT_QUOTES, 'UTF-8');
-                    $this->error("[x] $error");
+                    $this->error("[x] " . htmlspecialchars($error, ENT_QUOTES, 'UTF-8'));
                 }
             } else {
                 $this->info('Application installed successfully!');
             }
         } catch (\Throwable $exception) {
-            $this->handleError($exception);
+            $this->errorHandler($exception, 'Application installation failed');
         }
-    }
-
-    /**
-     * Handle errors that occur during the application installation process.
-     *
-     * @param \Throwable $exception The exception that occurred.
-     * @return void
-     */
-    private function handleError(\Throwable $exception): void
-    {
-        Log::error('Application installation failed', [
-            'message' => $exception->getMessage(),
-            'stack' => $exception->getTraceAsString(),
-        ]);
-
-        $this->error('Application installation failed! Please check the log for more details.');
     }
 
     /**
@@ -84,13 +64,43 @@ class AppInstall extends Command
      */
     private function performInstallationSteps(): void
     {
-        $this->clearCache();
-        $this->runMigrations();
-        $this->seedDatabase();
-        $this->cleanStorage();
-        $this->linkStorage();
-        $this->createOwner();
-        $this->runAppBuild();
+        $steps = [
+            'clearCache' => 'Clearing all caches...',
+            'runMigrations' => 'Running migrations...',
+            'seedDatabase' => 'Seeding the database...',
+            'cleanStorage' => 'Deleting temporary files...',
+            'linkStorage' => 'Linking storage...',
+            'createOwner' => 'Creating owner user...',
+            'runAppBuild' => 'Running npm build...'
+        ];
+
+        foreach ($steps as $method => $message) {
+            $this->info($message);
+            try {
+                $this->$method();
+            } catch (\Throwable $exception) {
+                $this->errorHandler($exception, $message);
+            }
+        }
+    }
+
+    /**
+     * Centralized error handling.
+     *
+     * @param \Throwable $exception
+     * @param string $context
+     * @return void
+     */
+    private function errorHandler(\Throwable $exception, string $context): void
+    {
+        // Log the error for internal tracking
+        Exception::handle("Error during $context", $exception);
+
+        // Add the error to the errors array to be shown in the console
+        $this->errors[] = "$context failed: " . $exception->getMessage();
+
+        // Output the error message in the console
+        $this->error("$context failed!");
     }
 
     /**
@@ -98,7 +108,6 @@ class AppInstall extends Command
      */
     private function clearCache(): void
     {
-        $this->info('Clearing all caches...');
         $this->call('optimize:clear');
     }
 
@@ -107,7 +116,6 @@ class AppInstall extends Command
      */
     private function runMigrations(): void
     {
-        $this->info('Running migrations...');
         $this->call('migrate');
         $this->call('migrate:fresh', ['--force' => true]);
     }
@@ -117,7 +125,6 @@ class AppInstall extends Command
      */
     private function seedDatabase(): void
     {
-        $this->info('Seeding the database...');
         $this->call('db:seed', ['--force' => true]);
     }
 
@@ -125,15 +132,6 @@ class AppInstall extends Command
      * Delete temporary files and all files in storage/app/public/uploads
      */
     private function cleanStorage(): void
-    {
-        $this->deleteTemporaryFiles();
-        $this->info('Temporary files have been deleted.');
-    }
-
-    /**
-     * Delete temporary files and specific folders.
-     */
-    private function deleteTemporaryFiles(): void
     {
         File::cleanDirectory(storage_path('logs'));
         Storage::deleteDirectory('livewire-tmp');
@@ -145,13 +143,12 @@ class AppInstall extends Command
      */
     private function linkStorage(): void
     {
-        if ($this->isStorageLinked()) {
+        if (!$this->isStorageLinked()) {
+            $this->call('storage:link');
+            $this->info('Storage linked successfully.');
+        } else {
             $this->info('Public storage directory already exists.');
-            return;
         }
-
-        $this->call('storage:link');
-        $this->info('Storage linked successfully.');
     }
 
     /**
@@ -166,95 +163,14 @@ class AppInstall extends Command
 
     /**
      * Create the owner user.
-     *
-     * @return bool
      */
-    private function createOwner(): bool
+    private function createOwner(): void
     {
-        $this->info('Creating owner user...');
-
-        $ownerData = $this->getOwnerData();
-
-        if ($this->validateOwnerData($ownerData)) {
-            return $this->createUser($ownerData);
+        if (in_array(app()->environment(), ['local', 'development'])) {
+            $this->call('make:owner');
+        } else {
+            $this->info('Owner user creation is skipped in the current environment.');
         }
-
-        return false;
-    }
-
-    /**
-     * Get the owner user data from input.
-     *
-     * @return array
-     */
-    private function getOwnerData(): array
-    {
-        return [
-            'name' => text("What is the owner's name?"),
-            'email' => text("What is the owner's email?"),
-            'password' => password("What is the owner's password?"),
-            'password_confirmation' => password("Please confirm the owner's password"),
-        ];
-    }
-
-    /**
-     * Validate the owner user data.
-     *
-     * @param array $ownerData
-     * @return bool
-     */
-    private function validateOwnerData(array $ownerData): bool
-    {
-        $previousLocale = app()->getLocale();
-        app()->setLocale('en');
-
-        $validator = Validator::make($ownerData, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'password_confirmation' => ['required_with:password', 'same:password'],
-        ]);
-
-        if ($validator->fails()) {
-            $this->errors[] = $validator->errors()->first();
-            app()->setLocale($previousLocale);
-            return false;
-        }
-
-        app()->setLocale($previousLocale);
-        return true;
-    }
-
-    /**
-     * Create a new user based on the given data.
-     *
-     * @param array $ownerData
-     * @return bool
-     */
-    private function createUser(array $ownerData): bool
-    {
-        $status = Status::firstOrCreate(['slug' => 'user-status-verified']);
-
-        if (!$status) {
-            $this->errors[] = 'User status "Verified" not found.';
-            return false;
-        }
-
-        $user = User::create([
-            'name' => $ownerData['name'],
-            'email' => $ownerData['email'],
-            'password' => Hash::make($ownerData['password']),
-            'status_id' => $status->id,
-        ]);
-
-        if ($user) {
-            $user->syncRoles(['owner', 'admin']);
-            $this->info('Owner user created successfully!');
-            return true;
-        }
-
-        $this->errors[] = 'Error creating user.';
-        return false;
     }
 
     /**
@@ -262,10 +178,7 @@ class AppInstall extends Command
      */
     private function runAppBuild(): void
     {
-        $this->info('Running npm build...');
-
         try {
-            // Execute npm run build command
             $output = [];
             $resultCode = null;
 
@@ -279,8 +192,7 @@ class AppInstall extends Command
                 $this->info('App build completed successfully!');
             }
         } catch (\Throwable $exception) {
-            $this->errors[] = 'Error occurred during the build process: ' . $exception->getMessage();
-            $this->error('An error occurred during the build process!');
+            $this->errorHandler($exception, 'Build process');
         }
     }
 }

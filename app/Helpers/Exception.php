@@ -18,17 +18,20 @@ class Exception
      */
     public static function handle(string $message, \Throwable $th = null): string
     {
-        if ($th !== null) {
+        // Log error with exception details if throwable is provided
+        if ($th) {
             Log::error(__($message), [
                 'message' => $th->getMessage(),
                 'file' => $th->getFile(),
                 'line' => $th->getLine(),
-                'stack' => $th->getTraceAsString()
+                'stack' => $th->getTraceAsString(),
             ]);
         } else {
+            // Log the error message without throwable details
             Log::error(__($message));
         }
 
+        // Return the localized error message
         return __($message);
     }
 }

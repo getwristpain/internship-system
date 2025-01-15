@@ -111,9 +111,6 @@ new #[Layout('layouts.guest')] class extends Component {
 
     <form class="w-full space-y-8" wire:submit="login">
         <div class="space-y-2">
-            <div class="flex justify-center py-2">
-                <x-session-flash-status></x-session-flash-status>
-            </div>
             <x-input-form required name="email" type="email" model="email" placeholder="Email" autofocus />
             <x-input-form required name="password" type="password" model="password" placeholder="Password" />
             <x-input-checkbox name="remember" model="remember" label="Ingat saya" />

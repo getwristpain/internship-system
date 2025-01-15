@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Helpers\Exception;
+use Closure;
 use Illuminate\Http\Request;
 use App\Services\SystemService;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,38 +11,36 @@ use Symfony\Component\HttpFoundation\Response;
 class SystemMiddleware
 {
     /**
-     * Tangani request yang masuk.
+     * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure(\Illuminate\Http\Request): \Symfony\Component\HttpFoundation\Response $next
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            // 1. Periksa apakah sistem sudah terinstal
+            // Check if the system is installed
             if (SystemService::isInstalled()) {
-                // 2. Jika sistem sudah terinstal, blokir akses ke rute '/install*'
+                // If installed, block access to '/install*' routes
                 if ($request->is('install*')) {
                     return redirect(route('dashboard'));
                 }
             } else {
-                // 3. Jika sistem belum terinstal, arahkan ke rute '/install'
+                // If not installed, redirect to '/install' route
                 if (!$request->is('install*')) {
                     return redirect(route('install'));
                 }
             }
 
-            // 4. Lanjutkan ke request berikutnya jika tidak ada masalah
+            // Proceed to the next middleware or request handler
             return $next($request);
         } catch (\Throwable $th) {
-            // 5. Tangani kesalahan yang terjadi
-            $message = Exception::handle(__('system.error.message', ['context' => 'Server']), $th);
+            // Handle the exception
+            $message = Exception::handle(__('system.error.message', ['context' => 'Server']));
 
-            // 6. Kembalikan respon kesalahan server ke klien
+            // Return a JSON response with the error message
             return response()->json([
                 'message' => $message,
-            ], 500);
+            ], 500); // Optional: add HTTP status code, e.g., 500 for internal server error
         }
     }
 }

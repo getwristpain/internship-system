@@ -34,8 +34,6 @@ class DatabaseSeeder extends Seeder
             // Essensial Seeders
             RoleSeeder::class,
             MenuSeeder::class,
-            SchoolSeeder::class,
-            DepartmentSeeder::class,
         ]);
     }
 

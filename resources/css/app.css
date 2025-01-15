@@ -9,7 +9,7 @@ body {
 }
 
 .font-heading {
-    @apply font-sans font-black text-neutral-600;
+    @apply font-sans font-black text-neutral-800;
 }
 
 .screen-full {
@@ -25,8 +25,8 @@ body {
     @apply w-full h-full;
 }
 
-.container-center {
-    @apply inline-flex items-center justify-center;
+.align-vh-center {
+    @apply items-center justify-center;
 }
 
 .vh-full {
