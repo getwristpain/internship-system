@@ -9,10 +9,10 @@
     <div class="flex justify-between items-center text-neutral-600">
         @if ($backTo && $route)
             <div class="font-medium">
-                <a href="{{ route($route) ?? '#' }}" class="flex gap-4 items-center">
-                    <iconify-icon icon="lets-icons:back" class="scale-110"></iconify-icon>
-                    <p>{{ $backTo }}</p>
-                </a>
+                <x-link :$route>
+                    <span><iconify-icon icon="lets-icons:back" /></span>
+                    <span>{{ $backTo }}</span>
+                </x-link>
             </div>
         @endif
 

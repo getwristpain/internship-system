@@ -5,6 +5,10 @@ $attributes = [
     'accessKey' => 'kunci akses',
     'address' => 'alamat',
     'avatar' => 'foto profil',
+    'department' => [
+        'code' => 'kode jurusan',
+        'name' => 'nama jurusan',
+    ],
     'email' => 'email',
     'gender' => 'jenis kelamin',
     'group' => 'kelas',

@@ -1,12 +1,14 @@
 @props([
-    'type' => 'button',
-    'label' => '',
-    'icon' => '',
     'action' => '',
-    'hint' => '',
     'disabled' => '',
-    'class' =>
-        'bg-yellow-400 text-neutral-900 hover:bg-yellow-500 hover:shadow-lg hover:scale-105 disabled:bg-yellow-500 disabled:text-neutral-900',
+    'icon' => '',
+    'type' => 'button',
 ])
 
-<x-button :$type :$label :$icon :$action :$hint :$disabled :$class></x-button>
+@php
+    $btnClass = 'bg-yellow-400 text-neutral-900 hover:bg-yellow-500 disabled:bg-yellow-500 disabled:text-neutral-900';
+@endphp
+
+<x-button :$type :$icon :$action :$disabled {{ $attributes->merge(['class' => $btnClass]) }}>
+    {{ $slot }}
+</x-button>

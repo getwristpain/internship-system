@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Helpers\Exception;
+use App\Helpers\Logger;
+use App\Services\SystemService;
 use Closure;
 use Illuminate\Http\Request;
-use App\Services\SystemService;
 use Symfony\Component\HttpFoundation\Response;
 
 class SystemMiddleware
@@ -18,29 +18,32 @@ class SystemMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            // Check if the system is installed
-            if (SystemService::isInstalled()) {
-                // If installed, block access to '/install*' routes
-                if ($request->is('install*')) {
-                    return redirect(route('dashboard'));
-                }
-            } else {
-                // If not installed, redirect to '/install' route
-                if (!$request->is('install*')) {
-                    return redirect(route('install'));
-                }
+            // Redirect based on system installation status
+            $redirectRoute = $this->getRedirectRoute($request);
+            if ($redirectRoute) {
+                return redirect($redirectRoute);
             }
 
-            // Proceed to the next middleware or request handler
             return $next($request);
         } catch (\Throwable $th) {
-            // Handle the exception
-            $message = Exception::handle(__('system.error.message', ['context' => 'Server']));
-
-            // Return a JSON response with the error message
             return response()->json([
-                'message' => $message,
-            ], 500); // Optional: add HTTP status code, e.g., 500 for internal server error
+                'message' => Logger::handle('error', __('system.error.message', ['context' => 'Server'])),
+            ], 500);
         }
+    }
+
+    /**
+     * Determine the appropriate redirect route based on system installation status.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return string|null
+     */
+    protected function getRedirectRoute(Request $request): ?string
+    {
+        if (SystemService::isInstalled()) {
+            return $request->is('install*') ? route('dashboard') : null;
+        }
+
+        return !$request->is('install*') ? route('install') : null;
     }
 }

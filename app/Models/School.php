@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class School extends Model
 {
@@ -17,11 +18,31 @@ class School extends Model
     protected $fillable = [
         'name',
         'logo',
-        'email',
         'address',
         'postcode',
+        'email',
         'telp',
         'fax',
         'principal_name',
     ];
+
+    /**
+     * Get all departments associated with the school.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function departments(): HasMany
+    {
+        return $this->hasMany(Department::class);
+    }
+
+    /**
+     * Get all classrooms associated with the school.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany(Classroom::class);
+    }
 }

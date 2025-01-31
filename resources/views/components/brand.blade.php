@@ -17,13 +17,13 @@ new class extends Component {
     {
         $system = System::first();
         $this->brand = $system->app_name ?? '';
-        $this->logo = $system->app_logo ?? (asset('img/logo.png') ?? '');
+        $this->logo = $system->app_logo ? asset('/storage/' . $system->app_logo) : (asset('img/logo.png') ?? '');
     }
 }; ?>
 
 @volt
-    <div class="flex items-center gap-2 w-fit">
-        <x-application-logo :logo="$logo" class="scale-125 max-h-4" />
+    <div class="flex items-center gap-4 w-fit">
+        <x-app-logo :logo="$logo" class="w-4 h-4 scale-150" />
         <a wire:navigate href="{{ url('/') }}" class="font-bold text-heading text-nowrap">{{ $brand }}</a>
     </div>
 @endvolt

@@ -25,6 +25,8 @@ class User extends Authenticatable
         'email',
         'password',
         'status_id',
+        'department_id',
+        'classroom_id',
     ];
 
     protected $hidden = [
@@ -81,16 +83,6 @@ class User extends Authenticatable
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);
-    }
-
-    public function departments(): BelongsToMany
-    {
-        return $this->belongsToMany(Department::class, 'department_user');
-    }
-
-    public function groups(): BelongsToMany
-    {
-        return $this->belongsToMany(Group::class);
     }
 
     public function journals(): HasMany

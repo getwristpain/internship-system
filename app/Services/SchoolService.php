@@ -3,26 +3,23 @@
 namespace App\Services;
 
 use App\Models\School;
-use App\Helpers\Exception;
+use App\Helpers\Logger;
 use App\Helpers\FileHelper;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 
+use function Livewire\of;
+
 class SchoolService
 {
     /**
-     * Retrieve the school data.
+     * Retrieve the first school or create a new one.
      *
-     * @return School|null
+     * @return School
      */
-    public static function getSchoolData(): ?School
+    public static function firstSchool(): School
     {
-        try {
-            return School::first() ?? null;
-        } catch (\Throwable $th) {
-            Exception::handle(__('system.error.not_found', ['context' => 'Data sekolah']), $th);
-            return null;
-        }
+        return School::firstOrNew();
     }
 
     /**
@@ -30,33 +27,17 @@ class SchoolService
      *
      * @param array $schoolData
      * @param UploadedFile|null $logo
-     * @return bool
+     * @return School|null
      */
-    public static function store(array $schoolData, ?UploadedFile $logo): bool
+    public static function storeSchool(array $schoolData, ?UploadedFile $logo): ?School
     {
-        try {
-            // Validate the school data including logo
-            if (!self::validateSchoolData($schoolData, $logo)) {
-                return false;
-            }
-
-            // Save the logo if provided
-            if ($logo) {
-                $schoolData['logo'] = FileHelper::storeAsWebp($logo, 'logo');
-            }
-
-            // Retrieve the existing school data or create a new instance
-            $school = self::getSchoolData() ?? new School();
-
-            // Update or create the school data
-            $school->fill($schoolData);
-            $school->save();
-
-            return true;
-        } catch (\Throwable $th) {
-            Exception::handle(__('system.store_failed', ['context' => 'Data Sekolah']), $th);
-            return false;
+        if (!self::isValidSchoolData($schoolData, $logo)) {
+            return null;
         }
+
+        $schoolData['logo'] = self::processLogo($logo, $schoolData['logo'] ?? null);
+
+        return self::saveSchoolData($schoolData);
     }
 
     /**
@@ -66,11 +47,31 @@ class SchoolService
      * @param UploadedFile|null $logo
      * @return bool
      */
-    private static function validateSchoolData(array $schoolData, ?UploadedFile $logo): bool
+    private static function isValidSchoolData(array $schoolData, ?UploadedFile $logo): bool
     {
-        // Initialize validation rules for school data
-        $rules = [
+        $validator = Validator::make(
+            array_merge($schoolData, ['logo_file' => $logo]),
+            self::validationRules()
+        );
+
+        if ($validator->fails()) {
+            Logger::handle('error', 'Validation failed for school data.', new \Exception(json_encode($validator->errors()->getMessages())));
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get validation rules for school data.
+     *
+     * @return array
+     */
+    private static function validationRules(): array
+    {
+        return [
             'name' => 'required|string|min:5|max:255',
+            'logo_file' => 'nullable|file|mimes:png,jpg,webp|max:10240',
             'email' => 'required|email|min:5|max:255',
             'principal_name' => 'required|string|min:5|max:255',
             'address' => 'required|string|min:10|max:255',
@@ -78,22 +79,35 @@ class SchoolService
             'telp' => 'required|regex:/^\(\d{3}\) \d{5,}$/',
             'fax' => 'required|regex:/^\(\d{3}\) \d{5,}$/',
         ];
+    }
 
-        // If a logo is provided, add validation rules for it
+    /**
+     * Process the logo file.
+     *
+     * @param UploadedFile|null $logo
+     * @param string|null $currentLogo
+     * @return string|null
+     */
+    private static function processLogo(?UploadedFile $logo, ?string $currentLogo): ?string
+    {
         if ($logo) {
-            $schoolData['logo'] = $logo;
-            $rules['logo'] = 'file|mimes:png,jpg,webp|max:10240';
+            return FileHelper::storeAsWebp($logo, 'logo');
         }
 
-        // Perform the validation
-        $validator = Validator::make($schoolData, $rules);
+        return $currentLogo;
+    }
 
-        if ($validator->fails()) {
-            // Handle validation failure and provide feedback
-            Exception::handle(__('system.error.invalid', ['context' => 'Data sekolah']), new \Exception($validator->errors()->first()));
-            return false;
-        }
+    /**
+     * Save school data.
+     *
+     * @param array $schoolData
+     * @return School
+     */
+    private static function saveSchoolData(array $schoolData): School
+    {
+        $school = self::firstSchool();
+        $school->fill($schoolData)->save();
 
-        return true;
+        return $school;
     }
 }

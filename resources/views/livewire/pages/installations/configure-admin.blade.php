@@ -4,26 +4,38 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 
 new #[Layout('layouts.guest')] class extends Component {
-    /**
-     * Arahkan kembali ke langkah sebelumnya.
-     */
+    public function next()
+    {
+        return $this->redirect(route('install.finish'), navigate: true);
+    }
+
     public function back()
     {
-        return $this->redirect(route('install.step1'), navigate: true);
+        return $this->redirect(route('install.step2'), navigate: true);
     }
 }; ?>
 
 <div class="pb-8 space-y-12">
-    <x-nav-step backTo="Atur Sekolah" route="install.step1" step="2" finish="3" />
+    <x-nav-step backTo="Atur Jurusan" route="install.step2" step="3" finish="4" />
 
     <x-form-group action="next">
-        <x-slot name="formHeader">
-            <h1 class="text-2xl font-heading">Buat Administrator</h1>
+        <!-- Form Header --->
+        <x-slot name="header">
+            <h1 class="text-2xl font-heading">Buat Akun Administrator</h1>
+            <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Expedita labore ipsa, doloribus voluptatem
+                odit, fugiat possimus nemo, et architecto corrupti veniam numquam quae? Tempore, nobis odio
+                necessitatibus aliquid non temporibus!</p>
         </x-slot>
-        <x-slot name="formInput"></x-slot>
-        <x-slot name="formAction">
-            <x-button label="Kembali" action="back" />
-            <x-button-submit label="Selanjutnya" />
+
+        <!-- Form Content --->
+        <x-slot name="content">
+            <x-user-form />
+        </x-slot>
+
+        <!-- Form Footer --->
+        <x-slot name="footer">
+            <x-button action="back">Kembali</x-button>
+            <x-button-submit>Buat Akun</x-button-submit>
         </x-slot>
     </x-form-group>
 </div>

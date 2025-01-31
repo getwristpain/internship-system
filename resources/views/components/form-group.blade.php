@@ -2,22 +2,31 @@
     'action' => '',
 ])
 
-<div {{ $attributes->merge(['class' => 'container py-4 max-w-xl mx-auto']) }}>
-    <form wire:submit.prevent="{{ $action }}" class="flex flex-col gap-12">
-        <div class="flex flex-col justify-center items-center gap-2 text-center">
-            <!-- Form Headers --->
-            {{ $formHeader }}
-        </div>
-        <div class="flex flex-col gap-4">
-            <!-- Flash Message --->
-            <x-flash-message />
+<div {{ $attributes->merge(['class' => 'container max-w-xl mx-auto']) }}>
+    <form wire:submit.prevent="{{ $action }}" class="s-full flex flex-col gap-12">
+        <!-- Form Headers --->
+        @if (isset($header))
+            <div class="flex flex-col items-center justify-center gap-2 text-center">
+                {{ $header }}
+            </div>
+        @endif
 
-            <!-- Form Inputs --->
-            {{ $formInput }}
-        </div>
-        <div class="flex gap-4 justify-end items-center">
-            <!-- Form Actions --->
-            {{ $formAction }}
-        </div>
+        <!-- Form Body --->
+        @if (isset($content))
+            <div class="flex-1 flex flex-col">
+                <!-- Flash Message --->
+                <x-flash-message />
+
+                <!-- Form Content --->
+                {{ $content }}
+            </div>
+        @endif
+
+        <!-- Form Footer --->
+        @if (isset($footer))
+            <div class="flex items-center justify-end gap-4">
+                {{ $footer }}
+            </div>
+        @endif
     </form>
 </div>

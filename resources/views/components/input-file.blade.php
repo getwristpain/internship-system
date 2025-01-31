@@ -30,8 +30,8 @@
 
         <!-- Custom File Input with DaisyUI -->
         <div>
-            <label class="text-gray-700 border-gray-400 btn btn-neutral btn-outline {{ $class }}">
-                <span>{{ $placeholder }}</span>
+            <label class="btn basic-transition hover:shadow-lg hover:scale-105 disabled:disabled {{ $class }}">
+                <span class="text-neutral-700">{{ $placeholder }}</span>
                 <input id="{{ $name }}" type="file" wire:model.live="{{ $model }}" class="hidden"
                     {{ $required ? 'required' : '' }} {{ $disabled ? 'disabled' : '' }}
                     @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"

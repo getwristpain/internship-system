@@ -2,41 +2,100 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Str;
+
 class Formatter
 {
-    public static function relativeNum(int $num): string
+    private const UNITS = [
+        1_000_000_000_000 => 't',  // Triliun
+        1_000_000_000 => 'm',     // Miliar
+        1_000_000 => 'jt',        // Juta
+        1_000 => 'rb',            // Ribu
+    ];
+
+    /**
+     * Generate a reactive unique id.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function uniqid(string $value): string
     {
-        // Jika di atas 10.000, format menjadi relatif
-        if ($num >= 1_000_000_000_000) {
-            return number_format($num / 1_000_000_000_000, 1) . ' t'; // Triliun
-        } elseif ($num >= 1_000_000_000) {
-            return number_format($num / 1_000_000_000, 1) . ' m'; // Miliar
-        } elseif ($num >= 1_000_000) {
-            return number_format($num / 1_000_000, 1) . ' jt'; // Juta
-        } elseif ($num >= 10_000) {
-            return number_format($num / 1_000, 1) . ' rb'; // Ribu
-        }
-        return (string) $num; // Jumlah di bawah 10000
+        return now()->timestamp . '-' . Str::random(8) . "-$value";
     }
 
     /**
-     * Format phone number or fax to (xxx) xxxxxxx.
+     * Abbreviate a string by taking the first character of each word
+     * that starts with an uppercase letter. Ensures a minimum length of 3 characters
+     * if the input contains fewer than 3 words.
      *
-     * @param string $number
-     * @return string|null
+     * @param string $value
+     * @return string
      */
-    public static function telp(string $number): ?string
+    public static function abbrev(string $value): string
     {
-        // Remove non-digit characters
-        $number = preg_replace('/\D/', '', $number);
+        $words = explode(' ', trim($value));
+        $abbrev = collect($words)
+            ->filter(fn($word) => ctype_upper($word[0] ?? ''))
+            ->map(fn($word) => $word[0])
+            ->implode('');
 
-        // Check if the number has at least 5 digits
-        if (strlen($number) >= 5) {
-            // Format number as (xxx) xxx...
-            return '(' . substr($number, 0, 3) . ') ' . substr($number, 3);
+        if (count($words) >= 3) {
+            return strtoupper($abbrev);
         }
 
-        // If the number is invalid (not 10 digits), return null or an empty string.
-        return null;
+        $firstWord = preg_replace('/\s+/', '', $value);
+        while (strlen($abbrev) < 4 && strlen($abbrev) < strlen($firstWord)) {
+            $abbrev .= $firstWord[strlen($abbrev)] ?? '';
+        }
+
+        return strtoupper($abbrev);
+    }
+
+
+    /**
+     * Format a number into a human-readable relative format.
+     * Converts large numbers into units like "rb", "jt", "m", or "t".
+     *
+     * @param int|null $num
+     * @return string
+     */
+    public static function formatNum(?int $num): string
+    {
+        if ($num === null) return '0';
+
+        foreach (self::UNITS as $value => $suffix) {
+            if ($num >= $value) {
+                return sprintf('%s %s', number_format($num / $value, 1), $suffix);
+            }
+        }
+
+        return (string)$num;
+    }
+
+    /**
+     * Format a phone number into the format (XXX) XXX-XXXX.
+     *
+     * @param string|null $number
+     * @return string|null
+     */
+    public static function formatPhone(?string $number): ?string
+    {
+        if (empty($number) || strlen($cleanedNumber = preg_replace('/\D/', '', $number)) < 5) {
+            return null;
+        }
+
+        return sprintf('(%s) %s', substr($cleanedNumber, 0, 3), substr($cleanedNumber, 3));
+    }
+
+    /**
+     * Generate a code from multiple segments and convert it to uppercase with hyphens.
+     *
+     * @param mixed ...$segments
+     * @return string
+     */
+    public static function genCode(...$segments): string
+    {
+        return strtoupper(Str::slug(implode('-', array_map('strval', $segments)), '-'));
     }
 }

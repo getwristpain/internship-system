@@ -1,15 +1,16 @@
 @props([
-    'options' => [],
-    'disabled' => false,
-    'required' => false,
-    'autofocus' => false,
-    'placeholder' => 'Select or create an option...',
-    'name' => '',
-    'model' => '',
-    'label' => '',
     'allowCreate' => false,
-    'searchbar' => false,
+    'autofocus' => false,
     'badge' => '',
+    'disabled' => false,
+    'hideError' => false,
+    'label' => '',
+    'model' => '',
+    'name' => '',
+    'options' => [],
+    'placeholder' => 'Select or create an option...',
+    'required' => false,
+    'searchbar' => false,
 ])
 
 @php
@@ -56,12 +57,11 @@
     }
 @endphp
 
-<div class="flex flex-col gap-2 w-full font-medium pt-1 {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}"
-    :key="$name">
+<div class="flex flex-col gap-2 w-full font-medium pt-1 {{ $disabled ? 'disabled' : '' }}">
     <div class="flex flex-col gap-2 w-full">
         @if (!empty($label))
             <div class="text-sm text-gray-600">
-                <label for="{{ $name }}" class="text-sm font-medium text-gray-600">
+                <label for="{{ $name }}" class="text-sm font-medium text-gray-600 {{ !$required ?: 'required' }}">
                     {{ $label }}
                 </label>
             </div>
@@ -91,7 +91,7 @@
             <div @click="if (!{{ $disabled ? 'true' : 'false' }}) { open = !open }"
                 class="flex w-full gap-2 items-center justify-between cursor-pointer input input-bordered {{ $disabled ? 'opacity-80 cursor-not-allowed' : '' }}">
                 <iconify-icon icon="tabler:selector" class="text-gray-400 scale-125"></iconify-icon>
-                <span class="flex-1 text-gray-700 {{ $badgeClass }}" style="font-size: inherit;"
+                <span class="flex-1 text-gray-500 {{ $badgeClass }}" style="font-size: inherit;"
                     x-text="options.find(option => option.value === selected)?.text || '{{ $placeholder }}'"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline ml-2" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -124,7 +124,9 @@
             </div>
         </div>
     </div>
-    <div class="w-full sm:w-auto">
-        <x-input-error :messages="$errors->get($model)" class="mt-2" />
-    </div>
+    @if ($errors->has($model) && !$hideError)
+        <div class="w-full sm:w-auto">
+            <x-input-error :messages="$errors->get($model)" class="mt-2" />
+        </div>
+    @endif
 </div>

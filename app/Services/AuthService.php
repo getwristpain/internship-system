@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Status;
-use App\Helpers\Exception;
+use App\Helpers\Logger;
 use App\Helpers\RateLimiter;
 use App\Helpers\AccessKeyGen;
 use Spatie\Permission\Models\Role;
@@ -53,7 +53,7 @@ class AuthService
             $this->user = $this->createNewUser();
             Auth::login($this->user);
         } catch (\Throwable $th) {
-            Exception::handle('Failed to register a new user.', $th);
+            Logger::handle('Failed to register a new user.', $th);
             Session::flash('message.error', __('auth.register_failed'));
         }
     }
@@ -72,7 +72,7 @@ class AuthService
                 $this->authenticateUser();
             }
         } catch (\Throwable $th) {
-            Exception::handle('Failed to log in the user.', $th);
+            Logger::handle('Failed to log in the user.', $th);
             Session::flash('message.error', __('auth.login_error'));
         }
     }
@@ -104,7 +104,7 @@ class AuthService
             Auth::login($user, $this->remember);
             return true;
         } catch (\Throwable $th) {
-            Exception::handle('Failed to login with access key.', $th);
+            Logger::handle('Failed to login with access key.', $th);
             Session::flash('message.error', __('auth.login_error'));
         }
     }

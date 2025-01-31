@@ -1,7 +1,7 @@
 @props([
+    'name' => '',
     'show' => false,
     'fit' => false,
-    'form' => false,
     'action' => '',
     'header' => '',
     'footer' => null,
@@ -9,15 +9,16 @@
 
 <div x-data="{
     show: @entangle($show),
+    name: @entangle($name),
     closeModal() {
         this.show = false;
-        this.$dispatch('modal-closed');
+        this.$dispatch('{{ 'close-' . $name . '-modal' }}');
     }
-}" @keydown.escape.window="closeModal">
+}" @keydown.escape.window="closeModal" :class="{ 'hidden': !show }">
     <div x-show="show" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-10 overflow-y-auto" :class="{ 'hidden': !show }">
+        class="fixed inset-0 z-10 overflow-y-auto screen-full">
 
         <!-- Modal Background -->
         <div class="flex items-center justify-center w-screen min-h-screen p-4 bg-black bg-opacity-10">
@@ -33,7 +34,7 @@
                 <div
                     class="flex items-center justify-between p-4 space-x-8 text-lg bg-gray-100 border-b border-gray-300 rounded-t-lg">
                     <div class="grow line-clamp-1 text-nowrap">
-                        <h3 class="font-bold text-gray-800 font-heading">{{ $header }}</h3>
+                        <h3 class="text-lg font-heading">{{ $header }}</h3>
                     </div>
                     <div>
                         <button x-on:click="closeModal"
@@ -43,11 +44,11 @@
                     </div>
                 </div>
 
-                @if ($form)
-                    <form wire:submit.prevent="{{ $action }}" class="space-y-8">
+                @if ($action)
+                    <form wire:submit.prevent="{{ $action }}">
                 @endif
                 <!-- Content -->
-                <div class="w-full p-4">
+                <div class="w-full p-4 space-y-8">
                     {{ isset($content) ? $content : $slot }}
                 </div>
 
@@ -59,7 +60,7 @@
                     </div>
                 @endif
 
-                @if ($form)
+                @if ($action)
                     </form>
                 @endif
             </div>
