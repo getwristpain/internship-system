@@ -14,12 +14,42 @@ class MakeLogic extends Command
 
     protected $description = 'Create a new utility class with a dynamic namespace inside app directory';
 
+    protected $reservedClassNames = [
+        'Array',
+        'array',
+        'bool',
+        'Class',
+        'double',
+        'Error',
+        'Exception',
+        'false',
+        'float',
+        'Function',
+        'int',
+        'null',
+        'Number',
+        'Object',
+        'object',
+        'stdClass',
+        'String',
+        'string',
+        'Throwable',
+        'true',
+    ];
+
     public function handle(): void
     {
         $name = $this->argument('name');
         $extends = $this->option('extends');
 
         [$namespace, $filePath, $className] = $this->getClassDetails($name);
+
+        if ($this->isReservedClassName($className)) {
+            $message = Logger::handle('error', "The class name '$className' is reserved and cannot be used.");
+            $this->error($message);
+            return;
+        }
+
         $extends = $this->validateExtendsClass($extends);
 
         if ($this->classExists($filePath)) {
@@ -85,28 +115,33 @@ class MakeLogic extends Command
     }
 
     /**
+     * Validate if the class name is in the reserved list
+     *
+     * @param string $className
+     * @return bool
+     */
+    protected function isReservedClassName(string $className): bool
+    {
+        return in_array($className, $this->reservedClassNames);
+    }
+
+    /**
      * Get the short class name without namespace.
      *
      * @param string $class
      * @return string
      */
-    protected function getShortClassName(string $class): string
-    {
-        $parts = explode('\\', $class);
-        return end($parts);
-    }
-
     protected function generateClassContent(string $namespace, string $className, ?string $extends): string
     {
         $template = File::get(resource_path('templates/__class_template.stub'));
+        $extendsStatement = $extends ? "extends " . class_basename($extends) : '';
 
-        $shortClassName = $extends ? $this->getShortClassName($extends) : '';
-        $useStatement = $extends ? "use $extends;" : '';
-        $extendsStatement = $extends && $shortClassName ? "extends $shortClassName" : '';
+        $useStatement = $extends ? "\nuse $extends;\n" : '';
+        $classStatement = $extends ? $className . ' ' . $extendsStatement : $className;
 
         return str_replace(
-            ['{{ namespace }}', '{{ useStatement }}', '{{ className }}', '{{ extends }}'],
-            [$namespace, $useStatement, $className, $extendsStatement],
+            ['{{ namespace }}', '{{ useStatement }}', '{{ classStatement }}'],
+            [$namespace ?? '', $useStatement ?? '', $classStatement ?? ''],
             $template
         );
     }
