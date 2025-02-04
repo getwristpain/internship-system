@@ -2,55 +2,70 @@
 
 namespace App\Helpers;
 
+use App\DynamicMethodCaller;
 use App\Helpers\Logger;
 
 abstract class Helper
 {
+    use DynamicMethodCaller;
+
     /**
-     * Log message dengan level tertentu.
+     * Log a message with a specific level.
      */
-    protected static function log(string $level, string $message, ?\Throwable $exception = null): void
+    protected function logger(string $level, string $message, ?\Throwable $exception = null): void
     {
         Logger::handle($level, $message, $exception);
     }
 
     /**
-     * Cek apakah string kosong atau null.
+     * Generate a unique key with timestamp and a random string, base64-encoded with a salt.
      */
-    protected static function isEmpty(?string $value): bool
+    protected function key(string $salt): string
     {
-        return trim($value) === '' || $value === null;
+        $timestamp = now()->timestamp;
+        $randomStr = $this->str_random(8);
+        $key = $timestamp . '-' . base64_encode($randomStr . '-' . $salt);
+
+        return $key;
     }
 
     /**
-     * Bersihkan string dari karakter berbahaya.
+     * Check if a string is empty or null.
      */
-    protected static function sanitize(string $text): string
+    protected function isEmpty(?string $value): bool
+    {
+        return empty($value) || trim($value) === '';
+    }
+
+    /**
+     * Sanitize a string by removing dangerous characters.
+     */
+    protected function sanitize(string $text): string
     {
         return htmlspecialchars(strip_tags(trim($text)), ENT_QUOTES, 'UTF-8');
     }
 
     /**
-     * Konversi JSON ke array dengan error handling.
+     * Convert a JSON string to an array with error handling.
      */
-    protected static function jsonToArray(string $json): array
+    protected function jsonToArray(string $json): array
     {
         $data = json_decode($json, true);
         return json_last_error() === JSON_ERROR_NONE ? $data : [];
     }
 
     /**
-     * Format angka dengan pemisah ribuan.
+     * Format a number with thousands separators.
      */
-    protected static function formatNumber(float $number, int $decimals = 0): string
+    protected function formatNumber(float $number, int $decimals = 0): string
     {
         return number_format($number, $decimals, ',', '.');
     }
 
     /**
-     * Cek apakah nilai adalah angka.
+     * Check if a value is numeric.
      */
-    protected static function isNumeric($value): bool
+    protected function isNumeric($value): bool
     {
         return is_numeric($value);
     }

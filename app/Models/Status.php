@@ -13,9 +13,9 @@ class Status extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'type',
         'name',
-        'slug',
         'description',
     ];
 
@@ -26,11 +26,11 @@ class Status extends Model
     {
         parent::boot();
 
-        // Event saving to generate slug before saving the model
+        // Event saving to generate code before saving the model
         static::saving(function (Status $status) {
-            if (empty($status->slug)) {
+            if (empty($status->code)) {
                 $formattedSlug = strtolower(str_replace(' ', '-', $status->type . '-' . $status->name));
-                $status->slug = Str::slug($formattedSlug);
+                $status->code = Str::slug($formattedSlug);
             }
         });
     }

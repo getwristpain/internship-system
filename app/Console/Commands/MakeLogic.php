@@ -53,7 +53,7 @@ class MakeLogic extends Command
         $extends = $this->validateExtendsClass($extends);
 
         if ($this->classExists($filePath)) {
-            return;
+            exit(1);
         }
 
         $classContent = $this->generateClassContent($namespace, $className, $extends);

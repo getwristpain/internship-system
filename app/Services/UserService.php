@@ -3,90 +3,133 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Helpers\StatusBadgeMapper;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Status;
+use App\Services\Service;
+use App\Services\StatusService;
+use Illuminate\Support\Facades\Validator;
 
 class UserService extends Service
 {
+    protected array $userData = [
+        'roles' => ['guest']
+    ];
+
+    protected array $with = ['roles', 'status', 'department', 'classroom'];
+
+    protected StatusService $statusService;
+
     public function __construct()
     {
         parent::__construct(new User());
+        $this->statusService = new StatusService();
     }
 
-    /**
-     * Get a user by ID with relationships.
-     *
-     * @param string $id
-     * @return \App\Models\User|null
-     */
-    public function getUserById(string $id)
+    public function prepUserData($userData): array
     {
-        return $this->getByIdWithRelations($id, ['roles', 'status']);
+        return array_merge(
+            [
+                'roles' => $this->setRoles($userData['roles']),
+                'status_id' => $this->setStatus($userData['status'])->id,
+            ],
+            $userData
+        );
     }
 
-    /**
-     * Get all users with relationships, ordered by created_at.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection|null
-     */
-    public function getUsers()
+    protected function setRoles(...$roles): array
     {
-        return $this->cacheQuery(function ($query) {
-            return $query->with(['roles', 'status'])
-                ->orderBy('created_at', 'desc')
-                ->get();
-        });
+        return $roles ?? $this->userData['roles'];
     }
 
-    /**
-     * Get paginated users data with optional role filtering and search functionality.
-     *
-     * @param string|null $search
-     * @param array $roles
-     * @param int $perPage
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection
-     */
-    public function getPaginatedUsers(string $search = null, array $roles = [], int $perPage = 20)
+    protected function setStatus(array $statusData = []): ?Status
     {
-        return $this->cacheQuery(function ($query) use ($search, $roles, $perPage) {
-            $query = $this->model->with(['accessKey', 'roles', 'status'])
-                ->where('users.id', '!=', Auth::id());
+        $setStatusData = array_merge([
+            'code' => 'user-status-pending',
+            'type' => 'user-status',
+            'name' => 'Pending',
+            'description' => 'Pengguna ini aktif dan memiliki akses ke sistem.',
+        ], $statusData);
 
-            if (!empty($roles)) {
-                $query->role($roles);
+        return $this->statusService->findOne(['code', $setStatusData['code']], createable: true, data: $setStatusData);
+    }
+
+    public function rules(?string $userId = null, array $rules = []): array
+    {
+        $emailRules = 'required|email|unique:users,email';
+
+        if ($userId) {
+            $emailRules = 'required|email|unique:users,email,' . $userId;
+        }
+
+        return array_merge([
+            'name' => 'required|string|min:5|max:255',
+            'email' => $emailRules,
+            'password' => 'required|string|confirmed',
+            'status_id' => 'required|integer',
+            'department_id' => 'nullable|integer',
+            'classroom_id' => 'nullable|integer',
+        ], $rules);
+    }
+
+    public function validate(array $userData, ?string $userId = null, array $rules = [], array $messages = [], array $attributes = []): bool
+    {
+        $validator = Validator::make($userData, $this->rules($userId, $rules), $messages, $attributes);
+
+        if ($validator->fails()) {
+            throw new \Exception($validator->getMessageBag()->toJson());
+        }
+
+        return true;
+    }
+
+    public function findUser(string $userId, array $with = []): ?User
+    {
+        return $this->getById($userId, array_merge($this->with, $with));
+    }
+
+    public function findUserByRoles(...$roles): ?User
+    {
+        try {
+            return $this->cacheQuery(function ($query) use ($roles) {
+                return $query->roles($roles)->first();
+            }, 'find_user_by_roles', $roles);
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to retrieve user data based on roles.', $th);
+            throw $th;
+        }
+    }
+
+    public function getUsers(): ?\Illuminate\Database\Eloquent\Collection
+    {
+        return $this->getAll(['status', 'department', 'classroom']);
+    }
+
+    public function createUser(array $userData): User
+    {
+        $userData = $this->prepUserData($userData);
+
+        if ($this->validate($userData)) {
+            $createdUser = $this->create($userData);
+            if (!empty($createdUser) && !empty($userData['roles'])) {
+                $createdUser->syncRoles($userData['roles']);
             }
 
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('users.name', 'like', '%' . $search . '%')
-                        ->orWhere('users.email', 'like', '%' . $search . '%');
-                });
-            }
+            return $createdUser;
+        }
+    }
 
-            $query->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
-                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-                ->select('users.*')
-                ->orderByRaw("CASE WHEN roles.name = 'owner' THEN 0
-                                    WHEN roles.name = 'student' THEN 2
-                                    WHEN roles.name = 'teacher' THEN 3
-                                    WHEN roles.name = 'supervisor' THEN 4
-                                    WHEN roles.name = 'staff' THEN 5
-                                    WHEN roles.name = 'admin' THEN 6
-                                    ELSE 1 END")
-                ->orderBy('users.created_at', 'desc')
-                ->groupBy('users.id');
+    public function updateUser(string $userId, array $userData): User
+    {
+        $userData = $this->prepUserData($userData);
+        $updatedUser = $this->update($userId, $userData);
+        if (!empty($updatedUser) && !empty($userData['roles'])) {
+            $updatedUser->syncRoles($userData['roles']);
+        }
 
-            $users = $query->paginate($perPage);
+        return $updatedUser;
+    }
 
-            if (!$users->isEmpty()) {
-                foreach ($users->items() as $user) {
-                    if ($user->status) {
-                        $user->status->badgeClass = StatusBadgeMapper::getStatusBadgeClass($user->status->name);
-                    }
-                }
-            }
-
-            return $users->isEmpty() ? collect() : $users;
-        });
+    public function deleteUser(string $userId): bool
+    {
+        return $this->delete($userId);
     }
 }

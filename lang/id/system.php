@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'context' => array_merge(
+        require __DIR__ . '/attribute.php',
+    ),
+
     // Error Messages
     'error' => [
         'backup_failed' => ':context gagal dicadangkan.',
@@ -10,17 +14,19 @@ return [
         'duplicate' => ':context sudah ada.',
         'fetch_failed' => ':context gagal diambil.',
         'format_failed' => ':context gagal diformat.',
-        'generate_failed' => ':context gagal digenerasi.',
+        'generate_failed' => 'Gagal saat menghasilkan :context.',
+        'proccess_failed' => 'Gagal saat menjalankan :context.',
         'in_use' => ':context sedang digunakan dan tidak dapat dihapus.',
         'invalid' => ':context tidak valid.',
         'lock_failed' => ':context gagal dikunci.',
         'message' => ':context mengalami error.',
+        'method_not_found' => 'Metode :method tidak ditemukan.',
         'missing' => ':context yang diperlukan tidak ditemukan.',
         'not_found' => ':context tidak ditemukan.',
         'receive_failed' => ':context gagal diterima.',
         'send_failed' => ':context gagal dikirim.',
         'store_failed' => ':context gagal disimpan.',
-        'unauthorized' => 'Anda tidak memiliki izin untuk :action.',
+        'unauthorized' => 'Anda tidak memiliki izin untuk :context.',
         'unlock_failed' => ':context gagal dibuka kuncinya.',
         'update_failed' => ':context gagal diperbarui.',
         'upload_failed' => ':context gagal diunggah.',

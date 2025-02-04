@@ -3,127 +3,156 @@
 namespace App\Services;
 
 use App\Helpers\Logger;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class Service
+abstract class Service
 {
     protected Model $model;
+    protected string $cacheContext = 'record';
+    protected int $cacheDuration = 60;
 
     /**
      * Service constructor.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param Model $model
+     * @param string $cacheContext
+     * @param int $cacheDuration
      */
-    public function __construct(Model $model)
+    protected function __construct(Model $model, string $cacheContext = 'record', int $cacheDuration = 60)
     {
         $this->model = $model;
+        $this->cacheContext = $cacheContext;
+        $this->cacheDuration = $cacheDuration;
+    }
+
+    /**
+     * Log a message with a specific level.
+     *
+     * @param string $level
+     * @param string $message
+     * @param string $context
+     * @param \Throwable|null $exception
+     *
+     * @return string
+     */
+    protected function logger(string $level, string $message, string $context = '', ?\Throwable $exception = null): string
+    {
+        return Logger::handle($level, $message, $context, exception: $exception);
     }
 
     /**
      * Generate a unique cache key based on model, filters, and query parameters.
      *
-     * @param  array  $filters
-     * @return string
-     */
-    private function generateCacheKey(array $filters): string
-    {
-        $baseKey = get_class($this->model) . json_encode($filters);
-        return "query_" . md5($baseKey);
-    }
-
-    /**
-     * Run a query with caching and filtering.
+     * @param array $filters
      *
-     * @param  \Closure  $queryCallback
-     * @param  array  $filters
-     * @param  int  $cacheDuration
-     * @return mixed
+     * @return string|null
      */
-    public function cacheQuery(\Closure $queryCallback, array $filters = [], int $cacheDuration = 60): mixed
-    {
-        $cacheKey = $this->generateCacheKey($filters);
-
-        return Cache::remember($cacheKey, $cacheDuration, function () use ($queryCallback) {
-            return $queryCallback($this->model);
-        });
-    }
-
-    /**
-     * Retrieve all records from the model.
-     *
-     * @param  int  $cacheDuration
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getAll(int $cacheDuration = 60): Collection
-    {
-        return $this->cacheQuery(fn($query) => $query->all(), ['key' => 'all'], $cacheDuration);
-    }
-
-    /**
-     * Retrieve a single record by ID.
-     *
-     * @param  int  $id
-     * @param  int  $cacheDuration
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function getById(int $id, int $cacheDuration = 60): ?Model
-    {
-        return $this->cacheQuery(fn($query) => $query->findOrFail($id), ['id' => $id], $cacheDuration);
-    }
-
-    /**
-     * Retrieve a single record by ID with related data.
-     *
-     * @param  int  $id
-     * @param  array  $with
-     * @param  int  $cacheDuration
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function getByIdWithRelations(int $id, array $with = [], int $cacheDuration = 60): ?Model
-    {
-        return $this->cacheQuery(fn($query) => $query->with($with)->findOrFail($id), ['id' => $id, 'relations' => $with], $cacheDuration);
-    }
-
-    /**
-     * Create a new record.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Database\Eloquent\Model
-     *
-     * @throws \Throwable
-     */
-    public function create(array $data): Model
+    private function generateCacheKey(array $filters): ?string
     {
         try {
-            $model = $this->model->create($data);
-            Logger::handle('info', 'Created new record');
-            return $model;
+            $baseKey = get_class($this->model) . json_encode($filters);
+            $context = Str::slug(Str::lower($this->cacheContext), '_');
+
+            return "query_" . $context . '_' . md5($baseKey);
         } catch (\Throwable $th) {
-            Logger::handle('error', 'Error creating record: ' . $th->getMessage(), $th);
+            $this->logger('error', 'error.generate_failed', 'cache_key', $th);
             throw $th;
         }
     }
 
     /**
-     * Insert multiple records at once.
+     * Run a query with caching and filtering.
      *
-     * @param  array  $data
-     * @return int
+     * @param \Closure $queryCallback
+     * @param string $cacheKey
+     * @param array $filters
+     * @param int $cacheDuration
      *
-     * @throws \Throwable
+     * @return mixed
      */
-    public function bulkInsert(array $data): int
+    protected function cacheQuery(\Closure $queryCallback, string $cacheKey = 'key', array $filters = [], int $cacheDuration = 60): mixed
     {
         try {
-            $inserted = $this->model->insert($data);
-            Logger::handle('info', 'Bulk inserted records');
-            return $inserted;
+            $formattedCacheKey = $this->generateCacheKey(array_merge(['cache_key' => $cacheKey], $filters));
+
+            return Cache::remember($formattedCacheKey, $cacheDuration ?? $this->cacheDuration, function () use ($queryCallback) {
+                return $queryCallback($this->model);
+            });
         } catch (\Throwable $th) {
-            Logger::handle('error', 'Error bulk inserting records: ' . $th->getMessage(), $th);
+            $this->logger('error', __('system.error.proccess_failed', ['action' => __('system.action.cached_query')]), $th);
+            throw $th;
+        }
+    }
+
+    /**
+     * Retrieve all records from the model.
+     *
+     * @param array $with
+     *
+     * @return Collection|null
+     */
+    protected function getAll(array $with = []): ?Collection
+    {
+        try {
+            return $this->cacheQuery(function ($query) use ($with) {
+                if (!empty($with)) {
+                    $query->with($with);
+                }
+
+                return $query->all();
+            }, 'all');
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to take all records from the model.', $th);
+            throw $th;
+        }
+    }
+
+    /**
+     * Retrieve a single record by ID.
+     *
+     * @param $id
+     * @param array $with
+     *
+     * @return Model|null
+     */
+    protected function getById($id, array $with = []): ?Model
+    {
+        try {
+            return $this->cacheQuery(function ($query) use ($id, $with) {
+                if (!empty($with)) {
+                    $query->with($with);
+                }
+
+                return $query->find($id);
+            }, 'record', ['id' => $id]);
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to retrieve a single record with ID.', $th);
+            throw $th;
+        }
+    }
+
+    /**
+     * Create a new record.
+     *
+     * @param array $data
+     *
+     * @return Model
+     */
+    protected function create(array $data): Model
+    {
+        try {
+            return $this->cacheQuery(function ($query) use ($data) {
+                $model = $query->create($data);
+                $this->logger('info', 'Created new record');
+
+                return $model;
+            }, 'new');
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Error creating record.', $th);
             throw $th;
         }
     }
@@ -131,22 +160,24 @@ class Service
     /**
      * Update an existing record by ID.
      *
-     * @param  int  $id
-     * @param  array  $data
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param $id
+     * @param array $data
      *
-     * @throws \Throwable
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public function update(int $id, array $data): Model
+    protected function update($id, array $data, array $context = []): Model
     {
         try {
-            $model = $this->getById($id);
-            $model->update($data);
-            Cache::forget($this->generateCacheKey(['id' => $id]));
-            Logger::handle('info', "Updated record with ID {$id}");
-            return $model;
+            $user = $this->getById($id);
+
+            if ($user->update($data)) {
+                Cache::forget($this->generateCacheKey(['cache_key' => 'record', 'id' => $id]));
+                $this->logger('info', __('system.success.data_updated', $context));
+            }
+
+            return $user;
         } catch (\Throwable $th) {
-            Logger::handle('error', "Error updating record with ID {$id}: " . $th->getMessage(), $th);
+            $this->logger('error', "Error updating record with ID {$id}: " . $th->getMessage(), $th);
             throw $th;
         }
     }
@@ -154,42 +185,23 @@ class Service
     /**
      * Delete a record by ID.
      *
-     * @param  int  $id
-     * @return bool
+     * @param $id
      *
-     * @throws \Throwable
+     * @return bool
      */
-    public function delete(int $id): bool
+    protected function delete($id): bool
     {
         try {
-            $model = $this->getById($id);
-            $model->delete();
-            Cache::forget($this->generateCacheKey(['id' => $id]));
-            Logger::handle('info', "Deleted record with ID {$id}");
-            return true;
-        } catch (\Throwable $th) {
-            Logger::handle('error', "Error deleting record with ID {$id}: " . $th->getMessage(), $th);
-            throw $th;
-        }
-    }
+            $deleted = $this->getById($id)->delete();
 
-    /**
-     * Restore a soft-deleted record by ID.
-     *
-     * @param  int  $id
-     * @return bool
-     *
-     * @throws \Throwable
-     */
-    public function restore(int $id): bool
-    {
-        try {
-            $model = $this->model->withTrashed()->findOrFail($id);
-            $model->restore();
-            Logger::handle('info', "Restored record with ID {$id}");
-            return true;
+            if ($deleted) {
+                Cache::forget($this->generateCacheKey(['cache_key' => 'record', 'id' => $id]));
+                $this->logger('info', "Deleted record with ID {$id}");
+            }
+
+            return $deleted;
         } catch (\Throwable $th) {
-            Logger::handle('error', "Error restoring record with ID {$id}: " . $th->getMessage(), $th);
+            $this->logger('error', "Error deleting record with ID {$id}: " . $th->getMessage(), $th);
             throw $th;
         }
     }
@@ -197,21 +209,53 @@ class Service
     /**
      * Permanently delete a soft-deleted record by ID.
      *
-     * @param  int  $id
-     * @return bool
+     * @param $id
      *
-     * @throws \Throwable
+     * @return bool
      */
-    public function forceDelete(int $id): bool
+    protected function forceDelete($id): bool
     {
         try {
-            $model = $this->model->withTrashed()->findOrFail($id);
-            $model->forceDelete();
-            Cache::forget($this->generateCacheKey(['id' => $id]));
-            Logger::handle('info', "Permanently deleted record with ID {$id}");
-            return true;
+            $forceDeleted = $this->model->withTrashed()->find($id)->forceDelete();
+
+            if ($forceDeleted) {
+                Cache::forget($this->generateCacheKey(['cache_key' => 'record', 'id' => $id]));
+                $this->logger('info', "Permanently deleted record with ID {$id}");
+            }
+
+            return $forceDeleted;
         } catch (\Throwable $th) {
-            Logger::handle('error', "Error permanently deleting record with ID {$id}: " . $th->getMessage(), $th);
+            $this->logger('error', "Error permanently deleting record with ID {$id}: " . $th->getMessage(), $th);
+            throw $th;
+        }
+    }
+
+    /**
+     * Find a single record that match given conditions.
+     *
+     * @param array $conditions
+     * @param array $with
+     *
+     * @return Model|null
+     */
+    protected function findOne(array $conditions, array $with = [], bool $createable = false, array $data = []): ?Model
+    {
+        try {
+            $recordData = $this->cacheQuery(function ($query) use ($conditions, $with) {
+                if (!empty($with)) {
+                    $query->with($with);
+                }
+
+                return $query->where($conditions)->first();
+            }, 'find_one', $conditions);
+
+            if (empty($recordData) && $createable && !empty($data)) {
+                return $this->create($data);
+            }
+
+            return $recordData;
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to find a single record that match given conditions or creating a record.', $th);
             throw $th;
         }
     }
@@ -219,53 +263,46 @@ class Service
     /**
      * Find records that match given conditions.
      *
-     * @param  array  $conditions
-     * @param  int  $cacheDuration
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function findWhere(array $conditions, int $cacheDuration = 60): Collection
-    {
-        return $this->cacheQuery(fn($query) => $query->where($conditions)->get(), $conditions, $cacheDuration);
-    }
-
-    /**
-     * Count the number of records that match given conditions.
+     * @param array $conditions
+     * @param array $with
      *
-     * @param  array  $conditions
-     * @param  int  $cacheDuration
-     * @return int
+     * @return Collection|null
      */
-    public function countWhere(array $conditions, int $cacheDuration = 60): int
+    protected function findWhere(array $conditions, array $with = [], bool $createable = false, array $data = []): ?Collection
     {
-        return $this->cacheQuery(fn($query) => $query->where($conditions)->count(), $conditions, $cacheDuration);
-    }
+        try {
+            $recordData = $this->cacheQuery(function ($query) use ($conditions, $with) {
+                if (!empty($with)) {
+                    $query->with($with);
+                }
 
-    /**
-     * Paginate records based on the specified page size.
-     *
-     * @param  int  $perPage
-     * @param  int  $cacheDuration
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function paginate(int $perPage = 20, int $cacheDuration = 60): LengthAwarePaginator
-    {
-        return $this->cacheQuery(fn($query) => $query->paginate($perPage), ['per_page' => $perPage], $cacheDuration);
+                return $query->where($conditions)->get();
+            }, 'find_where', $conditions);
+
+            if (empty($recordData) && $createable && !empty($data)) {
+                return $this->create($data);
+            }
+
+            return $recordData;
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to find records that match given conditions.', $th);
+            throw $th;
+        }
     }
 
     /**
      * Run a database transaction.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @param callable $callback
      *
-     * @throws \Throwable
+     * @return mixed
      */
-    public function transaction(callable $callback): mixed
+    protected function transaction(callable $callback): mixed
     {
         try {
             return DB::transaction($callback);
         } catch (\Throwable $th) {
-            Logger::handle('error', 'Error in transaction: ' . $th->getMessage(), $th);
+            $this->logger('error', 'Error in transaction.', $th);
             throw $th;
         }
     }
@@ -273,16 +310,22 @@ class Service
     /**
      * Process records in batches.
      *
-     * @param  int  $batchSize
-     * @param  callable  $callback
+     * @param int $batchSize
+     * @param callable $callback
+     *
      * @return void
      */
-    public function batchProcess(int $batchSize = 100, callable $callback): void
+    protected function batchProcess(int $batchSize = 100, callable $callback): void
     {
-        $this->model->chunk($batchSize, function ($records) use ($callback) {
-            foreach ($records as $record) {
-                $callback($record);
-            }
-        });
+        try {
+            $this->model->chunk($batchSize, function ($records) use ($callback) {
+                foreach ($records as $record) {
+                    $callback($record);
+                }
+            });
+        } catch (\Throwable $th) {
+            $this->logger('error', 'Failed to proccess records in batches.', $th);
+            throw $th;
+        }
     }
 }
